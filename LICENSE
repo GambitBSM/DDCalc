@@ -1,0 +1,24 @@
+DDCalc LICENSE
+---------------
+
+Copyright (c) 2017, Felix Kahlhoefer, Christopher Savage, Patrick Scott, Martin White
+All rights reserved.
+
+The DDCalc software package is provided without warranty.  This
+software may be freely used and redistributed (modified or otherwise)
+for non-commercial use, subject to these restrictions:
+
+ * The relevant literature, as detailed in the README document, must be
+   cited when this software or any derivative is used.
+
+ * Any derived version of this software with non-trivial modificat-
+   ions, if it is to be redistributed, must be unambiguously presented
+   as modified from that provided by the original DDCalc authors.
+   Trivial modifications in this context are any changes made for
+   compatibility with and/or embedding in other software that does not
+   alter the underlying physics implementations.
+
+ * Redistribution of this software -- whether unaltered, modified, or
+   embedded in other software -- must maintain these license
+   requirements.
+
