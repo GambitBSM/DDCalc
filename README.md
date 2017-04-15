@@ -43,7 +43,7 @@ The experimental results implemented in DDCalc at this time are:
 
   * PICO: 60 (CF3) and 2L (C3F8)  
     C. Amole et al., PRD 93, 052014 (2016) [arXiv:1510.07754]
-    C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729]
+    C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729]  
     C. Amole et al., PRL 114, 231302 (2015) [arXiv:1503.00008]
 
   * SuperCDMS 2014: 577 kg-days (Ge)  
