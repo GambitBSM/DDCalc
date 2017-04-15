@@ -28,23 +28,28 @@ The experimental results implemented in DDCalc at this time are:
   TPC-based results
   ---
 
-  * XENON100 2012: 34*224.6 kg-days
+  * XENON100 2012: 34*224.6 kg-days  
     E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
 
-  * LUX 2013: 118*85.3 kg-days
+  * LUX 2013: 118*85.3 kg-days  
     D.S. Akerib et al., PRL 112, 091303 (2014) [arxiv:1310.8214]
 
-  * DARWIN projections (argon & xenon)
+  * DARWIN projections (argon & xenon)  
     J. Conrad et al., in preparation.
 
 
   Non-TPC results
   ---
 
-  * SuperCDMS 2014: 577 kg-days (Ge)
+  * PICO: 60 (CF3) and 2L (C3F8)  
+    C. Amole et al., PRD 93, 052014 (2016) [arXiv:1510.07754]
+    C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729]
+    C. Amole et al., PRL 114, 231302 (2015) [arXiv:1503.00008]
+
+  * SuperCDMS 2014: 577 kg-days (Ge)  
     R. Agnese et al., PRL 112, 241302 (2014) [arxiv:1402.7137]
 
-  * SIMPLE 2014: 18.24 kg-days (C2ClF5)
+  * SIMPLE 2014: 18.24 kg-days (C2ClF5)  
     M. Felizardo et al., PRD 89, 072013 (2014) [arXiv:1404.4309]
 
 
@@ -64,10 +69,10 @@ Yellin maximum gap method for a conservative exclusion limit with no
 background subtraction.  If you use one of those constraints,
 please cite the associated paper:
 
-  G. Feldman & R. Cousins, PRD 57, 3873 (1998) [physics/9711021]
-    http://inspirehep.net/record/454197
-  S. Yellin, PRD 66, 032005 (2002) [physics/0203002]
-    http://inspirehep.net/record/583791
+  G. Feldman & R. Cousins, PRD 57, 3873 (1998) [physics/9711021]  
+    http://inspirehep.net/record/454197  
+  S. Yellin, PRD 66, 032005 (2002) [physics/0203002]  
+    http://inspirehep.net/record/583791  
 
 
 Efficiencies for the liquid noble time-projection chamber (TPC)
@@ -76,13 +81,13 @@ the NEST model.  If using any TPC experimental results that rely on
 TPCMC-generated efficiencies (noted below), these papers should be
 cited:
 
-  TPCMC:
+  TPCMC:  
     <insert>
 
-  NEST:
-    M. Szydagis et al., JINST 6, P10002 (2011) [arxiv:1106.1613]
-      http://inspirehep.net/record/913031
-    M. Szydagis et al., JINST 8, C10003 (2013) [arxiv:1307.6601]
+  NEST:  
+    M. Szydagis et al., JINST 6, P10002 (2011) [arxiv:1106.1613]  
+      http://inspirehep.net/record/913031  
+    M. Szydagis et al., JINST 8, C10003 (2013) [arxiv:1307.6601]  
       http://inspirehep.net/record/1244479
 
 
@@ -217,23 +222,23 @@ Contributors
 The following have contributed to the development and
 testing of the DDCalc package:
 
-  * Felix Kahlhoefer, DESY
+  * Felix Kahlhoefer, DESY  
     LUX 2015/16, PICO, Panda X
 
-  * Lauren Hsu, FermiLab
+  * Lauren Hsu, FermiLab  
     SuperCDMS.
 
-  * Miguel Pato, Stockholm University
+  * Miguel Pato, Stockholm University  
     Calibration/tuning of LUX parameters.
 
-  * Chris Savage
+  * Chris Savage  
     Most fortran procedures.
 
-  * Andre Scaffidi, Univ of Adelaide
+  * Andre Scaffidi, Univ of Adelaide  
     SD form factors, C++ interface and example, testing.
 
-  * Pat Scott, Imperial College London
+  * Pat Scott, Imperial College London  
     C++ interface and example, testing, fortran structure, bug fixes, writeup.
 
-  * Martin White, Univ of Adelaide
+  * Martin White, Univ of Adelaide  
     C++ interface and example, testing, writeup.
