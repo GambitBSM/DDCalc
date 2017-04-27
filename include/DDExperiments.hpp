@@ -21,7 +21,7 @@ extern "C"
   // Experiment initialization (factory functions)
   int C_DDCalc_xenon100_2012_init(const bool&);
   int C_DDCalc_lux_2013_init(const bool&);
-  int C_DDCalc_lux_2016_prelim_init(const bool&);
+  int C_DDCalc_lux_2016_init(const bool&);
   int C_DDCalc_pandax_2016_init(const bool&);
   int C_DDCalc_lux_2015_init(const bool&);
   int C_DDCalc_pico-2l_init(const bool&);
@@ -56,9 +56,9 @@ namespace DDCalc
     C_DDCalc_lux_2013_init(intervals);
   }
   
-  int LUX_2016_prelim_Init(const bool intervals=true)
+  int LUX_2016_Init(const bool intervals=true)
   {
-    C_DDCalc_lux_2016_prelim_init(intervals);
+    C_DDCalc_lux_2016_init(intervals);
   }
   
   int PandaX_2016_Init(const bool intervals=true)

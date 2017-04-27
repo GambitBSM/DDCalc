@@ -20,7 +20,7 @@ USE SIMPLE_2014
 USE SuperCDMS_2014
 USE Darwin_Ar
 USE Darwin_Xe
-USE LUX_2016_prelim
+USE LUX_2016
 USE PandaX_2016
 USE LUX_2015
 USE PICO_2L
@@ -61,8 +61,8 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = XENON100_2012_Init(intervals)
   ELSE IF (GetLongArg('LUX-2013'))       THEN
     Detector = LUX_2013_Init(intervals)
-  ELSE IF (GetLongArg('LUX-2016_prelim')) THEN
-    Detector = LUX_2016_prelim_Init(intervals)
+  ELSE IF (GetLongArg('LUX-2016')) THEN
+    Detector = LUX_2016_Init(intervals)
   ELSE IF (GetLongArg('PandaX-2016'))    THEN
     Detector = PandaX_2016_Init(intervals)
   ELSE IF (GetLongArg('LUX-2015'))       THEN
