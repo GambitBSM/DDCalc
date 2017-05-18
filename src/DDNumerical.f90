@@ -809,44 +809,6 @@ END FUNCTION
 
 
 !-----------------------------------------------------------------------
-! Factorial
-! 
-! NOTE: Valid for INTEGER*4 or INTEGER*8 as the default INTEGER type.
-! In the former case, some of the constants below overflow and must
-! be coerced to the representable range, which is done automatically
-! by ifort, but gfortran requires the additional compilation flag
-! '-fno-range-check' (this flag only affects compile-time constants).
-! 
-ELEMENTAL FUNCTION FACTORIAL(n) RESULT(z)
-  IMPLICIT NONE
-  INTEGER, INTENT(IN) :: n
-  INTEGER :: z
-  ! Tabulated values
-  INTEGER, PARAMETER :: NMAX = 20
-  INTEGER, PARAMETER, DIMENSION(0:NMAX) :: FVALS = &
-    (/ 1,                                           & ! n = 0
-       1,                  2,                    & ! n = 1-2
-       6,                  24,                   & ! n = 3-4
-       120,                720,                  & ! n = 5-6
-       5040,               40320,                & ! n = 7-8
-       362880,             3628800,              & ! n = 9-10
-       39916800,           479001600,            & ! n = 11-12
-       6227020800,         87178291200,          & ! n = 13-14
-       1307674368000,      20922789888000,       & ! n = 15-16
-       355687428096000,    6402373705728000,     & ! n = 17-18
-       121645100408832000, 2432902008176640000  /) ! n = 19-20
-  IF (n .LT. 0) THEN
-    z = -HUGE(n)
-    !STOP 'ERROR: factorial cannot be called with negative argument'
-  ELSE IF (n .LE. NMAX) THEN
-    z = FVALS(n)
-  ELSE
-    z = HUGE(n)
-  END IF
-END FUNCTION
-
-
-!-----------------------------------------------------------------------
 ! Gamma function of integer argument [double precision]
 ! NOTE: Intrinsic routine of real argument available in Fortran 2008;
 !       the speed of the intrinsic routine may be comparable to this
