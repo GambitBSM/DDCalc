@@ -21,6 +21,7 @@ MODULE DDCalc
 !     Andre Scaffidi            University of Adelaide (2014)
 !     Lauren Hsu                FermiLab (2015)
 !     Pat Scott                 Imperial College London (2016)
+!     Felix Kahlhoefer          DESY (2017)
 ! 
 ! 
 ! 

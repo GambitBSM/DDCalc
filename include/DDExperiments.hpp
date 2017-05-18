@@ -24,9 +24,9 @@ extern "C"
   int C_DDCalc_lux_2016_init(const bool&);
   int C_DDCalc_pandax_2016_init(const bool&);
   int C_DDCalc_lux_2015_init(const bool&);
-  int C_DDCalc_pico-2l_init(const bool&);
-  int C_DDCalc_pico-60_f_init(const bool&);
-  int C_DDCalc_pico-60_i_init(const bool&);
+  int C_DDCalc_pico_2l_init(const bool&);
+  int C_DDCalc_pico_60_f_init(const bool&);
+  int C_DDCalc_pico_60_i_init(const bool&);
   int C_DDCalc_supercdms_2014_init(const bool&);
   int C_DDCalc_simple_2014_init(const bool&);
   int C_DDCalc_darwin_ar_init(const bool&);
