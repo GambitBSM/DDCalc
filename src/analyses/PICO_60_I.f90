@@ -16,7 +16,7 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct to the PICO_60_I analysis.
 !
-! This analysis includes only fluorine, which is sufficient for SD scattering.
+! This analysis includes only iodine, which is sub-dominant for SD scattering.
 !
 FUNCTION PICO_60_I_Init(intervals) RESULT(D)
 
@@ -73,7 +73,7 @@ FUNCTION PICO_60_I_Init(intervals) RESULT(D)
       = RESHAPE( (/ EFF0(:), EFF1(:) /) ,SHAPE(EFF))
 
   ! The fiducial mass is reduced to account for the iodine fraction.
-  ! NOTE: PICO-2L does not attempt background subtraction (to be implemented)
+  ! It is furthermore reduced by a trial factor of 1.8.
 
   CALL SetDetector(D,mass=5.18d0,time=92.8d0,Nevents=0,                 &
                    background=0.0d0,Nelem=1,Zelem=(/53/),               &

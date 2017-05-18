@@ -74,7 +74,6 @@ FUNCTION PICO_60_F_Init(intervals) RESULT(D)
 
   ! The fiducial mass is reduced to account for the fluorine fraction.
   ! It is furthermore reduced by a trial factor of 1.8.
-  ! NOTE: PICO-2L does not attempt background subtraction (to be implemented)
 
   CALL SetDetector(D,mass=2.32d0,time=92.8d0,Nevents=0,                 &
                    background=0.0d0,Nelem=1,Zelem=(/9/),                &
