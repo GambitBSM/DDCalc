@@ -691,41 +691,27 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
     Neff0 = 0
   END IF
   
+
+  ! Resize dRdEiso if necessary
+  IF (PRESENT(NE) .AND. PRESENT(Niso)) THEN
+    IF (ALLOCATED(D%dRdEiso)) DEALLOCATE(D%dRdEiso)
+    ALLOCATE(D%dRdEiso(NE,Niso))
+  ELSE IF ((iso_change .OR. E_change) .AND. (D%Niso .GE. 0)            &
+           .AND. (D%NE .GE. 0)) THEN
+    IF (ALLOCATED(D%dRdEiso)) DEALLOCATE(D%dRdEiso)
+    ALLOCATE(D%dRdEiso(D%NE,D%Niso))
+  END IF
+
+
   ! Resize rate arrays if necessary
   IF ((E_change .OR. eff_change) .AND. (D%NE .GE. 0)                   &
       .AND. (D%Neff .GE. 0)) THEN
-    IF (ALLOCATED(D%dRdEsi0)) DEALLOCATE(D%dRdEsi0)
-    ALLOCATE(D%dRdEsi0(-1:1,D%NE))
-    IF (ALLOCATED(D%dRdEsd0)) DEALLOCATE(D%dRdEsd0)
-    ALLOCATE(D%dRdEsd0(-1:1,D%NE))
-    IF (ALLOCATED(D%Rsi0)) DEALLOCATE(D%Rsi0)
-    ALLOCATE(D%Rsi0(-1:1,0:Neff0))
-    IF (ALLOCATED(D%Rsd0)) DEALLOCATE(D%Rsd0)
-    ALLOCATE(D%Rsd0(-1:1,0:Neff0))
-    IF (ALLOCATED(D%dRdEsi)) DEALLOCATE(D%dRdEsi)
-    ALLOCATE(D%dRdEsi(D%NE))
-    IF (ALLOCATED(D%dRdEsd)) DEALLOCATE(D%dRdEsd)
-    ALLOCATE(D%dRdEsd(D%NE))
-    IF (ALLOCATED(D%dRdE)) DEALLOCATE(D%dRdE)
-    ALLOCATE(D%dRdE(D%NE))
-    IF (ALLOCATED(D%Rsi)) DEALLOCATE(D%Rsi)
-    ALLOCATE(D%Rsi(0:Neff0))
-    IF (ALLOCATED(D%Rsd)) DEALLOCATE(D%Rsd)
-    ALLOCATE(D%Rsd(0:Neff0))
     IF (ALLOCATED(D%R)) DEALLOCATE(D%R)
     ALLOCATE(D%R(0:Neff0))
   END IF
   
   ! Resize event arrays if necessary
   IF (eff_change .AND. (D%Neff .GE. 0)) THEN
-    IF (ALLOCATED(D%MuSignalSI0)) DEALLOCATE(D%MuSignalSI0)
-    ALLOCATE(D%MuSignalSI0(-1:1,0:Neff0))
-    IF (ALLOCATED(D%MuSignalSD0)) DEALLOCATE(D%MuSignalSD0)
-    ALLOCATE(D%MuSignalSD0(-1:1,0:Neff0))
-    IF (ALLOCATED(D%MuSignalSI)) DEALLOCATE(D%MuSignalSI)
-    ALLOCATE(D%MuSignalSI(0:Neff0))
-    IF (ALLOCATED(D%MuSignalSD)) DEALLOCATE(D%MuSignalSD)
-    ALLOCATE(D%MuSignalSD(0:Neff0))
     IF (ALLOCATED(D%MuSignal)) DEALLOCATE(D%MuSignal)
     ALLOCATE(D%MuSignal(0:Neff0))
   END IF
@@ -736,20 +722,8 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
        .AND. (D%Neff .GE. 0)) THEN
     D%vmin        = 0d0
     D%eta         = 0d0
-    D%dRdEsi0     = 0d0
-    D%dRdEsd0     = 0d0
-    D%Rsi0        = 0d0
-    D%Rsd0        = 0d0
-    D%dRdEsi      = 0d0
-    D%dRdEsd      = 0d0
-    D%dRdE        = 0d0
-    D%Rsi         = 0d0
-    D%Rsd         = 0d0
+    D%dRdEiso     = 0d0
     D%R           = 0d0
-    D%MuSignalSI0 = 0d0
-    D%MuSignalSD0 = 0d0
-    D%MuSignalSI  = 0d0
-    D%MuSignalSD  = 0d0
     D%MuSignal    = 0d0
   END IF
   

@@ -172,45 +172,24 @@ PROGRAM DDCalc_exampleF
     WRITE(*,*)
     
     ! Set the WIMP parameters.
-    ! There are three ways to specify the WIMP-nucleon couplings, with
-    ! the WIMP mass [GeV] always the first argument:
     !   * DDCalc_SetWIMP_mfa(WIMP,m,fp,fn,ap,an)
     !     The standard couplings fp,fn [GeV^-2] & ap,an [unitless]
-    !   * DDCalc_SetWIMP_mG(WIMP,m,GpSI,GnSI,GpSD,GnSD)
-    !     The effective 4 fermion vertex couplings GpSI,GnSI,GpSD,GnSD
-    !     [GeV^-2], related by:
-    !         GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
-    !         GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
-    !   * DDCalc_SetWIMP_msigma(WIMP,m,sigmapSI,sigmanSI,sigmapSD,sigmanSD)
-    !     The WIMP-nucleon cross-sections [pb] (use a negative value
-    !     to indicate the corresponding coupling should be negative).
-    ! In the above, 'p' is for proton, 'n' is for neutron, 'SI' is for
-    ! spin-independent, and 'SD' is for spin-dependent.
+    ! In the above, 'p' is for proton, 'n' is for neutron.
     SELECT CASE(type)
-    CASE(TYPE_MG)
-      CALL DDCalc_SetWIMP_mG(WIMP,M,xpSI,xnSI,xpSD,xnSD)
     CASE(TYPE_MFA)
       CALL DDCalc_SetWIMP_mfa(WIMP,M,xpSI,xnSI,xpSD,xnSD)
-    CASE(TYPE_MSIGMA)
-      CALL DDCalc_SetWIMP_msigma(WIMP,M,xpSI,xnSI,xpSD,xnSD)
     END SELECT
     
     ! Get the current WIMP parameters with the same signature and units
     ! as above.  The only difference is that WIMP-nucleon cross-sections
     ! are always positive (physical) values.
-    CALL DDCalc_GetWIMP_mG(WIMP,M,GpSI,GnSI,GpSD,GnSD)
     CALL DDCalc_GetWIMP_mfa(WIMP,M,fp,fn,ap,an)
-    CALL DDCalc_GetWIMP_msigma(WIMP,M,sigmapSI,sigmanSI,sigmapSD,sigmanSD)
     WRITE(*,'(A,1(1X,1PG12.4))') 'WIMP mass [GeV]     ',M
     WRITE(*,*)
     WRITE(*,'(A28,4(1X,A11))')     'WIMP-nucleon couplings          ',  &
         ' proton-SI ',' neutron-SI',' proton-SD ',' neutron-SD'
-    WRITE(*,'(A28,4(1X,1PG11.4))') '  G [GeV^-2]                    ',  &
-        GpSI,GnSI,GpSD,GnSD
     WRITE(*,'(A28,4(1X,1PG11.4))') '  f & a [GeV^-2,unitless]       ',  &
         fp,fn,ap,an
-    WRITE(*,'(A28,4(1X,1PG11.4))') '  cross-section [pb]            ',  &
-        sigmapSI,sigmanSI,sigmapSD,sigmanSD
     WRITE(*,*)
     
     ! Do rate calculations.
@@ -249,20 +228,6 @@ PROGRAM DDCalc_exampleF
         DDCalc_Signal(SCDMS), &
         DDCalc_Signal(SIMPLE), &
         DDCalc_Signal(MyDetector)
-    ! The average expected WIMP spin-independent signal.
-    WRITE(*,'(A20,5(2X,1PG11.4))')  '  spin-independent              ', &
-        DDCalc_SignalSI(XENON), &
-        DDCalc_SignalSI(LUX), &
-        DDCalc_SignalSI(SCDMS), &
-        DDCalc_SignalSI(SIMPLE), &
-        DDCalc_SignalSI(MyDetector)
-    ! The average expected WIMP spin-dependent signal.
-    WRITE(*,'(A20,5(2X,1PG11.4))')  '  spin-dependent                ', &
-        DDCalc_SignalSD(XENON), &
-        DDCalc_SignalSD(LUX), &
-        DDCalc_SignalSD(SCDMS), &
-        DDCalc_SignalSD(SIMPLE), &
-        DDCalc_SignalSD(MyDetector)
     
     ! The log-likelihoods for the current WIMP; note these are _not_
     ! multiplied by -2.  The likelihood is calculated using a Poisson
@@ -323,27 +288,12 @@ PROGRAM DDCalc_exampleF
     WRITE(*,'(A)') 'A blank line terminates input.  The parameters are:'
     WRITE(*,'(A)') ''
     SELECT CASE(type)
-    CASE(TYPE_MG)
-      WRITE(*,'(A)') '  M     WIMP mass [GeV]'
-      WRITE(*,'(A)') '  GpSI  Spin-independent WIMP-proton effective coupling [GeV^-2]'
-      WRITE(*,'(A)') '  GnSI  Spin-independent WIMP-neutron effective coupling [GeV^-2]'
-      WRITE(*,'(A)') '  GpSD  Spin-dependent WIMP-proton effective coupling [GeV^-2]'
-      WRITE(*,'(A)') '  GnSD  Spin-dependent WIMP-neutron effective coupling [GeV^-2]'
     CASE(TYPE_MFA)
       WRITE(*,'(A)') '  M     WIMP mass [GeV]'
       WRITE(*,'(A)') '  fp    Spin-independent WIMP-proton effective coupling [GeV^-2]'
       WRITE(*,'(A)') '  fn    Spin-independent WIMP-neutron effective coupling [GeV^-2]'
       WRITE(*,'(A)') '  ap    Spin-dependent WIMP-proton effective coupling [unitless]'
       WRITE(*,'(A)') '  an    Spin-dependent WIMP-neutron effective coupling [unitless]'
-    CASE(TYPE_MSIGMA)
-      WRITE(*,'(A)') '  M         WIMP mass [GeV]'
-      WRITE(*,'(A)') '  sigmapSI  Spin-independent WIMP-proton cross-section [pb]'
-      WRITE(*,'(A)') '  sigmanSI  Spin-independent WIMP-neutron cross-section [pb]'
-      WRITE(*,'(A)') '  sigmapSD  Spin-dependent WIMP-proton cross-section [pb]'
-      WRITE(*,'(A)') '  sigmanSD  Spin-dependent WIMP-neutron cross-section [pb]'
-      WRITE(*,'(A)') ''
-      WRITE(*,'(A)') 'Negative cross-section values can be given to indicate the'
-      WRITE(*,'(A)') 'corresponding coupling should be taken to be negative.'
     END SELECT
     !WRITE(*,*) ''
   END SUBROUTINE
@@ -365,12 +315,8 @@ PROGRAM DDCalc_exampleF
     WRITE(*,'(A)') ''
     WRITE(*,'(A)') '------------------------------------------------------------'
     SELECT CASE(type)
-    CASE(TYPE_MG)
-      WRITE(*,'(A)') 'Enter values <M GpSI GnSI GpSD GnSD>:'
     CASE(TYPE_MFA)
       WRITE(*,'(A)') 'Enter values <M fp fn ap an>:'
-    CASE(TYPE_MSIGMA)
-      WRITE(*,'(A)') 'Enter values <M sigmapSI sigmanSI sigmapSD sigmanSD>:'
     END SELECT
     READ(*,'(A)') line
     IF (TRIM(line) .EQ. '') RETURN

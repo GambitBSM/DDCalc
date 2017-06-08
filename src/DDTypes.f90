@@ -25,30 +25,17 @@ END TYPE
 
 ! Structure to contain tabulated rates as a function of energy.
 TYPE, PUBLIC :: DetectorRateStruct
-  
-  ! Integrated rates (reference couplings) -----
-  ! Reference integrated rates calculated at \sigma = 1 pb for each
-  ! coupling, with the efficiency-weighted integral done separately
-  ! for each available efficiency curve.  Arrays are of size
-  ! [-1:1,0:Neff].  The first index is for the proton & neutron
-  ! components at sigma = 1 pb in each case and the second index is for
-  ! the S1 bin/interval (0 for full range). [cpd/kg]
-  REAL*8, ALLOCATABLE :: Rsi0(:,:),Rsd0(:,:)
-  
-  ! Integrated rates (actual couplings) --------
-  ! Efficiency-corrected rates at given couplings.  Arrays are of size
+
+  ! Integrated rate  --------
+  ! Efficiency-corrected rate at given couplings.  Array is of size
   ! [0:Neff] with the index being that of the S1 bin/interval
-  ! efficiency curve used in the integral (0 for full range).  Given
-  ! separately for SI and SD components as well as the SI+SD total.
+  ! efficiency curve used in the integral (0 for full range). 
   ! [cpd/kg]
-  REAL*8, ALLOCATABLE :: Rsi(:),Rsd(:),R(:)
+  REAL*8, ALLOCATABLE :: R(:)
   
   ! Events -------------------------------------
-  ! Expected number of signal events at reference couplings.
-  ! Arrays of size [-1:1,0:Neff].
-  REAL*8, ALLOCATABLE :: MuSignalSI0(:,:),MuSignalSD0(:,:)
-  ! Expected number of signal events.  Arrays of size [0:Neff].
-  REAL*8, ALLOCATABLE :: MuSignalSI(:),MuSignalSD(:),MuSignal(:)
+  ! Expected number of signal events.  Array of size [0:Neff].
+  REAL*8, ALLOCATABLE :: MuSignal(:)
   
   ! Average expected background events
   REAL*8 :: MuBackground = 0d0
@@ -62,14 +49,30 @@ END TYPE
 ! WIMP Structure
 TYPE, PUBLIC :: WIMPStruct
   REAL*8 :: m   ! WIMP mass [GeV]
-  ! Effective couplings to the proton and neutron in units of [GeV^-2].
-  ! In terms of more commonly used notation:
-  !   SI (scalar):        G = 2f
-  !   SD (axial-vector):  G = 2\sqrt{2} G_F a
-  ! where G, f, and a have 'p' and 'n' subscripts.
-  REAL*8 :: GpSI,GnSI,GpSD,GnSD  
-  ! Couplings that yield \sigma = 1 pb in each case.
-  REAL*8 :: GpSI0,GnSI0,GpSD0,GnSD0
+  ! WIMP type
+  ! Currently the following possibilities are implemented:
+  ! 'SIonly':      WIMP with only spin-independent interactions
+  ! 'SDonly':      WIMP with only spin-dependent interactions
+  ! 'SISD':        WIMP with spin-independent and spin-dependent 
+  !                interactions
+  ! 'HiggsPortal': Fermionic WIMP with scalar and pseudoscalar
+  !                couplings to the Higgs boson
+  CHARACTER(LEN=24) :: DMtype = ''
+  ! List of WIMP parameters. 
+  ! The length and meaning of this list depends on the WIMP type:
+  ! 'SIonly':      (fp, fn)
+  ! fp: SI DM-proton coupling, fn: SI DM-neutron coupling
+  ! 'SDonly':      (ap, an)
+  ! ap: SD DM-proton coupling, an: SD DM-neutron coupling
+  ! 'SISD':        (fp, fn, ap, an)
+  ! fp: SI DM-proton coupling, fn: SI DM-neutron coupling
+  ! ap: SD DM-proton coupling, an: SD DM-neutron coupling
+  ! 'HiggsPortal': (fsp, fsn, app, apn)
+  ! fsp: scalar DM-proton coupling, fsn: scalar DM-neutron coupling
+  ! app: pseudoscalar DM-proton coupling, apn: pseudoscalar DM-neutron coupling
+  REAL*8, ALLOCATABLE  :: params(:)
+  ! Number of parameters
+  INTEGER :: Nparams = 1
 END TYPE
 
 ! Structure containing halo parameters
@@ -153,10 +156,10 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Events -------------------------------------
   ! Observed number of events
-  INTEGER :: Nevents = -1
+  INTEGER :: Nevents = -1    !! keep this
   
   ! Average expected background events
-  REAL*8 :: MuBackground = 0d0
+  REAL*8 :: MuBackground = 0d0    !! keep this
   
   ! Isotopes -----------------------------------
   ! Number of isotopes
@@ -243,45 +246,27 @@ TYPE, PUBLIC :: DetectorStruct
   ! Tabulated mean inverse speed (eta) [s/km] at the above vmin.
   REAL*8, ALLOCATABLE :: eta(:,:)
   
-  ! Differential rates (reference couplings) ---
-  ! Reference differential rates calculated at \sigma = 1 pb for each
-  ! coupling and tabulated by energy.  Differential arrays are of size
-  ! [-1:1,1:NE] and are given separately for SI and SD couplings.  The
-  ! first index is for the proton & neutron components at sigma = 1 pb
-  ! in each case and the second index is that of the energy (given by
-  ! the E array at the same index).  These represent raw rates prior to
-  ! any efficiency cuts. [cpd/kg/keV]
-  REAL*8, ALLOCATABLE :: dRdEsi0(:,:),dRdEsd0(:,:)
+
+
+
+  ! structure for the differential rates,
+  ! separately for each isotope of the experiment.
+  ! These represent rates before efficiency cuts, but they already
+  ! do include the mass fraction of the corresponding isotope.
+  ! Units of this are cpd/kg/keV
+  ! Array is of size [1:NE,1:Niso].
+  REAL*8, ALLOCATABLE :: dRdEiso(:,:)
   
-  ! Integrated rates (reference couplings) -----
-  ! Reference integrated rates calculated at \sigma = 1 pb for each
-  ! coupling, with the efficiency-weighted integral done separately
-  ! for each available efficiency curve.  Arrays are of size
-  ! [-1:1,0:Neff].  The first index is for the proton & neutron
-  ! components at sigma = 1 pb in each case and the second index is for
-  ! the S1 bin/interval (0 for full range). [cpd/kg]
-  REAL*8, ALLOCATABLE :: Rsi0(:,:),Rsd0(:,:)
-  
-  ! Differential rates (actual couplings) ------
-  ! Differential rates at given couplings, tabulated by energy.
-  ! Arrays are of size [1:NE], given separately for SI and SD couplings
-  ! as well as the SI+SD total. [cpd/kg/keV]
-  REAL*8, ALLOCATABLE :: dRdEsi(:),dRdEsd(:),dRdE(:)
-  
-  ! Integrated rates (actual couplings) --------
-  ! Efficiency-corrected rates at given couplings.  Arrays are of size
+  ! Integrated rate --------
+  ! Efficiency-corrected rates.  Array is of size
   ! [0:Neff] with the index being that of the S1 bin/interval
-  ! efficiency curve used in the integral (0 for full range).  Given
-  ! separately for SI and SD components as well as the SI+SD total.
+  ! efficiency curve used in the integral (0 for full range).
   ! [cpd/kg]
-  REAL*8, ALLOCATABLE :: Rsi(:),Rsd(:),R(:)
+  REAL*8, ALLOCATABLE :: R(:)
   
   ! Events -------------------------------------
-  ! Expected number of signal events at reference couplings.
-  ! Arrays of size [-1:1,0:Neff].
-  REAL*8, ALLOCATABLE :: MuSignalSI0(:,:),MuSignalSD0(:,:)
   ! Expected number of signal events.  Arrays of size [0:Neff].
-  REAL*8, ALLOCATABLE :: MuSignalSI(:),MuSignalSD(:),MuSignal(:)
+  REAL*8, ALLOCATABLE :: MuSignal(:) 
   
 END TYPE
 
@@ -399,21 +384,14 @@ TYPE, PUBLIC :: DetectorSpectraStruct
   ! Tabulated mean inverse speed (eta) [s/km] at the above vmin.
   REAL*8, ALLOCATABLE :: eta(:,:)
   
-  ! Differential rates (reference couplings) ---
-  ! Reference differential rates calculated at \sigma = 1 pb for each
-  ! coupling and tabulated by energy.  Differential arrays are of size
-  ! [-1:1,1:NE] and are given separately for SI and SD couplings.  The
-  ! first index is for the proton & neutron components at sigma = 1 pb
-  ! in each case and the second index is that of the energy (given by
-  ! the E array at the same index).  These represent raw rates prior to
-  ! any efficiency cuts. [cpd/kg/keV]
-  REAL*8, ALLOCATABLE :: dRdEsi0(:,:),dRdEsd0(:,:)
-  
-  ! Differential rates (actual couplings) ------
-  ! Differential rates at given couplings, tabulated by energy.
-  ! Arrays are of size [1:NE], given separately for SI and SD couplings
-  ! as well as the SI+SD total. [cpd/kg/keV]
-  REAL*8, ALLOCATABLE :: dRdEsi(:),dRdEsd(:),dRdE(:)
+
+  ! new post DDCalc-1.0 structure for the differential rates,
+  ! separately for each isotope of the experiment.
+  ! These represent rates before efficiency cuts, but they already
+  ! do include the mass fraction of the corresponding isotope.
+  ! Array is of size [1:NE,1:Niso].
+  REAL*8, ALLOCATABLE :: dRdEiso(:,:)
+
   
 END TYPE
 

@@ -1,4 +1,4 @@
-GFORTRAN module version '10' created from /home/pat/gambit_internal/unreleased/DDCalc/src/DDConstants.f90
+GFORTRAN module version '10' created from DDConstants.f90
 MD5:1f67f4297f36bfd07d4f4191def0faf1 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()

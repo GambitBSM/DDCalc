@@ -39,55 +39,26 @@ CONTAINS
 ! 
 ! Optional output arguments:
 !   m           WIMP mass [GeV].
-!   GpSI        Spin-independent WIMP-proton coupling [GeV^-2].
-!   GnSI        Spin-independent WIMP-neutron coupling [GeV^-2].
-!   GpSD        Spin-dependent WIMP-proton coupling [GeV^-2].
-!   GnSD        Spin-dependent WIMP-neutron coupling [GeV^-2].
-!   GpSI0       Reference spin-independent WIMP-proton coupling [GeV^-2]
-!               corresponding to \sigma_{SI,p} = 1 pb.
-!   GnSI0       Reference spin-independent WIMP-neutron coupling [GeV^-2]
-!               corresponding to \sigma_{SI,n} = 1 pb.
-!   GpSD0       Reference spin-dependent WIMP-proton coupling [GeV^-2]
-!               corresponding to \sigma_{SD,p} = 1 pb.
-!   GnSD0       Reference spin-dependent WIMP-neutron coupling [GeV^-2]
-!               corresponding to \sigma_{SD,n} = 1 pb.
-!   fp          Spin-independent WIMP-proton coupling [GeV^-2].
-!               Related by GpSI = 2 fp.
-!   fn          Spin-independent WIMP-neutron coupling [GeV^-2].
-!               Related by GnSI = 2 fn.
-!   ap          Spin-dependent WIMP-proton coupling [unitless].
-!               Related by GpSD = 2\sqrt{2} G_F ap.
-!   an          Spin-dependent WIMP-neutron coupling [unitless].
-!               Related by GnSD = 2\sqrt{2} G_F an.
-!   sigmapSI    Spin-independent WIMP-proton cross-section [pb].
-!   sigmanSI    Spin-independent WIMP-neutron cross-section [pb].
-!   sigmapSD    Spin-dependent WIMP-proton cross-section [pb].
-!   sigmanSD    Spin-dependent WIMP-neutron cross-section [pb].
-! 
-SUBROUTINE GetWIMP(WIMP, m,GpSI,GnSI,GpSD,GnSD,GpSI0,GnSI0,GpSD0,GnSD0,       &
-                   fp,fn,ap,an,sigmapSI,sigmanSI,sigmapSD,sigmanSD)
+!   DMtype      WIMP type (see definition of WIMP stucture)
+!   params      WIMP parameters
+!   Nparams     Number of WIMP parameters
+SUBROUTINE GetWIMP(WIMP, m, DMtype, params, Nparams)
 
   IMPLICIT NONE
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
-  REAL*8, INTENT(OUT), OPTIONAL :: m,GpSI,GnSI,GpSD,GnSD,GpSI0,GnSI0,GpSD0,GnSD0, &
-           fp,fn,ap,an,sigmapSI,sigmanSI,sigmapSD,sigmanSD
-  IF (PRESENT(m))     m     = WIMP%m
-  IF (PRESENT(GpSI))  GpSI  = WIMP%GpSI
-  IF (PRESENT(GnSI))  GnSI  = WIMP%GnSI
-  IF (PRESENT(GpSD))  GpSD  = WIMP%GpSD
-  IF (PRESENT(GnSD))  GnSD  = WIMP%GnSD
-  IF (PRESENT(GpSI0)) GpSI0 = WIMP%GpSI0
-  IF (PRESENT(GnSI0)) GnSI0 = WIMP%GnSI0
-  IF (PRESENT(GpSD0)) GpSD0 = WIMP%GpSD0
-  IF (PRESENT(GnSD0)) GnSD0 = WIMP%GnSD0
-  IF (PRESENT(fp))    fp    = GToF(WIMP%GpSI)
-  IF (PRESENT(fn))    fn    = GToF(WIMP%GnSI)
-  IF (PRESENT(ap))    ap    = GToA(WIMP%GpSD)
-  IF (PRESENT(an))    an    = GToA(WIMP%GnSD)
-  IF (PRESENT(sigmapSI)) sigmapSI = GpToSigmapSI(WIMP%m,WIMP%GpSI)
-  IF (PRESENT(sigmanSI)) sigmanSI = GnToSigmanSI(WIMP%m,WIMP%GnSI)
-  IF (PRESENT(sigmapSD)) sigmapSD = GpToSigmapSD(WIMP%m,WIMP%GpSD)
-  IF (PRESENT(sigmanSD)) sigmanSD = GnToSigmanSD(WIMP%m,WIMP%GnSD)
+  REAL*8, INTENT(OUT), OPTIONAL :: m
+  CHARACTER(LEN=24), INTENT(OUT), OPTIONAL :: DMtype
+  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: params(:)
+  INTEGER, INTENT(OUT), OPTIONAL :: Nparams
+
+  IF (PRESENT(m))       m       = WIMP%m
+  IF (PRESENT(DMtype))  DMtype  = WIMP%DMtype
+  IF (PRESENT(Nparams)) Nparams  = WIMP%Nparams
+  IF (PRESENT(params)) THEN
+    ALLOCATE(params(WIMP%Nparams))
+    params = WIMP%params
+  END IF
+
 END SUBROUTINE
 
 
@@ -96,60 +67,51 @@ END SUBROUTINE
 ! 
 ! Optional input arguments:
 !   m           WIMP mass [GeV].
-!   GpSI        Spin-independent WIMP-proton coupling [GeV^-2].
-!   GnSI        Spin-independent WIMP-neutron coupling [GeV^-2].
-!   GpSD        Spin-dependent WIMP-proton coupling [GeV^-2].
-!   GnSD        Spin-dependent WIMP-neutron coupling [GeV^-2].
-!   fp          Spin-independent WIMP-proton coupling [GeV^-2].
-!               Related by GpSI = 2 fp.
-!   fn          Spin-independent WIMP-neutron coupling [GeV^-2].
-!               Related by GnSI = 2 fn.
-!   ap          Spin-dependent WIMP-proton coupling [unitless].
-!               Related by GpSD = 2\sqrt{2} G_F ap.
-!   an          Spin-dependent WIMP-neutron coupling [unitless].
-!               Related by GnSD = 2\sqrt{2} G_F an.
-! Optional cross-section arguments (give negative value to set
-! corresponding coupling negative):
-!   sigmapSI    Spin-independent WIMP-proton cross-section [pb].
-!   sigmanSI    Spin-independent WIMP-neutron cross-section [pb].
-!   sigmapSD    Spin-dependent WIMP-proton cross-section [pb].
-!   sigmanSD    Spin-dependent WIMP-neutron cross-section [pb].
-!   sigmaSI     Sets both sigmapSI and sigmanSI to the given value [pb].
-!   sigmaSD     Sets both sigmapSD and sigmanSD to the given value [pb].
-! 
-SUBROUTINE SetWIMP(WIMP,m,GpSI,GnSI,GpSD,GnSD,fp,fn,ap,an,                   &
-                   sigmapSI,sigmanSI,sigmapSD,sigmanSD,sigmaSI,sigmaSD)
+!   DMtype      WIMP type (see definition of WIMP stucture)
+!   params      WIMP parameters (must have the correct length)
+! Note that both DMtype and params must be specified at the same time
+SUBROUTINE SetWIMP(WIMP, m, DMtype, params)
 
   IMPLICIT NONE
-  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
-  REAL*8, INTENT(IN), OPTIONAL :: m,GpSI,GnSI,GpSD,GnSD,fp,fn,ap,an,    &
-           sigmapSI,sigmanSI,sigmapSD,sigmanSD,sigmaSI,sigmaSD
-  IF (PRESENT(m)) THEN
-     WIMP%m = MAX(m,SQRT(TINY(1d0)))
-     WIMP%GpSI0 = SigmapSIToGp(WIMP%m,1d0)
-     WIMP%GnSI0 = SigmanSIToGn(WIMP%m,1d0)
-     WIMP%GpSD0 = SigmapSDToGp(WIMP%m,1d0)
-     WIMP%GnSD0 = SigmanSDToGn(WIMP%m,1d0)
-  END IF
-  IF (PRESENT(GpSI))  WIMP%GpSI = GpSI
-  IF (PRESENT(GnSI))  WIMP%GnSI = GnSI
-  IF (PRESENT(GpSD))  WIMP%GpSD = GpSD
-  IF (PRESENT(GnSD))  WIMP%GnSD = GnSD
-  IF (PRESENT(fp))    WIMP%GpSI = FToG(fp)
-  IF (PRESENT(fn))    WIMP%GnSI = FToG(fn)
-  IF (PRESENT(ap))    WIMP%GpSD = AToG(ap)
-  IF (PRESENT(an))    WIMP%GnSD = AToG(an)
-  IF (PRESENT(sigmapSI)) WIMP%GpSI = SigmapSIToGp(WIMP%m,sigmapSI)
-  IF (PRESENT(sigmanSI)) WIMP%GnSI = SigmanSIToGn(WIMP%m,sigmanSI)
-  IF (PRESENT(sigmapSD)) WIMP%GpSD = SigmapSDToGp(WIMP%m,sigmapSD)
-  IF (PRESENT(sigmanSD)) WIMP%GnSD = SigmanSDToGn(WIMP%m,sigmanSD)
-  IF (PRESENT(sigmaSI)) THEN
-    WIMP%GpSI = SigmapSIToGp(WIMP%m,sigmaSI)
-    WIMP%GnSI = SigmanSIToGn(WIMP%m,sigmaSI)
-  END IF
-  IF (PRESENT(sigmaSD)) THEN
-    WIMP%GpSD = SigmapSDToGp(WIMP%m,sigmaSD)
-    WIMP%GnSD = SigmanSDToGn(WIMP%m,sigmaSD)
+  TYPE(WIMPStruct), INTENT(OUT) :: WIMP
+  REAL*8, INTENT(IN), OPTIONAL :: m
+  CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: DMtype
+  REAL*8, INTENT(IN), OPTIONAL :: params(:)
+  LOGICAL :: updated  
+
+  IF (PRESENT(m))       WIMP%m       = m
+  IF (PRESENT(DMtype) .AND. PRESENT(params)) THEN
+    updated = .FALSE.
+    IF ( DMtype .EQ. 'SIonly' ) THEN
+      WIMP%DMtype  = DMtype
+      WIMP%Nparams = 2
+      updated = .TRUE.
+    END IF
+    IF ( DMtype .EQ. 'SDonly' ) THEN
+      WIMP%DMtype  = DMtype
+      WIMP%Nparams = 2
+      updated = .TRUE.
+    END IF
+    IF ( DMtype .EQ. 'SISD' ) THEN
+      WIMP%DMtype  = DMtype
+      WIMP%Nparams = 4
+      updated = .TRUE.
+    END IF
+    IF ( DMtype .EQ. 'HiggsPortal' ) THEN
+      WIMP%DMtype  = DMtype
+      WIMP%Nparams = 4
+      updated = .TRUE.
+    END IF
+    IF ( updated ) THEN
+      ALLOCATE(WIMP%params(WIMP%Nparams))
+      WIMP%params = params(1:WIMP%Nparams)
+    ELSE
+      WRITE(0,*) 'WARNING: WIMP type not recognized by SetWIMP.'
+    END IF
+  ELSE
+    IF (PRESENT(DMtype) .OR. PRESENT(params)) THEN
+      WRITE(0,*) 'WARNING: Incomplete information provided to SetWIMP.'
+    END IF
   END IF
 
 END SUBROUTINE
@@ -164,14 +126,7 @@ FUNCTION InitWIMP() RESULT(WIMP)
   IMPLICIT NONE
   TYPE(WIMPStruct) :: WIMP
 
-  ! Default mass of 100 GeV
-  CALL SetWIMP(WIMP,m=100d0)
-  
-  ! Default cross-sections of 1 pb.
-  WIMP%GpSI = WIMP%GpSI0
-  WIMP%GnSI = WIMP%GnSI0
-  WIMP%GpSD = WIMP%GpSD0
-  WIMP%GnSD = WIMP%GnSD0
+  CALL SetWIMP(WIMP,m=100d0,DMtype='SIonly',params=[1d-9,1d-9])
   
 END FUNCTION
 
@@ -223,35 +178,44 @@ FUNCTION InitWIMPCommandLine(Arguments) RESULT(WIMP)
   TYPE(ArgumentStruct), INTENT(IN) :: Arguments
   TYPE(WIMPStruct) :: WIMP
   LOGICAL :: status
-  REAL*8 :: x
+  REAL*8 :: x, m, fp, fn, ap, an
   
-  ! Process mass: default value of 100 GeV
-  CALL SetWIMP(WIMP,m=100d0)
-  IF (GetLongArgReal('m',x)) CALL SetWIMP(WIMP,m=x)
+  ! Defauls values
+  m = 100d0
+  fp = 1d-9
+  fn = 1d-9
+  ap = 0d0
+  an = 0d0
+
+  IF (GetLongArgReal('m',x)) m = x
+
   IF (Arguments%Nparameters .GE. 1) THEN
     x = Arguments%values(1)
-    IF (x .GT. 0d0) CALL SetWIMP(WIMP,m=x)
+    IF (x .GT. 0d0) m = x
   END IF
   
-  ! Process couplings: defaults of 1 pb.
-  WIMP%GpSI = WIMP%GpSI0
-  WIMP%GnSI = WIMP%GnSI0
-  WIMP%GpSD = WIMP%GpSD0
-  WIMP%GnSD = WIMP%GnSD0
-  IF (GetLongArgReal('GpSI',x)) CALL SetWIMP(WIMP,GpSI=x)
-  IF (GetLongArgReal('GnSI',x)) CALL SetWIMP(WIMP,GnSI=x)
-  IF (GetLongArgReal('GpSD',x)) CALL SetWIMP(WIMP,GpSD=x)
-  IF (GetLongArgReal('GnSD',x)) CALL SetWIMP(WIMP,GnSD=x)
-  IF (GetLongArgReal('fp',x))   CALL SetWIMP(WIMP,fp=x)
-  IF (GetLongArgReal('fn',x))   CALL SetWIMP(WIMP,fn=x)
-  IF (GetLongArgReal('ap',x))   CALL SetWIMP(WIMP,ap=x)
-  IF (GetLongArgReal('an',x))   CALL SetWIMP(WIMP,an=x)
-  IF (GetLongArgReal('sigmapSI',x)) CALL SetWIMP(WIMP,sigmapSI=x)
-  IF (GetLongArgReal('sigmanSI',x)) CALL SetWIMP(WIMP,sigmanSI=x)
-  IF (GetLongArgReal('sigmapSD',x)) CALL SetWIMP(WIMP,sigmapSD=x)
-  IF (GetLongArgReal('sigmanSD',x)) CALL SetWIMP(WIMP,sigmanSD=x)
-  IF (GetLongArgReal('sigmaSI',x))  CALL SetWIMP(WIMP,sigmaSI=x)
-  IF (GetLongArgReal('sigmaSD',x))  CALL SetWIMP(WIMP,sigmaSD=x)
+  IF (GetLongArgReal('GpSI',x)) fp = GtoF(x)
+  IF (GetLongArgReal('GnSI',x)) fn = GtoF(x)
+  IF (GetLongArgReal('GpSD',x)) an = GtoA(x)
+  IF (GetLongArgReal('GnSD',x)) ap = GtoA(x)
+  IF (GetLongArgReal('fp',x))   fp = x
+  IF (GetLongArgReal('fn',x))   fn = x
+  IF (GetLongArgReal('ap',x))   ap = x
+  IF (GetLongArgReal('an',x))   an = x
+  IF (GetLongArgReal('sigmapSI',x)) fp = SigmapSItoFp(m,x)
+  IF (GetLongArgReal('sigmanSI',x)) fn = SigmanSItoFn(m,x)
+  IF (GetLongArgReal('sigmapSD',x)) ap = SigmapSDtoAp(m,x)
+  IF (GetLongArgReal('sigmanSD',x)) an = SigmanSDtoAn(m,x)
+  IF (GetLongArgReal('sigmaSI',x)) THEN
+    fp = SigmapSItoFp(m,x)
+    fn = SigmanSItoFn(m,x)
+  END IF
+  IF (GetLongArgReal('sigmaSD',x)) THEN
+    ap = SigmapSDtoAp(m,x)
+    an = SigmanSDtoAn(m,x)
+  END IF
+
+  CALL SetWIMP(WIMP, m=m, DMtype='SISD', params=[fp,fn,ap,an])
   
   ! Process command-line arguments (if more than just mass)
   IF (Arguments%Nparameters .GE. 1) THEN
@@ -344,6 +308,7 @@ FUNCTION ParseWIMPParameters(N,p,WIMP) RESULT(status)
   LOGICAL :: status
   INTEGER, INTENT(IN) :: N
   REAL*8, INTENT(IN) :: p(N)
+  REAL*8 :: m, fp, fn, ap, an
   
   ! Check for bad cases (e.g. non-positive mass)
   status = .FALSE.
@@ -351,36 +316,45 @@ FUNCTION ParseWIMPParameters(N,p,WIMP) RESULT(status)
   IF (p(1) .LE. 0d0) RETURN
   
   status = .TRUE.
+  m=p(1)
   
-  ! Meaning of parameters depends on number of parameters,
-  ! but first parameter is always mass
-  CALL SetWIMP(WIMP,m=p(1))
+  ! Meaning of parameters depends on number of parameters.
+
   SELECT CASE (N)
+
   CASE (1)
-    ! Form: m
-    ! Set WIMP couplings to 1 pb
-    WIMP%GpSI = WIMP%GpSI0
-    WIMP%GnSI = WIMP%GnSI0
-    WIMP%GpSD = WIMP%GpSD0
-    WIMP%GnSD = WIMP%GnSD0
+    fp = 1d-9
+    fn = 1d-9
+    ap = 0d0
+    an = 0d0
   CASE (2)
     ! Form: m sigmaSI
     ! Set SD couplings to zero
-    CALL SetWIMP(WIMP,sigmaSI=p(2),sigmaSD=0d0)
+    fp = SigmapSItoFp(m,p(2))
+    fn = SigmanSItoFn(m,p(2))
+    ap = 0d0
+    an = 0d0
   CASE (3)
     ! Form: m sigmaSI sigmaSD
-    CALL SetWIMP(WIMP,sigmaSI=p(2),sigmaSD=p(3))
+    fp = SigmapSItoFp(m,p(2))
+    fn = SigmanSItoFn(m,p(2))
+    ap = SigmapSDtoAp(m,p(3))
+    an = SigmanSDtoAn(m,p(3))
   CASE (4)
-    ! Form: m sigmaSI sigmapSD sigmanSD
-    CALL SetWIMP(WIMP,sigmaSI=p(2),sigmapSD=p(3),sigmanSD=p(4))
+    fp = SigmapSItoFp(m,p(2))
+    fn = SigmanSItoFn(m,p(2))
+    ap = SigmapSDtoAp(m,p(3))
+    an = SigmanSDtoAn(m,p(4))
   CASE (5)
-    !! Form: m sigmapSI sigmanSI sigmapSD sigmanSD
-    CALL SetWIMP(WIMP,sigmapSI=p(2),sigmanSI=p(3),sigmapSD=p(4),sigmanSD=p(5))
-    ! Form: m GpSI GnSI GpSD GnSD
-    !CALL SetWIMP(WIMP,GpSI=p(2),GnSI=p(3),GpSD=p(4),GnSD=p(5))
+    fp = SigmapSItoFp(m,p(2))
+    fn = SigmanSItoFn(m,p(3))
+    ap = SigmapSDtoAp(m,p(4))
+    an = SigmanSDtoAn(m,p(5))
   CASE (6:)
     status = .FALSE.
   END SELECT
+
+  if ( status ) CALL SetWIMP(WIMP,m=m, DMtype='SISD', params=[fp,fp,ap,an])
   
 END FUNCTION
 

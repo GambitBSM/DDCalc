@@ -32,9 +32,9 @@
 // CONSTANTS -----------------------------------------------------------
 
 // These constants will be used to specify the type of input parameters.
-const int TYPE_MG     = 1;  // Four-fermion effective couplings G
+//const int TYPE_MG     = 1;  // Four-fermion effective couplings G
 const int TYPE_MFA    = 2;  // Effective couplings f (SI), a (SD)
-const int TYPE_MSIGMA = 3;  // WIMP-nucleon cross-sections
+//const int TYPE_MSIGMA = 3;  // WIMP-nucleon cross-sections
 
 
 // UTILITY FUNCTIONS DECLARATIONS --------------------------------------
@@ -75,22 +75,18 @@ int main(int argc, char* argv[])
 
   // Parse command line options
   // Notably, determining how WIMP parameters will be specified.
-  // Default command line option (no argument) will give type = TYPE_MSIGMA.
-  type = TYPE_MSIGMA;
+  // Default command line option (no argument) will give type = TYPE_MFA.
+  type = TYPE_MFA;
   for (int i=1; i<argc; i++)
   {
-    if (std::string(argv[i]) == "--mG")
-      type = TYPE_MG;
-    else if (std::string(argv[i]) == "--mfa")
+    if (std::string(argv[i]) == "--mfa")
       type = TYPE_MFA;
-    else if (std::string(argv[i]) == "--msigma")
-      type = TYPE_MSIGMA;
     else if (std::string(argv[i]) == "--help")
     {
       std::cout << "Usage:" << std::endl;
-      std::cout << "  ./DDCalc_exampleC [--mG|--mfa|--msigma]" << std::endl;
+      std::cout << "  ./DDCalc_exampleC [--mfa]" << std::endl;
       std::cout << "where the optional flag specifies the form in which the WIMP-" << std::endl;
-      std::cout << "nucleon couplings will be provided (default: --msigma)." << std::endl;
+      std::cout << "nucleon couplings will be provided (default: --mfa)." << std::endl;
       exit(0);
     } else
     {
@@ -158,30 +154,15 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
     
     /* Set the WIMP parameters.
-       There are three ways to specify the WIMP-nucleon couplings, with
+       Specify the WIMP-nucleon couplings, with
        the WIMP mass [GeV] always the first argument:
          * DDCalc::SetWIMP_mfa(m,fp,fn,ap,an)
            The standard couplings fp,fn [GeV^-2] & ap,an [unitless]
-         * DDCalc::SetWIMP_mG(m,GpSI,GnSI,GpSD,GnSD)
-           The effective 4 fermion vertex couplings GpSI,GnSI,GpSD,GnSD
-           [GeV^-2], related by:
-               GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
-               GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
-         * DDCalc::SetWIMP_msigma(m,sigmapSI,sigmanSI,sigmapSD,sigmanSD)
-           The WIMP-nucleon cross-sections [pb] (use a negative value
-           to indicate the corresponding coupling should be negative).
-       In the above, 'p' is for proton, 'n' is for neutron, 'SI' is for
-       spin-independent, and 'SD' is for spin-dependent. */
+       In the above, 'p' is for proton, 'n' is for neutron. */
     switch (type)
     {
-      case TYPE_MG:
-        DDCalc::SetWIMP_mG(WIMP,M,xpSI,xnSI,xpSD,xnSD);
-        break;
       case TYPE_MFA:
         DDCalc::SetWIMP_mfa(WIMP,M,xpSI,xnSI,xpSD,xnSD);
-        break;
-      case TYPE_MSIGMA:
-        DDCalc::SetWIMP_msigma(WIMP,M,xpSI,xnSI,xpSD,xnSD);
         break;
     }
     
@@ -189,8 +170,6 @@ int main(int argc, char* argv[])
        above.  The only difference is that WIMP-nucleon cross-sections
        are always positive. */
     DDCalc::GetWIMP_mfa(WIMP,M,fp,fn,ap,an);
-    DDCalc::GetWIMP_mG(WIMP,M,GpSI,GnSI,GpSD,GnSD);
-    DDCalc::GetWIMP_msigma(WIMP,M,sigmapSI,sigmanSI,sigmapSD,sigmanSD);
     
     /* Print out the above WIMP mass, couplings, and cross sections. */
     printf("%s %- #12.5g\n","WIMP mass [GeV]     ",M);
@@ -198,11 +177,7 @@ int main(int argc, char* argv[])
     printf("%-28s %11s %11s %11s %11s\n","WIMP-nucleon couplings",
            " proton-SI "," neutron-SI"," proton-SD "," neutron-SD");
     printf("%-28s %- #11.5g %- #11.5g %- #11.5g %- #11.5g\n",
-           "  G [GeV^-2]",GpSI,GnSI,GpSD,GnSD);
-    printf("%-28s %- #11.5g %- #11.5g %- #11.5g %- #11.5g\n",
            "  f & a [GeV^-2,unitless]",fp,fn,ap,an);
-    printf("%-28s %- #11.5g %- #11.5g %- #11.5g %- #11.5g\n",
-           "  cross-section [pb]",sigmapSI,sigmanSI,sigmapSD,sigmanSD);
     std::cout << std::endl;
     
     /* Do rate calculations using the specified WIMP and halo parameters.
@@ -244,20 +219,7 @@ int main(int argc, char* argv[])
         DDCalc::Signal(SCDMS),
         DDCalc::Signal(SIMPLE),
         DDCalc::Signal(MyDetector));
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
-           "  spin-independent  ",
-        DDCalc::SignalSI(XENON),
-        DDCalc::SignalSI(LUX),
-        DDCalc::SignalSI(SCDMS),
-        DDCalc::SignalSI(SIMPLE),
-        DDCalc::SignalSI(MyDetector));
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
-           "  spin-dependent    ",
-        DDCalc::SignalSD(XENON),
-        DDCalc::SignalSD(LUX),
-        DDCalc::SignalSD(SCDMS),
-        DDCalc::SignalSD(SIMPLE),
-        DDCalc::SignalSD(MyDetector));
+
     
     /* The log-likelihoods for the current WIMP; note these are _not_
        multiplied by -2.  The likelihood is calculated using a Poisson
@@ -325,29 +287,12 @@ void WriteDescription(const int type)
   std::cout << std::endl;
   switch (type)
   {
-    case TYPE_MG:
-      std::cout << "  M     WIMP mass [GeV]" << std::endl;
-      std::cout << "  GpSI  Spin-independent WIMP-proton effective coupling [GeV^-2]" << std::endl;
-      std::cout << "  GnSI  Spin-independent WIMP-neutron effective coupling [GeV^-2]" << std::endl;
-      std::cout << "  GpSD  Spin-dependent WIMP-proton effective coupling [GeV^-2]" << std::endl;
-      std::cout << "  GnSD  Spin-dependent WIMP-neutron effective coupling [GeV^-2]" << std::endl;
-      break;
     case TYPE_MFA:
       std::cout << "  M     WIMP mass [GeV]" << std::endl;
       std::cout << "  fp    Spin-independent WIMP-proton effective coupling [GeV^-2]" << std::endl;
       std::cout << "  fn    Spin-independent WIMP-neutron effective coupling [GeV^-2]" << std::endl;
       std::cout << "  ap    Spin-dependent WIMP-proton effective coupling [unitless]" << std::endl;
       std::cout << "  an    Spin-dependent WIMP-neutron effective coupling [unitless]" << std::endl;
-      break;
-    case TYPE_MSIGMA:
-      std::cout << "  M         WIMP mass [GeV]" << std::endl;
-      std::cout << "  sigmapSI  Spin-independent WIMP-proton cross-section [pb]" << std::endl;
-      std::cout << "  sigmanSI  Spin-independent WIMP-neutron cross-section [pb]" << std::endl;
-      std::cout << "  sigmapSD  Spin-dependent WIMP-proton cross-section [pb]" << std::endl;
-      std::cout << "  sigmanSD  Spin-dependent WIMP-neutron cross-section [pb]" << std::endl;
-      std::cout << std::endl;
-      std::cout << "Negative cross-section values can be given to indicate the" << std::endl;
-      std::cout << "corresponding coupling should be taken to be negative." << std::endl;
       break;
   }
 }
@@ -361,14 +306,8 @@ bool GetWIMPParams(const int type, double& M, double& xpSI, double& xnSI,
   std::cout << "------------------------------------------------------------" << std::endl;
   switch (type)
   {
-    case TYPE_MG:
-      std::cout << "Enter values <M GpSI GnSI GpSD GnSD>:" << std::endl;
-      break;
     case TYPE_MFA:
       std::cout << "Enter values <M fp fn ap an>:" << std::endl;
-      break;
-    case TYPE_MSIGMA:
-      std::cout << "Enter values <M sigmapSI sigmanSI sigmapSD sigmanSD>:" << std::endl;
       break;
     }
   

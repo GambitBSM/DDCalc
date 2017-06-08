@@ -89,8 +89,7 @@ END SUBROUTINE
 
 
 !-----------------------------------------------------------------------
-! Prints to standard output information regarding the WIMP,
-! notably the mass and couplings.
+! Prints to standard output information regarding the WIMP.
 ! 
 ! Optional input arguments:
 !   extra_lines     Blank lines (albeit with prefix) to add after
@@ -100,26 +99,28 @@ SUBROUTINE WriteWIMPHeader(WIMP,extra_lines)
   IMPLICIT NONE
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   INTEGER, INTENT(IN), OPTIONAL :: extra_lines
+  INTEGER :: paramID
   
   !WRITE(*,'(A)') COMMENT_LINE
   
   ! Mass
   WRITE(*,'(A,F11.4)') COMMENT_PREFIX &
-      // 'WIMP mass [GeV]                       =',WIMP%m
+      // 'WIMP mass [GeV]     =',WIMP%m
+  WRITE(*,'(A)') COMMENT_PREFIX
+
+  ! Type
+  WRITE(*,'(A,A)') COMMENT_PREFIX &
+      // 'WIMP type           =',WIMP%DMtype
   WRITE(*,'(A)') COMMENT_PREFIX
   
-  ! Couplings
-  WRITE(*,'(A,2(2X,A12))') COMMENT_PREFIX &
-      // 'WIMP-nucleon couplings:  ','  G [GeV^-2]','  sigma [pb]'
-  WRITE(*,'(A,2(2X,1PG12.4))') COMMENT_PREFIX &
-      // '  proton SI              ',WIMP%GpSI,GpToSigmapSI(WIMP%m,WIMP%GpSI)
-  WRITE(*,'(A,2(2X,1PG12.4))') COMMENT_PREFIX &
-      // '  neutron SI             ',WIMP%GnSI,GnToSigmanSI(WIMP%m,WIMP%GnSI)
-  WRITE(*,'(A,2(2X,1PG12.4))') COMMENT_PREFIX &
-      // '  proton SD              ',WIMP%GpSD,GpToSigmapSD(WIMP%m,WIMP%GpSD)
-  WRITE(*,'(A,2(2X,1PG12.4))') COMMENT_PREFIX &
-      // '  neutron SD             ',WIMP%GnSD,GnToSigmanSD(WIMP%m,WIMP%GnSD)
-  WRITE(*,'(A)') COMMENT_PREFIX
+  ! Parameters
+  DO paramID = 1,WIMP%Nparams
+
+    WRITE(*,'(A,1(X,I2),A,1(2X,1PG12.4))') COMMENT_PREFIX &
+        // ' WIMP parameter',paramID,':',WIMP%params(paramID)
+    WRITE(*,'(A)') COMMENT_PREFIX
+
+  END DO
   
   IF (PRESENT(extra_lines)) CALL WriteEmptyCommentLines(extra_lines)
   
@@ -437,7 +438,7 @@ SUBROUTINE WriteEventsAndLikelihoodsColumnHeader()
     CONTINUE
   CASE (1:2)
     WRITE(*,'(A,1(1X,A8),3(1X,A11),2(1X,A11))') COMMENT_PREFIX,         &
-        'observed','background ','signal(SI) ','signal(SD) ',           &
+        'observed','background ',           &
         '  log(L)   ','  log(p)   '
   CASE (3:)
     WRITE(*,'(A,1(1X,A10),4(1X,A10),4(1X,A10),1(1X,A8),3(1X,A11),2(1X,A11))') &
@@ -468,24 +469,14 @@ SUBROUTINE WriteEventsAndLikelihoodsData(Detector,WIMP)
   
   ! Columns to print depend on the verbosity level.
   ! For data, only absolute value of verbosity is used.
-  
-  SELECT CASE (ABS(VerbosityLevel))
-  CASE (:2)
+ 
+  IF (ABS(VerbosityLevel) .GE. 2) THEN
     WRITE(*,'(A,1(2X,I5,2X),3(1X,1PG11.4),2(1X,1PG11.4))')              &
         DATA_PREFIX,                                                    &
         Detector%Nevents,Detector%MuBackground,           &
-        Detector%MuSignalSI(0),Detector%MuSignalSD(0),    &
         lnLike,lnp
-  CASE (3:)
-    WRITE(*,'(A,1(1X,F10.3),4(1X,1PG10.3),4(1X,1PG10.3),1(2X,I5,2X),3(1X,1PG11.4),2(1X,1PG11.4))') &
-        DATA_PREFIX,                                                    &
-        WIMP%m,WIMP%GpSI,WIMP%GnSI,WIMP%GpSD,WIMP%GnSD,                 &
-        GpToSigmapSI(WIMP%m,WIMP%GpSI),GnToSigmanSI(WIMP%m,WIMP%GnSI),  &
-        GpToSigmapSD(WIMP%m,WIMP%GpSD),GnToSigmanSD(WIMP%m,WIMP%GnSD),  &
-        Detector%Nevents,Detector%MuBackground,           &
-        Detector%MuSignalSI(0),Detector%MuSignalSD(0),    &
-        lnLike,lnp
-  END SELECT
+  END IF
+ 
   
 END SUBROUTINE
 
@@ -624,23 +615,13 @@ SUBROUTINE WriteSpectrumData(Detector)
     SELECT CASE (ABS(VerbosityLevel))
     CASE (:2)
       ! Differential rate
-      WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                           &
-          CoerceExponent(Detector%dRdE(KE),2,5)
+      WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')
     CASE (3)
       ! Combined, si, sd
-      WRITE(*,'(3(1X,1PG12.5))',ADVANCE='NO')                           &
-          CoerceExponent(Detector%dRdE(KE),2,5),                 &
-          CoerceExponent(Detector%dRdEsi(KE),2,5),               &
-          CoerceExponent(Detector%dRdEsd(KE),2,5)
+      WRITE(*,'(3(1X,1PG12.5))',ADVANCE='NO')
     CASE (4:)
       ! Reference rate components
-      WRITE(*,'(6(1X,1PG12.5))',ADVANCE='NO')                           &
-          CoerceExponent(Detector%dRdEsi0(+1,KE),2,5),           &
-          CoerceExponent(Detector%dRdEsi0( 0,KE),2,5),           &
-          CoerceExponent(Detector%dRdEsi0(-1,KE),2,5),           &
-          CoerceExponent(Detector%dRdEsd0(+1,KE),2,5),           &
-          CoerceExponent(Detector%dRdEsd0( 0,KE),2,5),           &
-          CoerceExponent(Detector%dRdEsd0(-1,KE),2,5)
+      WRITE(*,'(6(1X,1PG12.5))',ADVANCE='NO')
     END SELECT
     WRITE(*,'(A)') ''
   END DO
@@ -661,75 +642,79 @@ SUBROUTINE WriteEventsByMassHeader(WIMP,extra_lines)
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   INTEGER, INTENT(IN), OPTIONAL :: extra_lines
   REAL*8 :: sigmapSI,sigmanSI,sigmapSD,sigmanSD
+
+  IF ( WIMP%DMtype .EQ. 'SISD' ) THEN
   
-  !WRITE(*,'(A)') COMMENT_LINE
+    !WRITE(*,'(A)') COMMENT_LINE
+    
+    ! Will write out the fixed WIMP-nucleon cross-sections.
+    ! Negative for negative couplings.
+    sigmapSI = FpToSigmapSI(WIMP%m,WIMP%params(1))
+    sigmanSI = FnToSigmanSI(WIMP%m,WIMP%params(2))
+    sigmapSD = ApToSigmapSD(WIMP%m,WIMP%params(3))
+    sigmanSD = AnToSigmanSD(WIMP%m,WIMP%params(4))
+    
+    ! Description and fixed cross-sections
+    IF (VerbosityLevel .GE. 2) THEN
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // 'The table below gives the expected spin-independent (SI) and spin-'
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // 'dependent (SD) interaction events, tabulated by WIMP mass, for fixed'
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // 'WIMP-nucleon cross-sections.  The fixed cross-sections are [pb]:'
+      WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
+          // '  sigmapSI (proton SI)  =',CoerceExponent(sigmapSI,2,4)
+      WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
+          // '  sigmanSI (neutron SI) =',CoerceExponent(sigmanSI,2,4)
+      WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
+          // '  sigmapSD (proton SD)  =',CoerceExponent(sigmapSD,2,4)
+      WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
+          // '  sigmanSD (neutron SD) =',CoerceExponent(sigmanSD,2,4)
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // 'A negative cross-section means the corresponding WIMP-nucleon coupling'
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // 'will be taken to be negative.'
+      !WRITE(*,'(A)') COMMENT_PREFIX &
+      !    // ''
+      WRITE(*,'(A)') COMMENT_PREFIX
+    END IF
+    
+    IF (VerbosityLevel .GE. 2) THEN
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // 'The columns below contain the following data:'
+    END IF
+    
+    IF (VerbosityLevel .GE. 2) THEN
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // '  mass         WIMP mass [GeV].'
+    END IF
+    
+    IF (VerbosityLevel .GE. 3) THEN
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // '  G            WIMP-nucleon couplings for spin-independent (SI) and'
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // '               spin-dependent (SD) interactions [GeV^-2].'
+    END IF
+    
+    IF (VerbosityLevel .GE. 2) THEN
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // '  events(SI)   Average expected spin-independent events.'
+      WRITE(*,'(A)') COMMENT_PREFIX &
+          // '  events(SD)   Average expected spin-dependent events.'
+    END IF
+    
+    IF (VerbosityLevel .GE. 2) THEN
+      WRITE(*,'(A)') COMMENT_PREFIX
+    END IF
+    
+    IF (PRESENT(extra_lines)) CALL WriteEmptyCommentLines(extra_lines)
   
-  ! Will write out the fixed WIMP-nucleon cross-sections.
-  ! Negative for negative couplings.
-  sigmapSI = GpToSigmapSI(WIMP%m,WIMP%GpSI)
-  sigmanSI = GnToSigmanSI(WIMP%m,WIMP%GnSI)
-  sigmapSD = GpToSigmapSD(WIMP%m,WIMP%GpSD)
-  sigmanSD = GnToSigmanSD(WIMP%m,WIMP%GnSD)
-  IF (WIMP%GpSI .LT. 0d0) sigmapSI = -ABS(sigmapSI)
-  IF (WIMP%GnSI .LT. 0d0) sigmanSI = -ABS(sigmanSI)
-  IF (WIMP%GpSD .LT. 0d0) sigmapSD = -ABS(sigmapSD)
-  IF (WIMP%GnSD .LT. 0d0) sigmanSD = -ABS(sigmanSD)
-  
-  ! Description and fixed cross-sections
-  IF (VerbosityLevel .GE. 2) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'The table below gives the expected spin-independent (SI) and spin-'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'dependent (SD) interaction events, tabulated by WIMP mass, for fixed'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'WIMP-nucleon cross-sections.  The fixed cross-sections are [pb]:'
-    WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
-        // '  sigmapSI (proton SI)  =',CoerceExponent(sigmapSI,2,4)
-    WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
-        // '  sigmanSI (neutron SI) =',CoerceExponent(sigmanSI,2,4)
-    WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
-        // '  sigmapSD (proton SD)  =',CoerceExponent(sigmapSD,2,4)
-    WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
-        // '  sigmanSD (neutron SD) =',CoerceExponent(sigmanSD,2,4)
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'A negative cross-section means the corresponding WIMP-nucleon coupling'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'will be taken to be negative.'
-    !WRITE(*,'(A)') COMMENT_PREFIX &
-    !    // ''
-    WRITE(*,'(A)') COMMENT_PREFIX
+  ELSE
+
+    WRITE(0,*) 'WARNING: WriteEventsByMassHeader called with WIMP type other than SISD.'
+
   END IF
-  
-  IF (VerbosityLevel .GE. 2) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'The columns below contain the following data:'
-  END IF
-  
-  IF (VerbosityLevel .GE. 2) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // '  mass         WIMP mass [GeV].'
-  END IF
-  
-  IF (VerbosityLevel .GE. 3) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // '  G            WIMP-nucleon couplings for spin-independent (SI) and'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // '               spin-dependent (SD) interactions [GeV^-2].'
-  END IF
-  
-  IF (VerbosityLevel .GE. 2) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // '  events(SI)   Average expected spin-independent events.'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // '  events(SD)   Average expected spin-dependent events.'
-  END IF
-  
-  IF (VerbosityLevel .GE. 2) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX
-  END IF
-  
-  IF (PRESENT(extra_lines)) CALL WriteEmptyCommentLines(extra_lines)
-  
+
 END SUBROUTINE
 
 
@@ -821,30 +806,15 @@ SUBROUTINE WriteEventsByMassData(Detector,WIMP)
   WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
       CoerceNumber(WIMP%m,10,4)
   
+  ! ---Outdated---
   ! Couplings
-  IF (ABS(VerbosityLevel) .GE. 4) THEN
-    WRITE(*,'(4(1X,1PG10.3))',ADVANCE='NO')                             &
-        CoerceExponent(WIMP%GpSI,2,3),CoerceExponent(WIMP%GnSI,2,3),    &
-        CoerceExponent(WIMP%GpSD,2,3),CoerceExponent(WIMP%GnSD,2,3)
-  END IF
+  !IF (ABS(VerbosityLevel) .GE. 4) THEN
+  !  WRITE(*,'(4(1X,1PG10.3))',ADVANCE='NO')                             &
+  !      CoerceExponent(WIMP%GpSI,2,3),CoerceExponent(WIMP%GnSI,2,3),    &
+  !      CoerceExponent(WIMP%GpSD,2,3),CoerceExponent(WIMP%GnSD,2,3)
+  !END IF
   
-  ! Events (full range)
-  IF (ABS(VerbosityLevel) .GE. 3) WRITE(*,'(1X,A1)',ADVANCE='NO') ' '
-  WRITE(*,'(2(1X,1PG11.4))',ADVANCE='NO')                               &
-      CoerceExponent(Detector%MuSignalSI(0),2,4),                &
-      CoerceExponent(Detector%MuSignalSD(0),2,4)
   
-  ! Events for sub-intervals
-  IF (ABS(VerbosityLevel) .GE. 3) THEN
-    IF (Detector%intervals) THEN
-      DO Keff = 1,Detector%Neff
-        WRITE(*,'(1X,A1)',ADVANCE='NO') ' '
-        WRITE(*,'(2(1X,1PG11.4))',ADVANCE='NO')                         &
-            CoerceExponent(Detector%MuSignalSI(Keff),2,4),       &
-            CoerceExponent(Detector%MuSignalSD(Keff),2,4)
-      END DO
-    END IF
-  END IF
   
   WRITE(*,'(A)') ''
   
@@ -986,45 +956,54 @@ SUBROUTINE WriteConstraintsSIData(s1,s2,Detector,WIMP)
   REAL*8, INTENT(IN) :: s1,s2
   REAL*8 :: mu,x1,x2,sigmapSI,sigmanSI
   
-  ! Need scale factors x s.t. sigma -> x*sigma gives desired
-  ! number of events.
-  CALL DDCalc_GetRates(Detector,signal_si=mu)
-  ! Empty set case
-  IF (s2 .EQ. 0d0) THEN
-    x1 = 0d0
-    x2 = 0d0
-  ! General case
-  ELSE IF (mu .GT. 0d0) THEN
-    x1 = s1/mu
-    x2 = s2/mu
-  ! No events case (at any scale)
+  IF ( WIMP%DMtype .EQ. 'SIonly' ) THEN
+
+    ! Need scale factors x s.t. sigma -> x*sigma gives desired
+    ! number of events.
+    CALL DDCalc_GetRates(Detector,signal_si=mu)
+    ! Empty set case
+    IF (s2 .EQ. 0d0) THEN
+      x1 = 0d0
+      x2 = 0d0
+    ! General case
+    ELSE IF (mu .GT. 0d0) THEN
+      x1 = s1/mu
+      x2 = s2/mu
+    ! No events case (at any scale)
+    ELSE
+      x1 = 0d0
+      x2 = HUGE(1d0)
+    END IF
+  
+    ! Cross-sections (multiply by x for limit)
+    sigmapSI = FpToSigmapSI(WIMP%m,WIMP%params(1))
+    sigmanSI = FnToSigmanSI(WIMP%m,WIMP%params(2))
+  
+    ! Columns to print depend on the verbosity level.
+    ! For data, only absolute value of verbosity is used.
+  
+    ! Mass
+    WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
+        CoerceNumber(WIMP%m,10,4)
+  
+    ! WIMP-proton cross-section
+    WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                               &
+        CoerceExponent(x1*sigmapSI,2,5),CoerceExponent(x2*sigmapSI,2,5)
+  
+    ! WIMP-neutron cross-section
+    IF (ABS(VerbosityLevel) .GE. 3) THEN
+      WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                             &
+          CoerceExponent(x1*sigmanSI,2,5),CoerceExponent(x2*sigmanSI,2,5)
+    END IF
+  
+    WRITE(*,'(A)') ''
+
   ELSE
-    x1 = 0d0
-    x2 = HUGE(1d0)
+
+    WRITE(0,*) 'WARNING: WriteConstraintsSIData called with WIMP type other than SIonly.'
+
   END IF
-  
-  ! Cross-sections (multiply by x for limit)
-  sigmapSI = GpToSigmapSI(WIMP%m,WIMP%GpSI)
-  sigmanSI = GnToSigmanSI(WIMP%m,WIMP%GnSI)
-  
-  ! Columns to print depend on the verbosity level.
-  ! For data, only absolute value of verbosity is used.
-  
-  ! Mass
-  WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
-      CoerceNumber(WIMP%m,10,4)
-  
-  ! WIMP-proton cross-section
-  WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                               &
-      CoerceExponent(x1*sigmapSI,2,5),CoerceExponent(x2*sigmapSI,2,5)
-  
-  ! WIMP-neutron cross-section
-  IF (ABS(VerbosityLevel) .GE. 3) THEN
-    WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                             &
-        CoerceExponent(x1*sigmanSI,2,5),CoerceExponent(x2*sigmanSI,2,5)
-  END IF
-  
-  WRITE(*,'(A)') ''
+
   
 END SUBROUTINE
 
@@ -1166,46 +1145,54 @@ SUBROUTINE WriteConstraintsSDData(s1,s2,Detector,WIMP)
   REAL*8, INTENT(IN) :: s1,s2
   REAL*8 :: mu,x1,x2,sigmapSD,sigmanSD
   
-  ! Need scale factors x s.t. sigma -> x*sigma gives desired
-  ! number of events.
-  CALL DDCalc_GetRates(Detector,signal_sd=mu)
-  ! Empty set case
-  IF (s2 .EQ. 0d0) THEN
-    x1 = 0d0
-    x2 = 0d0
-  ! General case
-  ELSE IF (mu .GT. 0d0) THEN
-    x1 = s1/mu
-    x2 = s2/mu
-  ! No events case (at any scale)
-  ELSE
-    x1 = 0d0
-    x2 = HUGE(1d0)
-  END IF
+  IF ( WIMP%DMtype .EQ. 'SDonly' ) THEN
+
+    ! Need scale factors x s.t. sigma -> x*sigma gives desired
+    ! number of events.
+    CALL DDCalc_GetRates(Detector,signal_sd=mu)
+    ! Empty set case
+    IF (s2 .EQ. 0d0) THEN
+      x1 = 0d0
+      x2 = 0d0
+    ! General case
+    ELSE IF (mu .GT. 0d0) THEN
+      x1 = s1/mu
+      x2 = s2/mu
+    ! No events case (at any scale)
+    ELSE
+      x1 = 0d0
+      x2 = HUGE(1d0)
+    END IF
   
-  ! Cross-sections (multiply by x for limit)
-  sigmapSD = GpToSigmapSI(WIMP%m,WIMP%GpSD)
-  sigmanSD = GnToSigmanSI(WIMP%m,WIMP%GnSD)
+    ! Cross-sections (multiply by x for limit)
+    sigmapSD = ApToSigmapSD(WIMP%m,WIMP%params(1))
+    sigmanSD = AnToSigmanSD(WIMP%m,WIMP%params(2))
  
-  ! Columns to print depend on the verbosity level.
-  ! For data, only absolute value of verbosity is used.
+    ! Columns to print depend on the verbosity level.
+    ! For data, only absolute value of verbosity is used.
   
-  ! Mass
-  WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
-      CoerceNumber(WIMP%m,10,4)
+    ! Mass
+    WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
+        CoerceNumber(WIMP%m,10,4)
   
-  ! WIMP-proton cross-section
-  WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                               &
-      CoerceExponent(x1*sigmapSD,2,5),CoerceExponent(x2*sigmapSD,2,5)
+    ! WIMP-proton cross-section
+    WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                               &
+        CoerceExponent(x1*sigmapSD,2,5),CoerceExponent(x2*sigmapSD,2,5)
   
-  ! WIMP-neutron cross-section
-  IF (ABS(VerbosityLevel) .GE. 3) THEN
-    WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                             &
-        CoerceExponent(x1*sigmanSD,2,5),CoerceExponent(x2*sigmanSD,2,5)
+    ! WIMP-neutron cross-section
+    IF (ABS(VerbosityLevel) .GE. 3) THEN
+      WRITE(*,'(2(1X,1PG12.5))',ADVANCE='NO')                             &
+          CoerceExponent(x1*sigmanSD,2,5),CoerceExponent(x2*sigmanSD,2,5)
+    END IF
+  
+    WRITE(*,'(A)') ''
+  
+  ELSE
+
+    WRITE(0,*) 'WARNING: WriteConstraintsSDData called with WIMP type other than SDonly.'
+
   END IF
-  
-  WRITE(*,'(A)') ''
-  
+
 END SUBROUTINE
 
 
@@ -1339,32 +1326,40 @@ SUBROUTINE WriteLimitsSIData(lnp,Detector,WIMP)
   REAL*8, INTENT(IN) :: lnp
   REAL*8 :: x,sigmapSI,sigmanSI
   
-  ! Need scale factor
-  x = DDCalc_ScaleToPValue(Detector,lnp=lnp)
+  IF ( WIMP%DMtype .EQ. 'SIonly' ) THEN
+
+    ! Need scale factor
+    x = DDCalc_ScaleToPValue(Detector,lnp=lnp)
   
-  ! Cross-sections (multiply by x for limit)
-  sigmapSI = GpToSigmapSI(WIMP%m,WIMP%GpSI)
-  sigmanSI = GnToSigmanSI(WIMP%m,WIMP%GnSI)
+    ! Cross-sections (multiply by x for limit)
+    sigmapSI = FpToSigmapSI(WIMP%m,WIMP%params(1))
+    sigmanSI = FnToSigmanSI(WIMP%m,WIMP%params(1))
   
-  ! Columns to print depend on the verbosity level.
-  ! For data, only absolute value of verbosity is used.
+    ! Columns to print depend on the verbosity level.
+    ! For data, only absolute value of verbosity is used.
   
-  ! Mass
-  WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
-      CoerceNumber(WIMP%m,10,4)
+    ! Mass
+    WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
+        CoerceNumber(WIMP%m,10,4)
   
-  ! WIMP-proton cross-section
-  WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                               &
-      CoerceExponent(x*sigmapSI,2,5)
+    ! WIMP-proton cross-section
+    WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                               &
+        CoerceExponent(x*sigmapSI,2,5)
   
-  ! WIMP-neutron cross-section
-  IF (ABS(VerbosityLevel) .GE. 3) THEN
-    WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                             &
-        CoerceExponent(x*sigmanSI,2,5)
+    ! WIMP-neutron cross-section
+    IF (ABS(VerbosityLevel) .GE. 3) THEN
+      WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                             &
+          CoerceExponent(x*sigmanSI,2,5)
+    END IF
+  
+    WRITE(*,'(A)') ''
+  
+  ELSE
+
+    WRITE(0,*) 'WARNING: WriteLimitsSIData called with WIMP type other than SIonly.'
+
   END IF
-  
-  WRITE(*,'(A)') ''
-  
+
 END SUBROUTINE
 
 
@@ -1506,31 +1501,40 @@ SUBROUTINE WriteLimitsSDData(lnp,Detector,WIMP)
   REAL*8, INTENT(IN) :: lnp
   REAL*8 :: x,sigmapSD,sigmanSD
   
-  ! Need scale factor
-  x = DDCalc_ScaleToPValue(Detector,lnp=lnp)
+  IF ( WIMP%DMtype .EQ. 'SDonly' ) THEN
+
+    ! Need scale factor
+    x = DDCalc_ScaleToPValue(Detector,lnp=lnp)
   
-  ! Cross-sections (multiply by x for limit)
-  sigmapSD = GpToSigmapSI(WIMP%m,WIMP%GpSD)
-  sigmanSD = GnToSigmanSI(WIMP%m,WIMP%GnSD)
+    ! Cross-sections (multiply by x for limit)
+    sigmapSD = ApToSigmapSD(WIMP%m,WIMP%params(1))
+    sigmanSD = AnToSigmanSD(WIMP%m,WIMP%params(2))
   
-  ! Columns to print depend on the verbosity level.
-  ! For data, only absolute value of verbosity is used.
+    ! Columns to print depend on the verbosity level.
+    ! For data, only absolute value of verbosity is used.
   
-  ! Mass
-  WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
-      CoerceNumber(WIMP%m,10,4)
+    ! Mass
+    WRITE(*,'(A,1(1X,F10.4))',ADVANCE='NO') DATA_PREFIX,                  &
+        CoerceNumber(WIMP%m,10,4)
   
-  ! WIMP-proton cross-section
-  WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                               &
-      CoerceExponent(x*sigmapSD,2,5)
+    ! WIMP-proton cross-section
+    WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                               &
+        CoerceExponent(x*sigmapSD,2,5)
   
-  ! WIMP-neutron cross-section
-  IF (ABS(VerbosityLevel) .GE. 3) THEN
-    WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                             &
-        CoerceExponent(x*sigmanSD,2,5)
+    ! WIMP-neutron cross-section
+    IF (ABS(VerbosityLevel) .GE. 3) THEN
+      WRITE(*,'(1(1X,1PG12.5))',ADVANCE='NO')                             &
+          CoerceExponent(x*sigmanSD,2,5)
+    END IF
+  
+    WRITE(*,'(A)') ''
+
+  ELSE
+
+    WRITE(0,*) 'WARNING: WriteLimitsSDData called with WIMP type other than SDonly.'
+
   END IF
-  
-  WRITE(*,'(A)') ''
+
   
 END SUBROUTINE
 

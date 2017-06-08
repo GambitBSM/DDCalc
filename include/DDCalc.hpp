@@ -35,15 +35,11 @@ extern "C"
   // WIMP parameter setters and getters
   void C_DDCalc_ddcalc_setwimp_mfa(const int&, const double&,
                   const double&, const double&, const double&, const double&);
-  void C_DDCalc_ddcalc_setwimp_mg(const int&, const double&,
-                  const double&, const double&, const double&, const double&);
-  void C_DDCalc_ddcalc_setwimp_msigma(const int&, const double&,
-                  const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_mfa(const int&, double&,
                   double&, double&, double&, double&);
-  void C_DDCalc_ddcalc_getwimp_mg(const int&, double&,
-                  double&, double&, double&, double&);
-  void C_DDCalc_ddcalc_getwimp_msigma(const int&, double&,
+  void C_DDCalc_ddcalc_setwimp_higgsportal(const int&, const double&,
+                  const double&, const double&, const double&, const double&);
+  void C_DDCalc_ddcalc_getwimp_higgsportal(const int&, double&,
                   double&, double&, double&, double&);
   
   // Detector parameter setter (minimum recoil energy to consider)
@@ -56,8 +52,6 @@ extern "C"
   int C_DDRates_ddcalc_events(const int&);          // Number of events
   double C_DDRates_ddcalc_background(const int&);   // Expected backgrounds
   double C_DDRates_ddcalc_signal(const int&);       // Expected signal
-  double C_DDRates_ddcalc_signalsi(const int&);     // Expected signal (spin-independent)
-  double C_DDRates_ddcalc_signalsd(const int&);     // Expected signal (spin-dependent)  
   double C_DDStats_ddcalc_loglikelihood(const int&); // Log-likelihood
   double C_DDStats_ddcalc_logpvalue(const int&);     // Log of the p-value  
   double C_DDStats_ddcalc_scaletopvalue(const int&, const double&);
@@ -128,19 +122,13 @@ namespace DDCalc
   {
     C_DDCalc_ddcalc_setwimp_mfa(WIMPIndex,m,fp,fn,ap,an);
   }
-  
-  void SetWIMP_mG(const int WIMPIndex, const double m, const double GpSI, const double GnSI,
-                  const double GpSD, const double GnSD)
+
+  void SetWIMP_Higgsportal(const int WIMPIndex, const double m, const double fsp, const double fsn,
+                   const double app, const double apn)
   {
-    C_DDCalc_ddcalc_setwimp_mg(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
+    C_DDCalc_ddcalc_setwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
   }
-  
-  void SetWIMP_msigma(const int WIMPIndex, const double m, const double sigmapSI, const double sigmanSI,
-                      const double sigmapSD, const double sigmanSD)
-  {
-    C_DDCalc_ddcalc_setwimp_msigma(WIMPIndex,m,sigmapSI,sigmanSI,sigmapSD,sigmanSD);
-  }
-  
+    
   // Get the WIMP parameters with the same signatures and units as above.
   // The only difference is that WIMP-nucleon cross-sections are always
   // positive.
@@ -149,19 +137,13 @@ namespace DDCalc
   {
     C_DDCalc_ddcalc_getwimp_mfa(WIMPIndex,m,fp,fn,ap,an);
   }
-  
-  void GetWIMP_mG(const int WIMPIndex, double& m, double& GpSI, double& GnSI,
-                          double& GpSD, double& GnSD)
-  {
-    C_DDCalc_ddcalc_getwimp_mg(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
-  }
-  
-  void GetWIMP_msigma(const int WIMPIndex, double& m, double& sigmapSI, double& sigmanSI,
-                             double& sigmapSD, double& sigmanSD)
-  {
-    C_DDCalc_ddcalc_getwimp_msigma(WIMPIndex,m,sigmapSI,sigmanSI,sigmapSD,sigmanSD);
-  }
 
+  void GetWIMP_Higgsportal(const int WIMPIndex, double& m, double& fsp, double& fsn,
+                          double& app, double& apn)
+  {
+    C_DDCalc_ddcalc_getwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
+  }
+  
   //########## Detector setter #########################################
 
   // Minimum recoil energy to consider (keV)
@@ -197,18 +179,7 @@ namespace DDCalc
   {
     return C_DDRates_ddcalc_signal(DetectorIndex);
   }
-  
-  // Read off the expected signal (spin-independent) for the specified analysis.
-  double SignalSI(const int DetectorIndex)
-  {
-    return C_DDRates_ddcalc_signalsi(DetectorIndex);
-  }
-  
-  // Read off the expected signal (spin-dependent) for the specified analysis.
-  double SignalSD(const int DetectorIndex)
-  {
-    return C_DDRates_ddcalc_signalsd(DetectorIndex);
-  }
+ 
   
   // Read off the log-likelihoods for the specificed analysis; note these
   // are _not_ multiplied by -2.  The likelihood is calculated using a Poisson

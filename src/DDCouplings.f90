@@ -271,5 +271,64 @@ ELEMENTAL FUNCTION GnToSigmanSD(m,G) RESULT(sigma)
   sigma = 1d10 * 3*INVPI * ((m*Mn/(m+Mn))*G*HBARC)**2
 END FUNCTION
 
+!-----------------------------------------------------------------------
+! Composite functions converting couplings to cross sections
+ELEMENTAL FUNCTION FpToSigmapSI(m,f) RESULT(sigma)
+  IMPLICIT NONE
+  REAL*8 :: sigma
+  REAL*8, INTENT(IN) :: m,f
+  sigma = GpToSigmapSI(m,FtoG(f))
+END FUNCTION
+
+ELEMENTAL FUNCTION FnToSigmanSI(m,f) RESULT(sigma)
+  IMPLICIT NONE
+  REAL*8 :: sigma
+  REAL*8, INTENT(IN) :: m,f
+  sigma = GnToSigmanSI(m,FtoG(f))
+END FUNCTION
+
+ELEMENTAL FUNCTION ApToSigmapSD(m,a) RESULT(sigma)
+  IMPLICIT NONE
+  REAL*8 :: sigma
+  REAL*8, INTENT(IN) :: m,a
+  sigma = GpToSigmapSD(m,AtoG(a))
+END FUNCTION
+
+ELEMENTAL FUNCTION AnToSigmanSD(m,a) RESULT(sigma)
+  IMPLICIT NONE
+  REAL*8 :: sigma
+  REAL*8, INTENT(IN) :: m,a
+  sigma = GnToSigmanSD(m,AtoG(a))
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! Composite functions converting cross sections to couplings
+ELEMENTAL FUNCTION SigmapSItoFp(m,sigma) RESULT(f)
+  IMPLICIT NONE
+  REAL*8 :: f
+  REAL*8, INTENT(IN) :: m,sigma
+  f = GtoF(SigmapSIToGp(m,sigma))
+END FUNCTION
+
+ELEMENTAL FUNCTION SigmanSItoFn(m,sigma) RESULT(f)
+  IMPLICIT NONE
+  REAL*8 :: f
+  REAL*8, INTENT(IN) :: m,sigma
+  f = GtoF(SigmanSIToGn(m,sigma))
+END FUNCTION
+
+ELEMENTAL FUNCTION SigmapSDtoAp(m,sigma) RESULT(a)
+  IMPLICIT NONE
+  REAL*8 :: a
+  REAL*8, INTENT(IN) :: m,sigma
+  a = GtoA(SigmapSDToGp(m,sigma))
+END FUNCTION
+
+ELEMENTAL FUNCTION SigmanSDtoAn(m,sigma) RESULT(a)
+  IMPLICIT NONE
+  REAL*8 :: a
+  REAL*8, INTENT(IN) :: m,sigma
+  a = GtoA(SigmanSDToGn(m,sigma))
+END FUNCTION
 
 END MODULE
