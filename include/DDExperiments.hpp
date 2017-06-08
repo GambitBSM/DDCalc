@@ -23,6 +23,7 @@ extern "C"
   int C_DDCalc_lux_2013_init(const bool&);
   int C_DDCalc_lux_2016_init(const bool&);
   int C_DDCalc_pandax_2016_init(const bool&);
+  int C_DDCalc_xenon1t_2017_init(const bool&);
   int C_DDCalc_lux_2015_init(const bool&);
   int C_DDCalc_pico_2l_init(const bool&);
   int C_DDCalc_pico_60_f_init(const bool&);
@@ -64,6 +65,11 @@ namespace DDCalc
   int PandaX_2016_Init(const bool intervals=true)
   {
     C_DDCalc_pandax_2016_init(intervals);
+  }
+
+  int Xenon1T_2017_Init(const bool intervals=true)
+  {
+    C_DDCalc_xenon1t_2017_init(intervals);
   }
 
   int LUX_2015_Init(const bool intervals=true)
