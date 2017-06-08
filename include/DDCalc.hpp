@@ -37,9 +37,9 @@ extern "C"
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_mfa(const int&, double&,
                   double&, double&, double&, double&);
-  void C_DDCalc_ddcalc_setwimp_mG(const int&, const double&,
+  void C_DDCalc_ddcalc_setwimp_mg(const int&, const double&,
                   const double&, const double&, const double&, const double&);
-  void C_DDCalc_ddcalc_getwimp_mG(const int&, double&,
+  void C_DDCalc_ddcalc_getwimp_mg(const int&, double&,
                   double&, double&, double&, double&);
   void C_DDCalc_ddcalc_setwimp_higgsportal(const int&, const double&,
                   const double&, const double&, const double&, const double&);
@@ -127,7 +127,7 @@ namespace DDCalc
   void SetWIMP_mG(const int WIMPIndex, const double m, const double GpSI, const double GnSI,
                    const double GpSD, const double GnSD)
   {
-    C_DDCalc_ddcalc_setwimp_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
+    C_DDCalc_ddcalc_setwimp_mg(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
   }
 
   void SetWIMP_Higgsportal(const int WIMPIndex, const double m, const double fsp, const double fsn,
@@ -148,7 +148,7 @@ namespace DDCalc
   void GetWIMP_mG(const int WIMPIndex, double& m, double& GpSI, double& GnSI,
                           double& GpSD, double& GnSD)
   {
-    C_DDCalc_ddcalc_getwimp_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
+    C_DDCalc_ddcalc_getwimp_mg(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
   }
 
   void GetWIMP_Higgsportal(const int WIMPIndex, double& m, double& fsp, double& fsn,
