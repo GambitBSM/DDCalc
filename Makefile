@@ -157,7 +157,7 @@ endif
 #################### FILES / TARGETS #######################
 
 # Main programs
-fprograms := DDCalc_run DDTest
+fprograms := DDCalc_run
 
 # Example/test programs
 ftestprograms := DDCalc_exampleF
