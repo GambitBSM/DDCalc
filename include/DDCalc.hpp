@@ -37,6 +37,10 @@ extern "C"
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_mfa(const int&, double&,
                   double&, double&, double&, double&);
+  void C_DDCalc_ddcalc_setwimp_mG(const int&, const double&,
+                  const double&, const double&, const double&, const double&);
+  void C_DDCalc_ddcalc_getwimp_mG(const int&, double&,
+                  double&, double&, double&, double&);
   void C_DDCalc_ddcalc_setwimp_higgsportal(const int&, const double&,
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_higgsportal(const int&, double&,
@@ -112,15 +116,18 @@ namespace DDCalc
   //     [GeV^-2], related by:
   //         GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
   //         GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
-  //   * SetWIMP_msigma(m,sigmapSI,sigmanSI,sigmapSD,sigmanSD)
-  //     The WIMP-nucleon cross-sections [pb] (use a negative value
-  //     to indicate the corresponding coupling should be negative).
   // In the above, 'p' is for proton, 'n' is for neutron, 'SI' is for
   // spin-independent, and 'SD' is for spin-dependent.
   void SetWIMP_mfa(const int WIMPIndex, const double m, const double fp, const double fn,
                    const double ap, const double an)
   {
     C_DDCalc_ddcalc_setwimp_mfa(WIMPIndex,m,fp,fn,ap,an);
+  }
+
+  void SetWIMP_mG(const int WIMPIndex, const double m, const double GpSI, const double GnSI,
+                   const double GpSD, const double GnSD)
+  {
+    C_DDCalc_ddcalc_setwimp_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
   }
 
   void SetWIMP_Higgsportal(const int WIMPIndex, const double m, const double fsp, const double fsn,
@@ -136,6 +143,12 @@ namespace DDCalc
                           double& ap, double& an)
   {
     C_DDCalc_ddcalc_getwimp_mfa(WIMPIndex,m,fp,fn,ap,an);
+  }
+
+  void GetWIMP_mG(const int WIMPIndex, double& m, double& GpSI, double& GnSI,
+                          double& GpSD, double& GnSD)
+  {
+    C_DDCalc_ddcalc_getwimp_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
   }
 
   void GetWIMP_Higgsportal(const int WIMPIndex, double& m, double& fsp, double& fsn,

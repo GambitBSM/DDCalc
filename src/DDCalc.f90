@@ -54,9 +54,14 @@ MODULE DDCalc
 !
 ! WIMP parameter setting:
 !     SUBROUTINE DDCalc_SetWIMP_mfa(WIMP,m,fp,fn,ap,an)
+!     SUBROUTINE DDCalc_SetWIMP_mG(WIMP,m,GpSI,GnSI,GpSD,GnSD)
 !   where m is the WIMP mass [GeV], f is spin-independent (SI) WIMP-
 !   nucleon coupling [GeV^-2], a is the spin-dependent (SD) WIMP-nucleon
-!   coupling [unitless]
+!   coupling [unitless], G are the effective 4-fermion vertex couplings,
+!   related by:
+!     GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
+!     GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
+!   and sigma is the WIMP-nucleon scattering cross-section [pb].
 !
 !     SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
 !   where m is the WIMP mass [GeV], fs are scalar Higgs couplings [GeV^-2]
@@ -64,9 +69,8 @@ MODULE DDCalc
 !
 ! WIMP parameter retrieval:
 !     SUBROUTINE DDCalc_GetWIMP_mfa(WIMP,m,fp,fn,ap,an)
-!   Same as SetWIMP above, but retrieves current WIMP parameters.
-!
-!     SUBROUTINE DDCalc_GetWIMP_mfa(WIMP,m,fsp,fsn,app,apn)
+!     SUBROUTINE DDCalc_GetWIMP_mG(WIMP,m,fsp,fsn,app,apn)
+!     SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
 !   Same as SetWIMP above, but retrieves current WIMP parameters.
 !
 ! For advanced setters and getters for WIMP properties, see:
@@ -226,6 +230,8 @@ PUBLIC :: C_DDCalc_InitDetector
 PUBLIC :: DDCalc_SetSHM
 PUBLIC :: DDCalc_SetWIMP_mfa
 PUBLIC :: DDCalc_GetWIMP_mfa
+PUBLIC :: DDCalc_SetWIMP_mG
+PUBLIC :: DDCalc_GetWIMP_mG
 PUBLIC :: DDCalc_SetWIMP_Higgsportal
 PUBLIC :: DDCalc_GetWIMP_Higgsportal
 PUBLIC :: DDCalc_SetDetectorEmin
@@ -233,6 +239,8 @@ PUBLIC :: DDCalc_SetDetectorEmin
 PUBLIC :: C_DDCalc_SetSHM
 PUBLIC :: C_DDCalc_SetWIMP_mfa
 PUBLIC :: C_DDCalc_GetWIMP_mfa
+PUBLIC :: C_DDCalc_SetWIMP_mG
+PUBLIC :: C_DDCalc_GetWIMP_mG
 PUBLIC :: C_DDCalc_SetWIMP_Higgsportal
 PUBLIC :: C_DDCalc_GetWIMP_Higgsportal
 PUBLIC :: C_DDCalc_SetDetectorEmin
@@ -352,7 +360,8 @@ END SUBROUTINE
 
 
 !-----------------------------------------------------------------------
-! Sets/gets the WIMP mass and couplings.  Couplings are specified via
+! Sets/gets the WIMP mass and couplings for standard spin-independent
+! and spin-dependent interactions.  Couplings are specified via
 ! the commonly used fp/fn (spin-independent) and ap/an (spin-dependent)
 ! normalizations.
 ! 
@@ -413,6 +422,104 @@ SUBROUTINE DDCalc_GetWIMP_mfa(WIMP,m,fp,fn,ap,an)
 
 END SUBROUTINE
 
+! C++ interface wrappers
+SUBROUTINE C_DDCalc_SetWIMP_mfa(WIMPIndex,m,fp,fn,ap,an) &
+           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_mfa')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: m,fp,fn,ap,an
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_mfa' 
+  CALL DDCalc_SetWIMP_mfa(WIMPs(WIMPIndex)%p,m=REAL(m,KIND=8),           &
+               fp=REAL(fp,KIND=8),fn=REAL(fn,KIND=8),                  &
+               ap=REAL(ap,KIND=8),an=REAL(an,KIND=8))
+END SUBROUTINE
+
+SUBROUTINE C_DDCalc_GetWIMP_mfa(WIMPIndex,m,fp,fn,ap,an) &
+           BIND(C,NAME='C_DDCalc_ddcalc_getwimp_mfa')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(OUT) :: m,fp,fn,ap,an
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  REAL*8 :: m0,fp0,fn0,ap0,an0
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetWIMP_mfa' 
+  CALL DDCalc_GetWIMP_mfa(WIMPs(WIMPIndex)%p,m=m0,fp=fp0,fn=fn0,ap=ap0,an=an0)
+  ! Automatic type conversions here
+  m  = m0
+  fp = fp0
+  fn = fn0
+  ap = ap0
+  an = an0
+END SUBROUTINE
+
+!-----------------------------------------------------------------------
+! Sets/gets the WIMP mass and couplings.  Couplings are specified via
+! their effective 4-fermion vertex couplings 'G'.
+! 
+! For more detailed WIMP settings, see:
+!   SetWIMP() [interface name: DDCalc_SetWIMP]
+!   GetWIMP() [interface name: DDCalc_GetWIMP]
+! 
+! Input/output arguments:
+!   m           WIMP mass [GeV].
+!   GpSI        Spin-independent WIMP-proton coupling [GeV^-2].
+!               Related by GpSI = 2 fp.
+!   GnSI        Spin-independent WIMP-neutron coupling [GeV^-2].
+!               Related by GnSI = 2 fn.
+!   GpSD        Spin-dependent WIMP-proton coupling [GeV^-2].
+!               Related by GpSD = 2\sqrt{2} G_F ap.
+!   GnSD        Spin-dependent WIMP-neutron coupling [GeV^-2].
+!               Related by GnSD = 2\sqrt{2} G_F an.
+! 
+SUBROUTINE DDCalc_SetWIMP_mG(WIMP,m,GpSI,GnSI,GpSD,GnSD)
+  IMPLICIT NONE
+  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
+  REAL*8, INTENT(IN) :: m,GpSI,GnSI,GpSD,GnSD
+  CALL DDCalc_SetWIMP_mfa(WIMP,m,GtoF(GpSI),GtoF(GnSI),GtoA(GpSD),GtoA(GnSD))
+END SUBROUTINE
+
+SUBROUTINE DDCalc_GetWIMP_mG(WIMP,m,GpSI,GnSI,GpSD,GnSD)
+  IMPLICIT NONE
+  TYPE(WIMPStruct), INTENT(IN) :: WIMP
+  REAL*8, INTENT(OUT) :: m,GpSI,GnSI,GpSD,GnSD
+  REAL*8 :: fp, fn, ap, an
+  CALL DDCalc_GetWIMP_mfa(WIMP,m,fp,fn,ap,an)
+  GpSI = FtoG(fp)
+  GnSI = FtoG(fn)
+  GpSD = AtoG(ap)
+  GnSD = AtoG(an)
+END SUBROUTINE
+
+! C++ interface wrappers
+SUBROUTINE C_DDCalc_SetWIMP_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD) &
+           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_mg')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: m,GpSI,GnSI,GpSD,GnSD
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_mG' 
+  CALL DDCalc_SetWIMP_mG(WIMPs(WIMPIndex)%p,m=REAL(m,KIND=8),            &
+               GpSI=REAL(GpSI,KIND=8),GnSI=REAL(GnSI,KIND=8),          &
+               GpSD=REAL(GpSD,KIND=8),GnSD=REAL(GnSD,KIND=8))
+END SUBROUTINE
+
+SUBROUTINE C_DDCalc_GetWIMP_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD) &
+           BIND(C,NAME='C_DDCalc_ddcalc_getwimp_mg')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(OUT) :: m,GpSI,GnSI,GpSD,GnSD
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  REAL*8 :: m0,GpSI0,GnSI0,GpSD0,GnSD0
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetWIMP_mG' 
+  CALL DDCalc_GetWIMP_mG(WIMPs(WIMPIndex)%p,m=m0,GpSI=GpSI0,GnSI=GnSI0,GpSD=GpSD0,GnSD=GnSD0)
+  ! Automatic type conversions here
+  m    = m0
+  GpSI = GpSI0
+  GnSI = GnSI0
+  GpSD = GpSD0
+  GnSD = GnSD0
+END SUBROUTINE
+
 !-----------------------------------------------------------------------
 ! Sets/gets the WIMP mass and and its Higgs couplings. These couplings  
 ! can be of scalar or pseudoscalar nature.
@@ -460,38 +567,7 @@ SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
 
 END SUBROUTINE
 
-
-
 ! C++ interface wrappers
-SUBROUTINE C_DDCalc_SetWIMP_mfa(WIMPIndex,m,fp,fn,ap,an) &
-           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_mfa')
-  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
-  IMPLICIT NONE
-  REAL(KIND=C_DOUBLE), INTENT(IN) :: m,fp,fn,ap,an
-  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
-  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_mfa' 
-  CALL DDCalc_SetWIMP_mfa(WIMPs(WIMPIndex)%p,m=REAL(m,KIND=8),           &
-               fp=REAL(fp,KIND=8),fn=REAL(fn,KIND=8),                  &
-               ap=REAL(ap,KIND=8),an=REAL(an,KIND=8))
-END SUBROUTINE
-
-SUBROUTINE C_DDCalc_GetWIMP_mfa(WIMPIndex,m,fp,fn,ap,an) &
-           BIND(C,NAME='C_DDCalc_ddcalc_getwimp_mfa')
-  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
-  IMPLICIT NONE
-  REAL(KIND=C_DOUBLE), INTENT(OUT) :: m,fp,fn,ap,an
-  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
-  REAL*8 :: m0,fp0,fn0,ap0,an0
-  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetWIMP_mfa' 
-  CALL DDCalc_GetWIMP_mfa(WIMPs(WIMPIndex)%p,m=m0,fp=fp0,fn=fn0,ap=ap0,an=an0)
-  ! Automatic type conversions here
-  m  = m0
-  fp = fp0
-  fn = fn0
-  ap = ap0
-  an = an0
-END SUBROUTINE
-
 SUBROUTINE C_DDCalc_SetWIMP_higgsportal(WIMPIndex,m,fsp,fsn,app,apn) &
            BIND(C,NAME='C_DDCalc_ddcalc_setwimp_higgsportal')
   USE ISO_C_BINDING, only: C_DOUBLE, C_INT
