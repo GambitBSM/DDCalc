@@ -4,14 +4,16 @@
  * use of the interface defined in the DDCalc.hpp header file.
  * 
  * Run:
- *   ./DDCalc_exampleC [--mG|--mfa|--msigma]
+ *   ./DDCalc_exampleC [--mG|--mfa]
  * where the optional flag specifies the form in which the WIMP-nucleon
- * couplings will be provided (default: --msigma).
+ * couplings will be provided (default: --mfa).
  * 
  * 
  *       A. Scaffidi     U of Adelaide    2015    
  *       C. Savage       Nordita          2015
  *       P. Scott        Imperial Collge  2016
+ *       F. Kahlhoefer   DESY		  2017
+ *       S. Wild     	 DESY		  2017
  *       ddcalc@projects.hepforge.org
  * 
  **********************************************************************/
@@ -32,9 +34,8 @@
 // CONSTANTS -----------------------------------------------------------
 
 // These constants will be used to specify the type of input parameters.
-//const int TYPE_MG     = 1;  // Four-fermion effective couplings G
+const int TYPE_MG     = 1;  // Four-fermion effective couplings G
 const int TYPE_MFA    = 2;  // Effective couplings f (SI), a (SD)
-//const int TYPE_MSIGMA = 3;  // WIMP-nucleon cross-sections
 
 
 // UTILITY FUNCTIONS DECLARATIONS --------------------------------------
@@ -57,8 +58,7 @@ int main(int argc, char* argv[])
 {  
   
   int type;
-  double M,xpSI,xnSI,xpSD,xnSD,GpSI,GnSI,GpSD,GnSD,fp,fn,ap,an,
-         sigmapSI,sigmanSI,sigmapSD,sigmanSD;
+  double M,xpSI,xnSI,xpSD,xnSD,GpSI,GnSI,GpSD,GnSD,fp,fn,ap,an;
   
   // These three sets of indices refer to instance of the three types that
   // are the bedrock of DDCalc.  (Almost) every calculation needs to be
@@ -79,12 +79,14 @@ int main(int argc, char* argv[])
   type = TYPE_MFA;
   for (int i=1; i<argc; i++)
   {
-    if (std::string(argv[i]) == "--mfa")
+    if (std::string(argv[i]) == "--mG")
+      type = TYPE_MG;
+    else if (std::string(argv[i]) == "--mfa")
       type = TYPE_MFA;
     else if (std::string(argv[i]) == "--help")
     {
       std::cout << "Usage:" << std::endl;
-      std::cout << "  ./DDCalc_exampleC [--mfa]" << std::endl;
+      std::cout << "  ./DDCalc_exampleC [--mG|--mfa]" << std::endl;
       std::cout << "where the optional flag specifies the form in which the WIMP-" << std::endl;
       std::cout << "nucleon couplings will be provided (default: --mfa)." << std::endl;
       exit(0);
@@ -154,13 +156,22 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
     
     /* Set the WIMP parameters.
-       Specify the WIMP-nucleon couplings, with
+       There are three ways to specify the WIMP-nucleon couplings, with
        the WIMP mass [GeV] always the first argument:
          * DDCalc::SetWIMP_mfa(m,fp,fn,ap,an)
            The standard couplings fp,fn [GeV^-2] & ap,an [unitless]
-       In the above, 'p' is for proton, 'n' is for neutron. */
+         * DDCalc::SetWIMP_mG(m,GpSI,GnSI,GpSD,GnSD)
+           The effective 4 fermion vertex couplings GpSI,GnSI,GpSD,GnSD
+           [GeV^-2], related by:
+               GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
+               GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
+       In the above, 'p' is for proton, 'n' is for neutron, 'SI' is for
+       spin-independent, and 'SD' is for spin-dependent. */
     switch (type)
     {
+      case TYPE_MG:
+        DDCalc::SetWIMP_mG(WIMP,M,xpSI,xnSI,xpSD,xnSD);
+        break;
       case TYPE_MFA:
         DDCalc::SetWIMP_mfa(WIMP,M,xpSI,xnSI,xpSD,xnSD);
         break;
@@ -170,12 +181,15 @@ int main(int argc, char* argv[])
        above.  The only difference is that WIMP-nucleon cross-sections
        are always positive. */
     DDCalc::GetWIMP_mfa(WIMP,M,fp,fn,ap,an);
+    DDCalc::GetWIMP_mG(WIMP,M,GpSI,GnSI,GpSD,GnSD);
     
     /* Print out the above WIMP mass, couplings, and cross sections. */
     printf("%s %- #12.5g\n","WIMP mass [GeV]     ",M);
     std::cout << std::endl;
     printf("%-28s %11s %11s %11s %11s\n","WIMP-nucleon couplings",
            " proton-SI "," neutron-SI"," proton-SD "," neutron-SD");
+    printf("%-28s %- #11.5g %- #11.5g %- #11.5g %- #11.5g\n",
+           "  G [GeV^-2]",GpSI,GnSI,GpSD,GnSD);
     printf("%-28s %- #11.5g %- #11.5g %- #11.5g %- #11.5g\n",
            "  f & a [GeV^-2,unitless]",fp,fn,ap,an);
     std::cout << std::endl;
@@ -219,7 +233,6 @@ int main(int argc, char* argv[])
         DDCalc::Signal(SCDMS),
         DDCalc::Signal(SIMPLE),
         DDCalc::Signal(MyDetector));
-
     
     /* The log-likelihoods for the current WIMP; note these are _not_
        multiplied by -2.  The likelihood is calculated using a Poisson
@@ -287,6 +300,13 @@ void WriteDescription(const int type)
   std::cout << std::endl;
   switch (type)
   {
+    case TYPE_MG:
+      std::cout << "  M     WIMP mass [GeV]" << std::endl;
+      std::cout << "  GpSI  Spin-independent WIMP-proton effective coupling [GeV^-2]" << std::endl;
+      std::cout << "  GnSI  Spin-independent WIMP-neutron effective coupling [GeV^-2]" << std::endl;
+      std::cout << "  GpSD  Spin-dependent WIMP-proton effective coupling [GeV^-2]" << std::endl;
+      std::cout << "  GnSD  Spin-dependent WIMP-neutron effective coupling [GeV^-2]" << std::endl;
+      break;
     case TYPE_MFA:
       std::cout << "  M     WIMP mass [GeV]" << std::endl;
       std::cout << "  fp    Spin-independent WIMP-proton effective coupling [GeV^-2]" << std::endl;
@@ -306,6 +326,9 @@ bool GetWIMPParams(const int type, double& M, double& xpSI, double& xnSI,
   std::cout << "------------------------------------------------------------" << std::endl;
   switch (type)
   {
+    case TYPE_MG:
+      std::cout << "Enter values <M GpSI GnSI GpSD GnSD>:" << std::endl;
+      break;
     case TYPE_MFA:
       std::cout << "Enter values <M fp fn ap an>:" << std::endl;
       break;

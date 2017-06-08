@@ -4,14 +4,16 @@
 ! various direct detection constraints.
 ! 
 ! Run:
-!   ./DDCalc_exampleF [--mfa|--mG|--msigma]
+!   ./DDCalc_exampleF [--mfa|--mG]
 ! where the optional flag specifies the form in which the WIMP-nucleon
-! couplings will be provided (default: --msigma).
+! couplings will be provided (default: --mfa).
 ! 
 !   Created by
 !   Chris Savage    Nordita/Utah/SavageArchitectures
 !   Pat Scott       Imperial College
 !   Martin White    Adelaide
+!   Felix Kahlhoefer   DESY
+!   Sebastian Wild     DESY
 !   ddcalc@projects.hepforge.org
 ! 
 !#######################################################################
@@ -29,7 +31,7 @@ PROGRAM DDCalc_exampleF
   CHARACTER*32 :: arg
   INTEGER :: I,Narg,type
   REAL*8 :: M,xpSI,xnSI,xpSD,xnSD
-  REAL*8 :: GpSI,GnSI,GpSD,GnSD,fp,fn,ap,an,sigmapSI,sigmanSI,sigmapSD,sigmanSD
+  REAL*8 :: GpSI,GnSI,GpSD,GnSD,fp,fn,ap,an
   REAL*8 :: lnp
 
   ! These three types are the bedrock of DDCalc.  (Almost) every calculation
@@ -44,11 +46,10 @@ PROGRAM DDCalc_exampleF
   ! These constants will be used to specify the type of input parameters
   INTEGER, PARAMETER :: TYPE_MG     = 1
   INTEGER, PARAMETER :: TYPE_MFA    = 2
-  INTEGER, PARAMETER :: TYPE_MSIGMA = 3
   
   ! Parse command line options for this example program.
   ! In particlular, determine how the WIMP parameters will be specified.
-  type = TYPE_MSIGMA
+  type = TYPE_MFA
   Narg = IARGC()
   DO I = 1,Narg
     CALL GETARG(I,arg)
@@ -56,13 +57,11 @@ PROGRAM DDCalc_exampleF
       type = TYPE_MG
     ELSE IF (arg .EQ. '--mfa') THEN
       type = TYPE_MFA
-    ELSE IF (arg .EQ. '--msigma') THEN
-      type = TYPE_MSIGMA
     ELSE IF (arg .EQ. '--help') THEN
       WRITE(*,*) "Usage:"
-      WRITE(*,*) "  ./DDCalc_exampleF [--mG|--mfa|--msigma]"
+      WRITE(*,*) "  ./DDCalc_exampleF [--mG|--mfa]"
       WRITE(*,*) "where the optional flag specifies the form in which the WIMP-"
-      WRITE(*,*) "nucleon couplings will be provided (default: --msigma)."
+      WRITE(*,*) "nucleon couplings will be provided (default: --mfa)."
       STOP;
     ELSE
       WRITE(*,*) "WARNING: Ignoring unknown argument '" // TRIM(arg) // "'."
@@ -172,10 +171,20 @@ PROGRAM DDCalc_exampleF
     WRITE(*,*)
     
     ! Set the WIMP parameters.
+    ! There are three ways to specify the WIMP-nucleon couplings, with
+    ! the WIMP mass [GeV] always the first argument:
     !   * DDCalc_SetWIMP_mfa(WIMP,m,fp,fn,ap,an)
     !     The standard couplings fp,fn [GeV^-2] & ap,an [unitless]
-    ! In the above, 'p' is for proton, 'n' is for neutron.
+    !   * DDCalc_SetWIMP_mG(WIMP,m,GpSI,GnSI,GpSD,GnSD)
+    !     The effective 4 fermion vertex couplings GpSI,GnSI,GpSD,GnSD
+    !     [GeV^-2], related by:
+    !         GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
+    !         GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
+    ! In the above, 'p' is for proton, 'n' is for neutron, 'SI' is for
+    ! spin-independent, and 'SD' is for spin-dependent.
     SELECT CASE(type)
+    CASE(TYPE_MG)
+      CALL DDCalc_SetWIMP_mG(WIMP,M,xpSI,xnSI,xpSD,xnSD)
     CASE(TYPE_MFA)
       CALL DDCalc_SetWIMP_mfa(WIMP,M,xpSI,xnSI,xpSD,xnSD)
     END SELECT
@@ -183,11 +192,14 @@ PROGRAM DDCalc_exampleF
     ! Get the current WIMP parameters with the same signature and units
     ! as above.  The only difference is that WIMP-nucleon cross-sections
     ! are always positive (physical) values.
+    CALL DDCalc_GetWIMP_mG(WIMP,M,GpSI,GnSI,GpSD,GnSD)
     CALL DDCalc_GetWIMP_mfa(WIMP,M,fp,fn,ap,an)
     WRITE(*,'(A,1(1X,1PG12.4))') 'WIMP mass [GeV]     ',M
     WRITE(*,*)
     WRITE(*,'(A28,4(1X,A11))')     'WIMP-nucleon couplings          ',  &
         ' proton-SI ',' neutron-SI',' proton-SD ',' neutron-SD'
+    WRITE(*,'(A28,4(1X,1PG11.4))') '  G [GeV^-2]                    ',  &
+        GpSI,GnSI,GpSD,GnSD
     WRITE(*,'(A28,4(1X,1PG11.4))') '  f & a [GeV^-2,unitless]       ',  &
         fp,fn,ap,an
     WRITE(*,*)
@@ -288,6 +300,12 @@ PROGRAM DDCalc_exampleF
     WRITE(*,'(A)') 'A blank line terminates input.  The parameters are:'
     WRITE(*,'(A)') ''
     SELECT CASE(type)
+    CASE(TYPE_MG)
+      WRITE(*,'(A)') '  M     WIMP mass [GeV]'
+      WRITE(*,'(A)') '  GpSI  Spin-independent WIMP-proton effective coupling [GeV^-2]'
+      WRITE(*,'(A)') '  GnSI  Spin-independent WIMP-neutron effective coupling [GeV^-2]'
+      WRITE(*,'(A)') '  GpSD  Spin-dependent WIMP-proton effective coupling [GeV^-2]'
+      WRITE(*,'(A)') '  GnSD  Spin-dependent WIMP-neutron effective coupling [GeV^-2]'
     CASE(TYPE_MFA)
       WRITE(*,'(A)') '  M     WIMP mass [GeV]'
       WRITE(*,'(A)') '  fp    Spin-independent WIMP-proton effective coupling [GeV^-2]'
@@ -315,6 +333,8 @@ PROGRAM DDCalc_exampleF
     WRITE(*,'(A)') ''
     WRITE(*,'(A)') '------------------------------------------------------------'
     SELECT CASE(type)
+    CASE(TYPE_MG)
+      WRITE(*,'(A)') 'Enter values <M GpSI GnSI GpSD GnSD>:'
     CASE(TYPE_MFA)
       WRITE(*,'(A)') 'Enter values <M fp fn ap an>:'
     END SELECT
