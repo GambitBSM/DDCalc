@@ -27,6 +27,7 @@ USE LUX_2015
 USE PICO_2L
 USE PICO_60_F
 USE PICO_60_I
+USE PICO_60_2017
 
 IMPLICIT NONE
 
@@ -76,6 +77,8 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = PICO_60_F_Init(intervals)
   ELSE IF (GetLongArg('PICO-60_I'))      THEN
     Detector = PICO_60_I_Init(intervals)
+  ELSE IF (GetLongArg('PICO-60_2017'))   THEN
+    Detector = PICO_60_2017_Init(intervals)
   ELSE IF (GetLongArg('SuperCDMS-2014')) THEN !(low-energy analysis)
     Detector = SuperCDMS_2014_Init(intervals) 
   ELSE IF (GetLongArg('SIMPLE-2014'))    THEN

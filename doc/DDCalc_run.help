@@ -502,17 +502,23 @@ the detector options described later.
 
    --PICO-2L
          Sets the detector and analysis to that of the PICO 2L
-         result (R. Agnese et al., arxiv:1402.7137).
+         result (C. Amole et al., arxiv:1601.03729).
 
    --PICO-60_F
          Sets the detector and analysis to that of the PICO 60
-         result (R. Agnese et al., arxiv:1402.7137), including only
+         result (C. Amole et al., arxiv:1510.07754), including only
          fluorine.
 
    --PICO-60_I
          Sets the detector and analysis to that of the PICO 60
-         result (R. Agnese et al., arxiv:1402.7137), including only
+         result (C. Amole et al., arxiv:1510.07754), including only
          iodine.
+
+   --PICO-60_2017
+         Sets the detector and analysis to that of the PICO 60 2017
+         result (C. Amole et al., arxiv:1702.07666), including only
+         iodine.
+
 
 General detector options.  The detector isotopic composition and analysis
 efficiency options are in their own later sections.  Defaults generally

@@ -42,9 +42,10 @@ The experimental results implemented in DDCalc at this time are:
   * XENON100 2012: 34*224.6 kg-days (Xe)  
     E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
 
-  * PICO: 60 (CF3) and 2L (C3F8)  
+  * PICO: 60 (CF3), 2L (C3F8) and 60 (C3F8)
     C. Amole et al., PRD 93, 052014 (2016) [arXiv:1510.07754]  
     C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729] 
+    C. Amole et al., arXiv:1702.07666 
 
   * SuperCDMS 2014: 577 kg-days (Ge)  
     R. Agnese et al., PRL 112, 241302 (2014) [arxiv:1402.7137]
