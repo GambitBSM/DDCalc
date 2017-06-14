@@ -253,7 +253,9 @@ $(BUILD)/DDExperiments.o: $(BUILD)/XENON100_2012.o \
  $(BUILD)/LUX_2015.o \
  $(BUILD)/PICO_2L.o \
  $(BUILD)/PICO_60_F.o \
- $(BUILD)/PICO_60_I.o
+ $(BUILD)/PICO_60_I.o \
+ $(BUILD)/PICO_60_2017.o \
+ $(BUILD)/Xenon1T_2017.o
 $(BUILD)/DDHalo.o: $(BUILD)/DDConstants.o \
  $(BUILD)/DDTypes.o \
  $(BUILD)/DDUtils.o \
