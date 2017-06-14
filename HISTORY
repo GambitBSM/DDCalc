@@ -1,0 +1,10 @@
+DDCalc Revision History
+=======================
+Full details can be found in the git log.  Only a summary of the
+changes in each new version is given here.
+
+v1.1.0 - June 2017
+Added implementation of Xenon1T (2017) and PICO-60 (2017).
+
+v1.0.0 - May 2017
+Initial release in combination with GAMBIT v1.0.0.
