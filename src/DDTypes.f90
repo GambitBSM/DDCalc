@@ -23,29 +23,6 @@ TYPE, PUBLIC :: ArgumentStruct
 END TYPE 
 
 
-! Structure to contain tabulated rates as a function of energy.
-TYPE, PUBLIC :: DetectorRateStruct
-
-  ! Integrated rate  --------
-  ! Efficiency-corrected rate at given couplings.  Array is of size
-  ! [0:Neff] with the index being that of the S1 bin/interval
-  ! efficiency curve used in the integral (0 for full range). 
-  ! [cpd/kg]
-  REAL*8, ALLOCATABLE :: R(:)
-  
-  ! Events -------------------------------------
-  ! Expected number of signal events.  Array of size [0:Neff].
-  REAL*8, ALLOCATABLE :: MuSignal(:)
-  
-  ! Average expected background events
-  REAL*8 :: MuBackground = 0d0
-  
-  ! Observed number of events
-  INTEGER :: Nevents = -1
-  
-END TYPE
-
-
 ! WIMP Structure
 TYPE, PUBLIC :: WIMPStruct
   REAL*8 :: m   ! WIMP mass [GeV]
@@ -141,15 +118,6 @@ TYPE, PUBLIC :: DetectorStruct
   ! and need to be reinitialized.
   LOGICAL :: stale = .TRUE.
   
-  ! Detector parameters (future use)
-  !TYPE(DetectorParametersStruct) :: parameters
-  
-  ! Detector efficiencies  (future use)
-  !TYPE(DetectorEfficiencyStruct) :: efficiency
-  
-  ! Detector rates  (future use)
-  !TYPE(DetectorRateStruct) :: rates
-  
   ! Exposure -----------------------------------
   ! Detector fiducial mass [kg]
   REAL*8 :: mass = 118d0
@@ -162,10 +130,10 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Events -------------------------------------
   ! Observed number of events
-  INTEGER :: Nevents = -1    !! keep this
+  INTEGER :: Nevents = -1   
   
   ! Average expected background events
-  REAL*8 :: MuBackground = 0d0    !! keep this
+  REAL*8 :: MuBackground = 0d0  
   
   ! Isotopes -----------------------------------
   ! Number of isotopes
@@ -266,130 +234,6 @@ TYPE, PUBLIC :: DetectorStruct
   
 END TYPE
 
-
-! <<<<THE FOLLOWING STRUCTURES ARE FOR FUTURE USE ONLY>>>>
-
-
-! Structure to contain tabulated detection efficiencies as a
-! function of energy, for the overall analysis range and possibly
-! for subintervals/bins.
-TYPE, PUBLIC :: DetectorEfficiencyStruct
-  
-  ! File containing efficiencies
-  CHARACTER(LEN=1024) :: file = ''
-  
-  ! Number of tabulation points (energies).
-  INTEGER :: NE = -1
-  
-  ! Tabulated energies [keV].  Array of size [1:NE].
-  REAL*8, ALLOCATABLE :: E(:)
-  
-  ! Number of S1 bins/sub-intervals with efficiencies (does not
-  ! include total interval). Will calculate rates for each bin/interval
-  ! plus total.
-  INTEGER :: Neff = -1
-  
-  ! Array of size [1:NE,0:Neff] with the second index for the S1
-  ! bin/interval (zero for full range)
-  REAL*8, ALLOCATABLE :: eff(:,:)
-  
-END TYPE
-
-
-! Structure to contain various detector parameters.
-TYPE, PUBLIC :: DetectorParametersStruct
-  
-  ! Exposure -----------------------------------
-  ! Detector fiducial mass [kg]
-  REAL*8 :: mass = 118d0
-  
-  ! Detector exposure time [day]
-  REAL*8 :: time = 85.3d0
-  
-  ! Total detector exposure [kg*day]
-  REAL*8 :: exposure = 118d0*85.3d0
-  
-  ! Isotopes -----------------------------------
-  ! Number of isotopes
-  INTEGER :: Niso = -1
-  
-  ! Detector isotopes, their mass fractions, and nuclear masses [GeV]
-  INTEGER, ALLOCATABLE :: Ziso(:)
-  INTEGER, ALLOCATABLE :: Aiso(:)
-  REAL*8, ALLOCATABLE  :: fiso(:)
-  REAL*8, ALLOCATABLE  :: Miso(:)  ! Calculated internally
-  
-END TYPE
-
-
-! Structure to contain tabulated differential rates dR/dE as a function
-! of energy.
-TYPE, PUBLIC :: DetectorSpectraStruct
-  
-  ! Tabulation ---------------------------------
-  ! Number of tabulation points (energies).
-  ! NOTE: This tabulation is fixed to that used by the efficiency data.
-  INTEGER :: NE = -1
-  
-  ! Tabulated energies [keV].  Array of size [1:NE].
-  REAL*8, ALLOCATABLE :: E(:)
-  
-  ! Efficiencies -------------------------------
-  ! Tabulated detection efficiencies.  Here tabulated at desired
-  ! E for dR/dE calculations.
-  
-  ! Number of S1 bins/intervals with efficiencies.
-  ! Will calculate rates for each bin/interval plus total.
-  INTEGER :: Neff = -1
-  
-  ! Array of size [1:NE,0:Neff] with the second index for the S1
-  ! bin/interval (zero for full range)
-  REAL*8, ALLOCATABLE :: eff(:,:)
-  
-  ! Form factors -------------------------------
-  ! Tabulated spin-independent or spin-dependent form factors combined
-  ! with prefactors.  Arrays of size [-1:1,1:NE,1:Niso].  Defined as
-  ! [unitless]:
-  !   Wsi(+1,:,:) = (1/pi) Z^2 F^2(q)        ! SI proton
-  !   Wsi( 0,:,:) = (1/pi) 2*Z*(A-Z) F^2(q)  ! SI crossterm
-  !   Wsi(-1,:,:) = (1/pi) (A-Z)^2 F^2(q)    ! SI neutron
-  !   Wsd(+1,:,:) = 4/(2J+1) Spp(q)          ! SD proton
-  !   Wsd( 0,:,:) = 4/(2J+1) Spn(q)          ! SD crossterm
-  !   Wsd(-1,:,:) = 4/(2J+1) Snn(q)          ! SD neutron
-  ! The above definitions give for the conventional SI and SD
-  ! cross-sections:
-  !   \sigma(q) = \mu^2 (hbar c)^2 [W(1)*Gp^2 + W(0)*Gp*Gn + W(-1)*Gn^2]
-  ! where Gp and Gn are the effective proton and neutron couplings
-  ! in units of [GeV^-2] and \mu is the reduced mass.  In terms of
-  ! more commonly used notation:
-  !   SI (scalar):        G = 2f
-  !   SD (axial-vector):  G = 2\sqrt{2} G_F a
-  ! where G, f, and a have 'p' and 'n' subscripts.  While form factors
-  ! are often a function of the momentum transfer, we tabulate them
-  ! here as a function of recoil energy E = q^2/2M.
-  ! NOTE: Need only be calculated once.
-  REAL*8, ALLOCATABLE :: Wsi(:,:,:),Wsd(:,:,:)
-  
-  ! Halo ---------------------------------------
-  ! The minimum velocity for producing a recoil of energy E, given
-  ! by vmin = sqrt{M E/(2\mu^2)} [km/s].
-  ! Array of size [1:NE,1:Niso] that needs to be recalculated when the
-  ! WIMP mass changes.
-  REAL*8, ALLOCATABLE :: vmin(:,:)
-  
-  ! Tabulated mean inverse speed (eta) [s/km] at the above vmin.
-  REAL*8, ALLOCATABLE :: eta(:,:)
-  
-
-  ! new post DDCalc-1.0 structure for the differential rates,
-  ! separately for each isotope of the experiment.
-  ! These represent rates before efficiency cuts, but they already
-  ! do include the mass fraction of the corresponding isotope.
-  ! Array is of size [1:NE,1:Niso].
-  REAL*8, ALLOCATABLE :: dRdEiso(:,:)
-
-  
-END TYPE
 
 !#### Internal caches of WIMPs, Halos and Detectors for C interface ####
 TYPE, PUBLIC :: WIMPStructPtr
