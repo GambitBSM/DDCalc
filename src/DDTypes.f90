@@ -123,6 +123,12 @@ END TYPE
 ! a function of energy.
 TYPE, PUBLIC :: DetectorStruct
   
+  ! flag which indicates whether the detector has been successfully initialized.
+  ! If this remains false after calling SetDetector, it means that some of the 
+  ! required input arguments have not been specified.
+  LOGICAL :: InitSuccess = .FALSE.
+
+
   ! Label --------------------------------------
   ! Label for the experimental result contained in this structure.
   ! Must be at most 12 characters as it will be used in column headers.

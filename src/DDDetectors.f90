@@ -279,48 +279,58 @@ END SUBROUTINE
 !   Emin        If given, sets all efficiencies below the given energy
 !               [keV] to zero, removing all contributions from recoils
 !               at lower energies.
-! Optional form factor arguments.  The NE and Niso arguments must also
-! be given for changes to take effect.
-!   Wsi,Wsd     Arrays of size [-1:1,1:NE,1:Niso] containing weighted
-!               form factors for spin-independent (SI) and spin-
-!               dependent (SD) couplings.  Note: these are replaced with
-!               internal calculations if the energy tabulation changes
-!               in subsequent calls.  Should not be used in combination
-!               with Emin.
-! 
+!
+
 SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,fiso,Nelem,Zelem,stoich,          &
                        NE,E,                                            &
                        eff_file,eff_filename,Neff,eff,       &
-                       intervals,Emin,Wsi,Wsd)
+                       intervals,Emin)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(INOUT) :: D
   CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: eff_file,eff_filename
   LOGICAL, INTENT(IN), OPTIONAL :: intervals
   INTEGER, INTENT(IN), OPTIONAL :: Nevents,Niso,Nelem,NE,Neff
-  !INTEGER, INTENT(IN), OPTIONAL :: Ziso(Niso),Aiso(Niso),Zelem(Nelem), &
-  !                                 stoich(Nstoich)
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,background,Emin
-  !REAL*8, INTENT(IN), OPTIONAL :: fiso(Niso),E(NE),eff(NE,0:Neff),      &
-  !        Wsi(-1:1,NE,Niso),Wsd(-1:1,NE,Niso)
-  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,0:),       &
-          Wsi(-1:,:,:),Wsd(-1:,:,:)
+  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,0:)
   LOGICAL :: iso_change,E_change,eff_change
   INTEGER :: KE,Kiso,Neff0
   INTEGER, ALLOCATABLE :: stoich0(:)
-  REAL*8 :: f,dx
-  ! For setting default energy tabulation (logarithmic spacing)
-  INTEGER, PARAMETER :: E_PER_DECADE = 100
-  REAL*8, PARAMETER :: DEFAULT_EMIN = 0.1d0
-  REAL*8, PARAMETER :: DEFAULT_EMAX = 1000d0
-  
+ 
+
+  ! Some of the formally optional input arguments are actually mandatory for the code to work.
+  ! Check whether they are all present, and if not set InitSuccess to false
+  !
+  ! E and NE have to be given.
+  IF ( (.NOT. PRESENT(E)) .OR. (.NOT. PRESENT(NE)) ) THEN
+    D%InitSuccess = .False.
+    RETURN
+  END IF
+  ! NE has to be positive
+  IF ( PRESENT(NE) ) THEN
+    IF (.NOT. NE > 0) THEN
+      D%InitSuccess = .False.
+      RETURN      
+    END IF
+  END IF
+  ! Either (eff and Neff) or eff_file have to be given in order to specify the efficiencies
+  IF (.NOT. PRESENT(eff_file)) THEN
+    IF ( (.NOT. PRESENT(eff)) .OR. (.NOT. PRESENT(Neff)) ) THEN
+      D%InitSuccess = .False.
+      RETURN
+    END IF
+  END IF
+
+
+ 
   ! Indicate if quantities changed, indicating need for
   ! array resizing and initialization
   iso_change = .FALSE.
   E_change   = .FALSE.
   eff_change = .FALSE.
-  
+ 
+
   ! Exposures
   IF (PRESENT(mass)) THEN
     D%mass     = mass
@@ -385,38 +395,16 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
   END IF
   
   ! Energies
-  IF (PRESENT(NE) .AND. PRESENT(E)) THEN
-    IF (ALLOCATED(D%E) .AND. (NE .NE. D%NE)) DEALLOCATE(D%E)
-    IF (.NOT. ALLOCATED(D%E)) ALLOCATE(D%E(NE))
-    D%NE = NE
-    D%E = E(1:NE)
-    IF (ALLOCATED(D%E_cache)) DEALLOCATE(D%E_cache)
-    ALLOCATE(D%E_cache(D%NE))
-    D%E_cache = D%E
-    E_change = .TRUE.
-  END IF
-  
-  ! Set default energies if not initialized or NE <= 0.
-  ! Will use logarithmic spacing, but including E=0.
-  IF (PRESENT(NE)) THEN
-    IF (NE .LE. 0) D%NE = NE
-  END IF
-  IF (D%NE .LE. 0) THEN
-    IF (ALLOCATED(D%E)) DEALLOCATE(D%E)
-    D%NE = NINT(E_PER_DECADE*(LOG10(DEFAULT_EMAX/DEFAULT_EMIN))) + 2
-    ALLOCATE(D%E(D%NE))
-    dx = 1d0/E_PER_DECADE
-    D%E(1) = 0d0
-    D%E(2) = DEFAULT_EMIN
-    DO KE = 2, D%NE-1
-      D%E(KE) = DEFAULT_EMIN * 10d0**((KE-2)*dx)
-    END DO
-    D%E(D%NE) = DEFAULT_EMAX
-    IF (ALLOCATED(D%E_cache)) DEALLOCATE(D%E_cache)
-    ALLOCATE(D%E_cache(D%NE))
-    D%E_cache = D%E
-    E_change = .TRUE.
-  END IF
+  IF (ALLOCATED(D%E) .AND. (NE .NE. D%NE)) DEALLOCATE(D%E)
+  IF (.NOT. ALLOCATED(D%E)) ALLOCATE(D%E(NE))
+  D%NE = NE
+  D%E = E(1:NE)
+  IF (ALLOCATED(D%E_cache)) DEALLOCATE(D%E_cache)
+  ALLOCATE(D%E_cache(D%NE))
+  D%E_cache = D%E
+  E_change = .TRUE.
+
+ 
   
   ! Set efficiencies
   ! ...from file
@@ -427,8 +415,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
       eff_change = .TRUE.
     END IF
   ! ...by arguments
-  ELSE IF (PRESENT(NE) .AND. PRESENT(E) .AND. PRESENT(Neff)       &
-           .AND. PRESENT(eff)) THEN
+  ELSE IF (PRESENT(Neff) .AND. PRESENT(eff)) THEN
     IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
     ALLOCATE(D%eff(NE,0:Neff))
     D%Neff  = Neff
@@ -454,35 +441,23 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
   END IF
   
   
-  ! Weighted form factors (SI)
-  IF (PRESENT(NE) .AND. PRESENT(Niso) .AND. PRESENT(Wsi)) THEN
-    IF (ALLOCATED(D%Wsi)) DEALLOCATE(D%Wsi)
-    ALLOCATE(D%Wsi(-1:1,NE,Niso))
-    D%Wsi = Wsi(-1:1,1:NE,1:Niso)
-  ELSE IF ((iso_change .OR. E_change) .AND. (D%Niso .GE. 0)            &
-           .AND. (D%NE .GE. 0)) THEN
-    IF (ALLOCATED(D%Wsi)) DEALLOCATE(D%Wsi)
-    ALLOCATE(D%Wsi(-1:1,D%NE,D%Niso))
-    DO Kiso = 1,D%Niso
-      CALL CalcWSI(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
-                   EToQ(D%E,D%Miso(Kiso)),D%Wsi(:,:,Kiso))
-    END DO
-  END IF
+  ! Calculate weighted form factors (SI)
+  IF (ALLOCATED(D%Wsi)) DEALLOCATE(D%Wsi)
+  ALLOCATE(D%Wsi(-1:1,D%NE,D%Niso))
+  DO Kiso = 1,D%Niso
+    CALL CalcWSI(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
+                 EToQ(D%E,D%Miso(Kiso)),D%Wsi(:,:,Kiso))
+  END DO
+
   
-  ! Weighted form factors (SD)
-  IF (PRESENT(NE) .AND. PRESENT(Niso) .AND. PRESENT(Wsd)) THEN
-    IF (ALLOCATED(D%Wsd)) DEALLOCATE(D%Wsd)
-    ALLOCATE(D%Wsd(-1:1,NE,Niso))
-    D%Wsd = Wsd(-1:1,1:NE,1:Niso)
-  ELSE IF ((iso_change .OR. E_change) .AND. (D%Niso .GE. 0)            &
-           .AND. (D%NE .GE. 0)) THEN
-    IF (ALLOCATED(D%Wsd)) DEALLOCATE(D%Wsd)
-    ALLOCATE(D%Wsd(-1:1,D%NE,D%Niso))
-    DO Kiso = 1,D%Niso
-      CALL CalcWSD(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
-                   EToQ(D%E,D%Miso(Kiso)),D%Wsd(:,:,Kiso))
-    END DO
-  END IF
+  ! Calculate weighted form factors (SD)
+  IF (ALLOCATED(D%Wsd)) DEALLOCATE(D%Wsd)
+  ALLOCATE(D%Wsd(-1:1,D%NE,D%Niso))
+  DO Kiso = 1,D%Niso
+    CALL CalcWSD(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
+                 EToQ(D%E,D%Miso(Kiso)),D%Wsd(:,:,Kiso))
+  END DO
+
   
   ! Resize halo velocity arrays if necessary
   IF ((iso_change .OR. E_change) .AND. (D%Niso .GE. 0)                 &
@@ -536,6 +511,9 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
     D%R           = 0d0
     D%MuSignal    = 0d0
   END IF
+
+  ! Everything went fine up to here, so set InitSuccess to True
+  D%InitSuccess = .TRUE.
   
 END SUBROUTINE
 

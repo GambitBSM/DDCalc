@@ -42,9 +42,12 @@ PROGRAM DDTest
   Halo = DDCalc_InitHalo()
 
   Detector = LUX_2016_Init(.true.)
+  WRITE (*,*) Detector%InitSuccess
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-  WRITE (*,*) Detector%MuSignal 
-
+  WRITE (*,*) Detector%MuSignal
+  !WRITE (*,*) Detector%E
+  !WRITE (*,*) Detector%eff(100,1)
+  !WRITE (*,*) Detector%eff(100,2)
 
 
 

@@ -1,5 +1,5 @@
-GFORTRAN module version '10' created from src/DDTypes.f90
-MD5:900436fb6e9c41394942ce65b1f5f1f0 -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '10' created from DDTypes.f90
+MD5:4ed808fa81cad62f1f2860129e2c95e3 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -114,231 +114,226 @@ UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
 UNKNOWN-ACCESS ())) PUBLIC (() () () ()) () 0 0 48465521)
 7 'Detectorstruct' 'ddtypes' '' 1 ((DERIVED UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOC_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0
-((44 'label' (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0
-INTEGER ()) 0 '12'))) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (CHARACTER 1 0 0 0 CHARACTER (()))
-0 12 '            ')) (45 'description' (CHARACTER 1 0 0 0 CHARACTER ((
+((44 'initsuccess' (LOGICAL 4 0 0 0 LOGICAL ()) () (UNKNOWN-FL
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
+CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0)) (45 'label' (CHARACTER 1 0 0
+0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '12'))) () (
+UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
+UNKNOWN-ACCESS (CONSTANT (CHARACTER 1 0 0 0 CHARACTER (())) 0 12
+'            ')) (46 'description' (CHARACTER 1 0 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1024'))) () (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
 CONSTANT (CHARACTER 1 0 0 0 CHARACTER (())) 0 1024
 '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '))
-(46 'stale' (LOGICAL 4 0 0 0 LOGICAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(47 'stale' (LOGICAL 4 0 0 0 LOGICAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0
-0 0 LOGICAL ()) 0 1)) (47 'mass' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL
+0 0 LOGICAL ()) 0 1)) (48 'mass' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
-CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.76000000000000@2')) (48 'time' (
+CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.76000000000000@2')) (49 'time' (
 REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0
-'0.554ccccccccccc@2')) (49 'exposure' (REAL 8 0 0 0 REAL ()) () (
+'0.554ccccccccccc@2')) (50 'exposure' (REAL 8 0 0 0 REAL ()) () (
 UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
 UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.27516666666666@4'))
-(50 'nevents' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(51 'nevents' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
-0 0 INTEGER ()) 0 '-1')) (51 'mubackground' (REAL 8 0 0 0 REAL ()) () (
+0 0 INTEGER ()) 0 '-1')) (52 'mubackground' (REAL 8 0 0 0 REAL ()) () (
 UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
 UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.00000000000000@0'))
-(52 'niso' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(53 'niso' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
-0 0 INTEGER ()) 0 '-1')) (53 'ziso' (INTEGER 4 0 0 0 INTEGER ()) (1 0
+0 0 INTEGER ()) 0 '-1')) (54 'ziso' (INTEGER 4 0 0 0 INTEGER ()) (1 0
 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN
-0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (54 'aiso' (INTEGER 4 0 0
+0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (55 'aiso' (INTEGER 4 0 0
 0 INTEGER ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())
-(55 'fiso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
+(56 'fiso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (56 'miso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ())
+UNKNOWN-ACCESS ()) (57 'miso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ())
 (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
-DIMENSION) UNKNOWN-ACCESS ()) (57 'ne' (INTEGER 4 0 0 0 INTEGER ()) () (
+DIMENSION) UNKNOWN-ACCESS ()) (58 'ne' (INTEGER 4 0 0 0 INTEGER ()) () (
 UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
-UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '-1')) (58 'e' (
+UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '-1')) (59 'e' (
 REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())
-(59 'e_cache' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
+(60 'e_cache' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (60 'eff_file' (CHARACTER 1 0 0 0 CHARACTER ((
+UNKNOWN-ACCESS ()) (61 'eff_file' (CHARACTER 1 0 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1024'))) () (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
 CONSTANT (CHARACTER 1 0 0 0 CHARACTER (())) 0 1024
 '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '))
-(61 'neeff' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(62 'neff' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
-0 0 INTEGER ()) 0 '-1')) (62 'eeff' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED
-() ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (63 'neff' (INTEGER 4 0 0 0
-INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0
-0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '-1')) (64
-'eff' (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL
-UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (65 'intervals' (LOGICAL 4 0 0 0 LOGICAL ()) () (
-UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
-UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 1)) (66 'eff0' (
-REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL
-UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (67 'wsi' (REAL 8 0 0 0 REAL ()) (3 0 DEFERRED () ()
+0 0 INTEGER ()) 0 '-1')) (63 'eff' (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED
 () () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (68 'wsd' (REAL 8 0 0 0 REAL ())
-(3 0 DEFERRED () () () () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (69 'vmin'
+ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (64 'intervals' (LOGICAL 4 0 0
+0 LOGICAL ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN
+0 0) UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 1)) (65 'wsi'
+(REAL 8 0 0 0 REAL ()) (3 0 DEFERRED () () () () () ()) (UNKNOWN-FL
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
+UNKNOWN-ACCESS ()) (66 'wsd' (REAL 8 0 0 0 REAL ()) (3 0 DEFERRED () ()
+() () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (67 'vmin' (REAL 8 0 0 0 REAL
+()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (68 'eta'
 (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (70 'eta' (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () ()
-() ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (71 'drdeiso' (REAL 8 0 0 0
-REAL ()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())
-(72 'r' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
-UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (73 'musignal' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED ()
-()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())) PUBLIC (() () () ()) () 0 0
-44270433)
+UNKNOWN-ACCESS ()) (69 'drdeiso' (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED ()
+() () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
+ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (70 'r' (REAL 8 0 0 0 REAL ())
+(1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (71 'musignal' (
+REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()))
+PUBLIC (() () () ()) () 0 0 44270433)
 8 'Detectorstructptr' 'ddtypes' '' 1 ((DERIVED UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 POINTER_COMP) (UNKNOWN 0 0 0 0 UNKNOWN
-()) 0 0 () () 0 ((74 'p' (DERIVED 7 0 0 0 DERIVED ()) () (UNKNOWN-FL
+()) 0 0 () () 0 ((72 'p' (DERIVED 7 0 0 0 DERIVED ()) () (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 POINTER) UNKNOWN-ACCESS
 ())) PUBLIC (() () () ()) () 0 0 65134285)
 9 'Halostruct' 'ddtypes' '' 1 ((DERIVED UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOC_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0
-((75 'vrot' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
+((73 'vrot' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0
-REAL ()) 0 '0.eb000000000000@2')) (76 'vlsr' (REAL 8 0 0 0 REAL ()) (1 0
+REAL ()) 0 '0.eb000000000000@2')) (74 'vlsr' (REAL 8 0 0 0 REAL ()) (1 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '3')) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DIMENSION) UNKNOWN-ACCESS (ARRAY (REAL
 8 0 0 0 REAL ()) 1 (((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.00000000000000@0') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.eb000000000000@2') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
-'0.00000000000000@0') ())) ('3'))) (77 'vpec' (REAL 8 0 0 0 REAL ()) (1
+'0.00000000000000@0') ())) ('3'))) (75 'vpec' (REAL 8 0 0 0 REAL ()) (1
 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '3')) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DIMENSION) UNKNOWN-ACCESS (ARRAY (REAL
 8 0 0 0 REAL ()) 1 (((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.b0000000000000@1') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.c0000000000000@1') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
-'0.70000000000000@1') ())) ('3'))) (78 'vsun' (REAL 8 0 0 0 REAL ()) (1
+'0.70000000000000@1') ())) ('3'))) (76 'vsun' (REAL 8 0 0 0 REAL ()) (1
 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '3')) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DIMENSION) UNKNOWN-ACCESS (ARRAY (REAL
 8 0 0 0 REAL ()) 1 (((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.b0000000000000@1') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.f7000000000000@2') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
-'0.70000000000000@1') ())) ('3'))) (79 'vobs' (REAL 8 0 0 0 REAL ()) ()
+'0.70000000000000@1') ())) ('3'))) (77 'vobs' (REAL 8 0 0 0 REAL ()) ()
 (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
 UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.f758092f831cc0@2'))
-(80 'rho' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(78 'rho' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0
-REAL ()) 0 '0.66666666666668@0')) (81 'vbulk' (REAL 8 0 0 0 REAL ()) (1
+REAL ()) 0 '0.66666666666668@0')) (79 'vbulk' (REAL 8 0 0 0 REAL ()) (1
 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '3')) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 DIMENSION) UNKNOWN-ACCESS (ARRAY (REAL
 8 0 0 0 REAL ()) 1 (((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.00000000000000@0') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.00000000000000@0') ()) ((CONSTANT (REAL 8 0 0 0 REAL ()) 0
-'0.00000000000000@0') ())) ('3'))) (82 'v0' (REAL 8 0 0 0 REAL ()) () (
+'0.00000000000000@0') ())) ('3'))) (80 'v0' (REAL 8 0 0 0 REAL ()) () (
 UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
 UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.eb000000000000@2'))
-(83 'vesc' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(81 'vesc' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0
-REAL ()) 0 '0.22600000000000@3')) (84 'tabulated' (LOGICAL 4 0 0 0
+REAL ()) 0 '0.22600000000000@3')) (82 'tabulated' (LOGICAL 4 0 0 0
 LOGICAL ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0
-0) UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0)) (85
+0) UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0)) (83
 'eta_file' (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0
 INTEGER ()) 0 '1024'))) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (CHARACTER 1 0 0 0
 CHARACTER (())) 0 1024
 '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '))
-(86 'nvmin' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(84 'nvmin' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
-0 0 INTEGER ()) 0 '-1')) (87 'vmin' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED
+0 0 INTEGER ()) 0 '-1')) (85 'vmin' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED
 () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0
-ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (88 'eta' (REAL 8 0 0 0 REAL ())
+ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (86 'eta' (REAL 8 0 0 0 REAL ())
 (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())) PUBLIC (() () ()
 ()) () 0 0 47570775)
 10 'Halostructptr' 'ddtypes' '' 1 ((DERIVED UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 POINTER_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () ()
-0 ((89 'p' (DERIVED 9 0 0 0 DERIVED ()) () (UNKNOWN-FL UNKNOWN-INTENT
+0 ((87 'p' (DERIVED 9 0 0 0 DERIVED ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 POINTER) UNKNOWN-ACCESS ())) PUBLIC (()
 () () ()) () 0 0 67663447)
 11 'Wimpstruct' 'ddtypes' '' 1 ((DERIVED UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 ALLOC_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0
-((90 'm' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ()) (91 'dmtype' (
+((88 'm' (REAL 8 0 0 0 REAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS ()) (89 'dmtype' (
 CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '24')))
 () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
 UNKNOWN-ACCESS (CONSTANT (CHARACTER 1 0 0 0 CHARACTER (())) 0 24
-'                        ')) (92 'params' (REAL 8 0 0 0 REAL ()) (1 0
+'                        ')) (90 'params' (REAL 8 0 0 0 REAL ()) (1 0
 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN
-0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (93 'nparams' (INTEGER 4 0
+0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (91 'nparams' (INTEGER 4 0
 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1')))
 PUBLIC (() () () ()) () 0 0 29375824)
 12 'Wimpstructptr' 'ddtypes' '' 1 ((DERIVED UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0 POINTER_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () ()
-0 ((94 'p' (DERIVED 11 0 0 0 DERIVED ()) () (UNKNOWN-FL UNKNOWN-INTENT
+0 ((92 'p' (DERIVED 11 0 0 0 DERIVED ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 POINTER) UNKNOWN-ACCESS ())) PUBLIC (()
 () () ()) () 0 0 66037022)
-95 'argumentstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+93 'argumentstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-96 'detectorefficiencystruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+94 'detectorefficiencystruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-97 'detectorparametersstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+95 'detectorparametersstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-98 'detectorratestruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+96 'detectorratestruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-99 'detectors' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+97 'detectors' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (DERIVED 8 0 0 0 DERIVED ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '1024')) 0 () () () 0 0)
-100 'detectorspectrastruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+98 'detectorspectrastruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-101 'detectorstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+99 'detectorstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-102 'detectorstructptr' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+100 'detectorstructptr' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-103 'halos' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+101 'halos' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (DERIVED 10 0 0 0 DERIVED ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '1024')) 0 () () () 0 0)
-104 'halostruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+102 'halostruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
 DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () ()
 0 () () () 0 0)
-105 'halostructptr' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+103 'halostructptr' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
-106 'max_detectors' 'ddtypes' '' 1 ((PARAMETER UNKNOWN-INTENT
+104 'max_detectors' 'ddtypes' '' 1 ((PARAMETER UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
 () (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1024') () 0 () () () 0 0)
-107 'max_halos' 'ddtypes' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+105 'max_halos' 'ddtypes' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1024') () 0 () () () 0 0)
-108 'max_wimps' 'ddtypes' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+106 'max_wimps' 'ddtypes' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1024') () 0 () () () 0 0)
-109 'n_detectors' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+107 'n_detectors' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-110 'n_halos' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+108 'n_halos' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-111 'n_wimps' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+109 'n_wimps' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-112 'wimps' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+110 'wimps' 'ddtypes' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (DERIVED 12 0 0 0 DERIVED ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '1024')) 0 () () () 0 0)
-113 'wimpstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+111 'wimpstruct' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
 DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () ()
 0 () () () 0 0)
-114 'wimpstructptr' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
+112 'wimpstructptr' 'ddtypes' '' 1 ((PROCEDURE UNKNOWN-INTENT
 UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 ()) 0 0 () () 0 () () () 0 0)
 )
@@ -347,10 +342,10 @@ UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
 'Detectorparametersstruct' 0 4 'Detectorratestruct' 0 5
 'Detectorspectrastruct' 0 6 'Detectorstruct' 0 7 'Detectorstructptr' 0 8
 'Halostruct' 0 9 'Halostructptr' 0 10 'Wimpstruct' 0 11 'Wimpstructptr'
-0 12 'argumentstruct' 0 95 'detectorefficiencystruct' 0 96
-'detectorparametersstruct' 0 97 'detectorratestruct' 0 98 'detectors' 0
-99 'detectorspectrastruct' 0 100 'detectorstruct' 0 101
-'detectorstructptr' 0 102 'halos' 0 103 'halostruct' 0 104 'halostructptr'
-0 105 'max_detectors' 0 106 'max_halos' 0 107 'max_wimps' 0 108
-'n_detectors' 0 109 'n_halos' 0 110 'n_wimps' 0 111 'wimps' 0 112
-'wimpstruct' 0 113 'wimpstructptr' 0 114)
+0 12 'argumentstruct' 0 93 'detectorefficiencystruct' 0 94
+'detectorparametersstruct' 0 95 'detectorratestruct' 0 96 'detectors' 0
+97 'detectorspectrastruct' 0 98 'detectorstruct' 0 99 'detectorstructptr'
+0 100 'halos' 0 101 'halostruct' 0 102 'halostructptr' 0 103
+'max_detectors' 0 104 'max_halos' 0 105 'max_wimps' 0 106 'n_detectors'
+0 107 'n_halos' 0 108 'n_wimps' 0 109 'wimps' 0 110 'wimpstruct' 0 111
+'wimpstructptr' 0 112)
