@@ -71,7 +71,7 @@ FUNCTION PandaX_2016_Init(intervals) RESULT(D)
 
   CALL SetDetector(D,mass=334.3d0,time=98.7d0,Nevents=3,                &
                    background=4.8d0,Nelem=1,Zelem=(/54/),               &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PandaX 2016]'
   

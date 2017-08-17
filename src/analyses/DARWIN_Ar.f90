@@ -95,7 +95,7 @@ FUNCTION DARWIN_Ar_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=20d3,time=2d0*365d0,Nevents=0,                &
                    background=0.5d0,Nelem=1,Zelem=(/18/),               &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals)
   D%eff_file = '[DARWIN Ar 2015]'
   

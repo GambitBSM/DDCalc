@@ -80,7 +80,7 @@ FUNCTION LUX_2015_Init(intervals) RESULT(D)
 
   CALL SetDetector(D,mass=118.0d0,time=85.3d0,Nevents=0,                &
                    background=0.64d0,Nelem=1,Zelem=(/54/),              &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[LUX 2015]'
   

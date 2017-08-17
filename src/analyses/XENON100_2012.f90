@@ -177,7 +177,7 @@ FUNCTION XENON100_2012_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=34d0,time=224.6d0,Nevents=2,                  &
                    background=1.0d0,Nelem=1,Zelem=(/54/),               &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals)
   D%eff_file = '[XENON100 2012]'
   

@@ -129,15 +129,11 @@ END SUBROUTINE
 !   E           Allocatable real array to be filled with recoil energies
 !               [keV]. Allocated to size [1:NE].
 !   eff_file    File from which efficiencies were read
-!   NEeff       Number of recoil energies E for efficiencies tabulation
-!   Eeff        Allocatable real array to be filled with recoil energies
-!               used for efficiencies tabulation [keV]. Allocated to
-!               size [1:NEeff].
 !   Neff        Number of subintervals for which efficiencies are
 !               available (0 for only total interval)
 !   eff         Allocatable dimension=2 array containing efficiencies
 !               as a function of recoil energy. Allocated to size
-!               [1:NEeff,0:Neff], where the first index is over recoil
+!               [1:NE,0:Neff], where the first index is over recoil
 !               energies and the second index is over the sub-interval
 !               number (0 for the total interval).
 !   Wsi,Wsd     Allocatable dimension=3 array containing weighted form
@@ -148,17 +144,17 @@ END SUBROUTINE
 ! 
 SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,fiso,Miso,NE,E,                   &
-                       eff_file,NEeff,Eeff,Neff,eff,                    &
+                       eff_file,Neff,eff,                    &
                        Wsi,Wsd,intervals)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(IN) :: D
   LOGICAL, INTENT(OUT), OPTIONAL :: intervals
   CHARACTER(LEN=*), INTENT(OUT), OPTIONAL :: eff_file
-  INTEGER, INTENT(OUT), OPTIONAL :: Nevents,Niso,NE,NEeff,Neff
+  INTEGER, INTENT(OUT), OPTIONAL :: Nevents,Niso,NE,Neff
   INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Ziso(:),Aiso(:)
   REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background
   REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: fiso(:),Miso(:),E(:),   &
-          Eeff(:),eff(:,:),Wsi(:,:,:),Wsd(:,:,:)
+          eff(:,:),Wsi(:,:,:),Wsd(:,:,:)
   
   ! Exposures
   IF (PRESENT(mass))     mass     = D%mass
@@ -197,14 +193,9 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   
   ! Efficiencies
   IF (PRESENT(eff_file)) eff_file = D%eff_file
-  IF (PRESENT(NEeff))    NEeff    = D%NEeff
-  IF (PRESENT(Eeff)) THEN
-    ALLOCATE(E(D%NEeff))
-    Eeff = D%Eeff
-  END IF
   IF (PRESENT(Neff))     Neff     = D%Neff
   IF (PRESENT(eff)) THEN
-    ALLOCATE(eff(D%NEeff,0:D%Neff))
+    ALLOCATE(eff(D%NE,0:D%Neff))
     eff = D%eff
   END IF
   
@@ -269,17 +260,13 @@ END SUBROUTINE
 !               and its integral.
 ! Optional efficiency curve(s) arguments.  Efficiencies can be provided
 ! by file or by providing tabulation data.  If tabulation data is given,
-! all of NEeff, Eeff, Neff, and eff must be provided.
+! all of NE, E, Neff, and eff must be provided.
 !   eff_file    File from which efficiencies shoud be read.
 !   eff_filename Sets the stored file name _without_ loading any data
 !               from the file.
-!   NEeff       Number of recoil energy tabulation points for
-!               efficiency data.
-!   Eeff        Array of size [1:NEeff] containing tabulation energies
-!               for efficiency data [keV].
 !   Neff        Number of sub-interval/bin efficiencies in efficiency
 !               data (0 if total only).
-!   eff         Array of size [1:NEeff,0:Neff] containing efficiencies
+!   eff         Array of size [1:NE,0:Neff] containing efficiencies
 !               as a function of recoil energy, where the first index
 !               is over recoil energies and the second index is over
 !               the sub-interval number (0 for the total interval).
@@ -304,20 +291,20 @@ END SUBROUTINE
 SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,fiso,Nelem,Zelem,stoich,          &
                        NE,E,                                            &
-                       eff_file,eff_filename,NEeff,Eeff,Neff,eff,       &
+                       eff_file,eff_filename,Neff,eff,       &
                        intervals,Emin,Wsi,Wsd)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(INOUT) :: D
   CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: eff_file,eff_filename
   LOGICAL, INTENT(IN), OPTIONAL :: intervals
-  INTEGER, INTENT(IN), OPTIONAL :: Nevents,Niso,Nelem,NE,NEeff,Neff
+  INTEGER, INTENT(IN), OPTIONAL :: Nevents,Niso,Nelem,NE,Neff
   !INTEGER, INTENT(IN), OPTIONAL :: Ziso(Niso),Aiso(Niso),Zelem(Nelem), &
   !                                 stoich(Nstoich)
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,background,Emin
   !REAL*8, INTENT(IN), OPTIONAL :: fiso(Niso),E(NE),eff(NE,0:Neff),      &
   !        Wsi(-1:1,NE,Niso),Wsd(-1:1,NE,Niso)
-  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),Eeff(:),eff(:,0:),       &
+  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,0:),       &
           Wsi(-1:,:,:),Wsd(-1:,:,:)
   LOGICAL :: iso_change,E_change,eff_change
   INTEGER :: KE,Kiso,Neff0
@@ -436,35 +423,16 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
   IF (PRESENT(eff_file)) THEN
     IF (eff_file .NE. '') THEN
       D%eff_file = eff_file
-      CALL LoadEfficiencyFile(eff_file,D%NEeff,D%Eeff,D%Neff,D%eff)
+      CALL LoadEfficiencyFile(eff_file,D%NE,D%E,D%Neff,D%eff)
       eff_change = .TRUE.
     END IF
   ! ...by arguments
-  ELSE IF (PRESENT(NEeff) .AND. PRESENT(Eeff) .AND. PRESENT(Neff)       &
+  ELSE IF (PRESENT(NE) .AND. PRESENT(E) .AND. PRESENT(Neff)       &
            .AND. PRESENT(eff)) THEN
-    IF (ALLOCATED(D%Eeff)) DEALLOCATE(D%Eeff)
     IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
-    ALLOCATE(D%Eeff(NEeff),D%eff(NEeff,0:Neff))
-    D%NEeff = NEeff
-    D%Eeff  = Eeff(1:NEeff)
+    ALLOCATE(D%eff(NE,0:Neff))
     D%Neff  = Neff
-    D%eff   = eff(1:NEeff,0:Neff)
-    eff_change = .TRUE.
-  END IF
-  
-  ! Set efficiency to 100% if not initialized or NEeff <= 0.
-  ! No intervals.
-  IF (PRESENT(NEeff)) THEN
-    IF (NEeff .LE. 0) D%NEeff = NEeff
-  END IF
-  IF (D%NEeff .LE. 0) THEN
-    IF (ALLOCATED(D%Eeff)) DEALLOCATE(D%Eeff)
-    IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
-    ALLOCATE(D%Eeff(2),D%eff(2,0:0))
-    D%NEeff = 2
-    D%Eeff  = (/ 0d0, HUGE(D%Eeff) /)
-    D%Neff  = 0
-    D%eff   = 1d0
+    D%eff   = eff(1:NE,0:Neff)
     eff_change = .TRUE.
   END IF
   

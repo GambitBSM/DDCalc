@@ -237,7 +237,7 @@ FUNCTION LUX_2013_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents=1,                  &
                    background=0.64d0,Nelem=1,Zelem=(/54/),              &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals)
   D%eff_file = '[LUX 2013]'
   

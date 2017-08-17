@@ -75,7 +75,7 @@ FUNCTION PICO_2L_Init(intervals) RESULT(D)
 
   CALL SetDetector(D,mass=1.57d0,time=66.3d0,Nevents=1,                 &
                    background=0.0d0,Nelem=1,Zelem=(/9/),                &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PICO_2L]'
   

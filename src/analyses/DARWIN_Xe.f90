@@ -95,7 +95,7 @@ FUNCTION DARWIN_Xe_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=12d3,time=2d0*365d0,Nevents=0,                &
                    background=0.5d0,Nelem=1,Zelem=(/54/),               &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals)
   D%eff_file = '[DARWIN Xe 2015]'
   

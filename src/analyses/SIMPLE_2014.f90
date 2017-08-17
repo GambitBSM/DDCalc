@@ -66,7 +66,7 @@ FUNCTION SIMPLE_2014_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,exposure=18.24d0,Nevents=8,background=12.7d0,      &
                    Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,             &
-                   NEeff=NE,Eeff=E,Neff=0,eff=eff,                      &
+                   NE=NE,E=E,Neff=0,eff=eff,                      &
                    intervals=.FALSE.)
   D%eff_file = '[SIMPLE 2014]'
   

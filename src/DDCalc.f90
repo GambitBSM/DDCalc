@@ -290,7 +290,7 @@ PUBLIC :: DDCalc_MainLogLikelihood
 PUBLIC :: DDCalc_MainLogLikelihoodInteractive
 PUBLIC :: DDCalc_MainLogPValue
 PUBLIC :: DDCalc_MainLogPValueInteractive
-PUBLIC :: DDCalc_MainSpectrum
+!PUBLIC :: DDCalc_MainSpectrum
 PUBLIC :: DDCalc_MainEventsByMass
 PUBLIC :: DDCalc_MainConstraintsSI
 PUBLIC :: DDCalc_MainConstraintsSD
@@ -674,8 +674,8 @@ SUBROUTINE DDCalc_Main()
     END IF
   ! ------------------------------------
   ! Prints the raw recoil spectrum dR/dE
-  ELSE IF (GetLongArg('spectrum')) THEN
-    CALL DDCalc_MainSpectrum()
+  !ELSE IF (GetLongArg('spectrum')) THEN
+  !  CALL DDCalc_MainSpectrum()
   ! ------------------------------------
   ! Calculates expected events, tabulated by WIMP mass
   ELSE IF (GetLongArg('events-by-mass')) THEN
@@ -1011,71 +1011,75 @@ END SUBROUTINE
 ! energy, i.e. the raw recoil energy spectrum (not including
 ! efficiencies or energy resolution).
 ! 
-SUBROUTINE DDCalc_MainSpectrum()
+! --- commented out (Aug 17 2017, Sebastian Wild)
+! --- incompatible with new E and Eeff convention.
 
-  IMPLICIT NONE
-  TYPE(DetectorStruct) :: Detector
-  TYPE(WIMPStruct) :: WIMP
-  TYPE(HaloStruct) :: Halo
-  LOGICAL :: use_log
-  INTEGER :: NE,K
-  REAL*8 :: Emin,Emax
-  REAL*8, ALLOCATABLE :: E(:),Eeff(:),eff(:,:)
-  TYPE(TabulationStruct) :: TS
-  
-  ! Show usage and exit
-  IF (ShowUsageRequested()) THEN
-    CALL ShowUsage()
-    STOP
-  END IF
-  
-  ! Initializes detector, halo and WIMP structures.
-  Detector = InitializeCommandLine(WIMP,Halo)
-  
-  ! Set tabulation energies; set efficiencies to 1.
-  ! Note same results can be achieved by simply giving NE=-1
-  ! and NEeff=-1 arguments to SetDetector (apart from any
-  ! --E-tabulation command line specification).
-  Emin = 0.1d0
-  Emax = 1000d0
-  NE   = -50
-  use_log = .TRUE.
-  CALL GetTabulationArgs('E-tabulation',Emin,Emax,NE,use_log)
-  CALL InitTabulation(TS,Emin,Emax,NE,.TRUE.)
-  NE = TS%N+2
-  ALLOCATE(E(1:NE),Eeff(1:2),eff(1:2,0:0))
-  E(1) = 0d0
-  DO K = 2,NE
-    E(K) = TabulationValue(TS,K-2)
-  END DO
-  Eeff = (/ 0d0, HUGE(Eeff) /)
-  eff = 1d0
-  CALL DDCalc_SetDetector(Detector,NE=NE,E=E,NEeff=2,Eeff=Eeff,Neff=0,eff=eff)
-  
-  ! For high verbosity level, we are printing reference rates, so
-  ! set "actual" rates to same.
-  IF (VerbosityLevel .GE. 4) CALL DDCalc_SetWIMP(WIMP,DMtype='SIonly',params=[1d-9,1d-9])
-  
-  ! Do rate calculations
-  CALL DDCalc_CalcRates(Detector,WIMP,Halo)
-  
-  ! Write out header.
-  IF (VerbosityLevel .GE. 2) THEN
-    CALL WriteCommandHeader()
-    CALL WriteWIMPHeader(WIMP)
-    CALL WriteHaloHeader(Halo)
-    CALL WriteDetectorHeader(Detector)
-    CALL WriteSpectrumHeader()
-  END IF
-  
-  IF (VerbosityLevel .GE. 1) THEN
-    CALL WriteSpectrumColumnHeader()
-  END IF
-  
-  ! Write out table.
-  CALL WriteSpectrumData(Detector)
-  
-END SUBROUTINE
+
+!SUBROUTINE DDCalc_MainSpectrum()
+!
+!  IMPLICIT NONE
+!  TYPE(DetectorStruct) :: Detector
+!  TYPE(WIMPStruct) :: WIMP
+!  TYPE(HaloStruct) :: Halo
+!  LOGICAL :: use_log
+!  INTEGER :: NE,K
+!  REAL*8 :: Emin,Emax
+!  REAL*8, ALLOCATABLE :: E(:),Eeff(:),eff(:,:)
+!  TYPE(TabulationStruct) :: TS
+!  
+!  ! Show usage and exit
+!  IF (ShowUsageRequested()) THEN
+!    CALL ShowUsage()
+!    STOP
+!  END IF
+!  
+!  ! Initializes detector, halo and WIMP structures.
+!  Detector = InitializeCommandLine(WIMP,Halo)
+!  
+!  ! Set tabulation energies; set efficiencies to 1.
+!  ! Note same results can be achieved by simply giving NE=-1
+!  ! and NEeff=-1 arguments to SetDetector (apart from any
+!  ! --E-tabulation command line specification).
+!  Emin = 0.1d0
+!  Emax = 1000d0
+!  NE   = -50
+!  use_log = .TRUE.
+!  CALL GetTabulationArgs('E-tabulation',Emin,Emax,NE,use_log)
+!  CALL InitTabulation(TS,Emin,Emax,NE,.TRUE.)
+!  NE = TS%N+2
+!  ALLOCATE(E(1:NE),Eeff(1:2),eff(1:2,0:0))
+!  E(1) = 0d0
+!  DO K = 2,NE
+!    E(K) = TabulationValue(TS,K-2)
+!  END DO
+!  Eeff = (/ 0d0, HUGE(Eeff) /)
+!  eff = 1d0
+!  CALL DDCalc_SetDetector(Detector,NE=NE,E=E,NEeff=2,Eeff=Eeff,Neff=0,eff=eff)
+!  
+!  ! For high verbosity level, we are printing reference rates, so
+!  ! set "actual" rates to same.
+!  IF (VerbosityLevel .GE. 4) CALL DDCalc_SetWIMP(WIMP,DMtype='SIonly',params=[1d-9,1d-9])
+!  
+!  ! Do rate calculations
+!  CALL DDCalc_CalcRates(Detector,WIMP,Halo)
+!  
+!  ! Write out header.
+!  IF (VerbosityLevel .GE. 2) THEN
+!    CALL WriteCommandHeader()
+!    CALL WriteWIMPHeader(WIMP)
+!    CALL WriteHaloHeader(Halo)
+!    CALL WriteDetectorHeader(Detector)
+!    CALL WriteSpectrumHeader()
+!  END IF
+!  
+!  IF (VerbosityLevel .GE. 1) THEN
+!    CALL WriteSpectrumColumnHeader()
+!  END IF
+!  
+!  ! Write out table.
+!  CALL WriteSpectrumData(Detector)
+!  
+!END SUBROUTINE
 
 
 ! ----------------------------------------------------------------------

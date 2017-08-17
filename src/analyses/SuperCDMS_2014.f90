@@ -654,13 +654,13 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
     ! These settings are for the analysis with all detectors
     CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents=11,              &
                      background=6.1d0,Nelem=1,Zelem=(/32/),             &
-                     NEeff=NE,Eeff=E,Neff=Nintervals,eff=eff,           &
+                     NE=NE,E=E,Neff=Nintervals,eff=eff,           &
                      intervals=intervals)
   ELSE
     ! These settings are for the analysis without t5z3
     CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents=8,               &
                      background=6.07d0,Nelem=1,Zelem=(/32/),            &
-                     NEeff=NE,Eeff=E,Neff=Nintervals,eff=eff,           &
+                     NE=NE,E=E,Neff=Nintervals,eff=eff,           &
                      intervals=intervals)
   END IF
   

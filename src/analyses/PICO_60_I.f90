@@ -77,7 +77,7 @@ FUNCTION PICO_60_I_Init(intervals) RESULT(D)
 
   CALL SetDetector(D,mass=5.18d0,time=92.8d0,Nevents=0,                 &
                    background=0.0d0,Nelem=1,Zelem=(/53/),               &
-                   NEeff=NE,Eeff=E,Neff=NEFF,eff=EFF,                   &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PICO_60 I]'
   

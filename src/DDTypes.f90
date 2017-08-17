@@ -187,17 +187,11 @@ TYPE, PUBLIC :: DetectorStruct
   ! File containing efficiencies
   CHARACTER(LEN=1024) :: eff_file = ''
   
-  ! Number of energies for efficiency tabulation.
-  INTEGER :: NEeff = -1
-  
-  ! Energies for efficiency tabulation [keV].  Array of size [1:NEeff].
-  REAL*8, ALLOCATABLE :: Eeff(:)
-  
   ! Number of S1 bins/intervals with efficiencies.
   ! Will calculate rates for each bin/interval plus total.
   INTEGER :: Neff = -1
   
-  ! Array of size [1:NEeff,0:Neff] with the second index for the S1
+  ! Array of size [1:NE,0:Neff] with the second index for the S1
   ! bin/interval (zero for full range)
   REAL*8, ALLOCATABLE :: eff(:,:)
   
