@@ -207,10 +207,6 @@ TYPE, PUBLIC :: DetectorStruct
   ! efficiencies for intervals/bins are not provided.
   LOGICAL :: intervals = .TRUE.
   
-  ! Array of size [1:NE,0:Neff] or [1:NE,0:0] containing efficiencies
-  ! retabulated to that of the E array.  Sub-interval efficiencies are
-  ! dropped if intervals=.FALSE.
-  REAL*8, ALLOCATABLE :: eff0(:,:)
   
   ! Form factors -------------------------------
   ! Tabulated spin-independent or spin-dependent form factors combined

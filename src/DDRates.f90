@@ -283,8 +283,8 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
       DO Keff = 0,Neff0
         D%R(Keff) = D%R(Keff)                                 &
             + 0.5d0 * (D%E(KE+1) - D%E(KE))                   &
-              * (D%eff0(KE,Keff)*D%dRdEiso(KE,Kiso)           &
-                 + D%eff0(KE+1,Keff)*D%dRdEiso(KE+1,Kiso))
+              * (D%eff(KE,Keff)*D%dRdEiso(KE,Kiso)           &
+                 + D%eff(KE+1,Keff)*D%dRdEiso(KE+1,Kiso))
       END DO
     END DO
   END DO
