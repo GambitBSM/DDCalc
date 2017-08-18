@@ -51,7 +51,10 @@ CONTAINS
 !                the total range and each interval/bin.  Allocated to
 !                size [1:NE,0:Neff].
 ! 
-! FIXME: update this function with the new index convention for eff
+! IMPORTANT:
+! Currently, this function assigns the same efficiency to all isotopes.
+! In case one wants to use isotope-dependent efficiencies loaded from files,
+! the function has to be expanded.
 !
 SUBROUTINE LoadEfficiencyFile(file,Niso,NE,E,Neff,eff)
   IMPLICIT NONE
