@@ -53,8 +53,8 @@ FUNCTION LogLikelihood(D) RESULT(lnlike)
   REAL*8 :: b,s,mu
     
   ! Get observed events and expected events
-  N = D%Nevents
-  b = D%MuBackground
+  N = D%Nevents(0)
+  b = D%MuBackground(0)
   s = D%MuSignal(0)
 
   IF (b .EQ. 0d0) THEN
@@ -108,12 +108,12 @@ FUNCTION LogPValue(D) RESULT(lnp)
   REAL*8 :: s,mu
     
   ! Get observed events and expected events
-  N  = D%Nevents
+  N  = D%Nevents(0)
   mu = D%MuSignal(0)
   
-  ! Check if rates are available for each interval
-  IF (D%intervals .AND. (D%Neff .EQ. D%Nevents+1)) THEN
-    lnp = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:N+1)))
+  ! Decide between maxgap and Poisson
+  IF (D%Nevents(0) .LT. 0) THEN
+    lnp = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins)))
   ELSE
     lnp = LogPoissonP(N,mu)
   END IF
@@ -162,7 +162,7 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   END IF
   
   ! Get observed events and expected events
-  N  = D%Nevents
+  N  = D%Nevents(0)
   mu = D%MuSignal(0)
   
   IF (mu .LE. 0d0) THEN
@@ -175,9 +175,9 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
     RETURN
   END IF
   
-  ! Use maximum gap if intervals available, otherwise Poisson
-  IF (D%intervals .AND. (D%Neff .EQ. D%Nevents+1)) THEN
-    f = MAXVAL(D%MuSignal(1:N+1)) / mu
+  ! Decide between maxgap and Poisson
+  IF (D%Nevents(0) .LT. 0) THEN
+    f = MAXVAL(D%MuSignal(1:D%Nbins)) / mu
     x = MaximumGapScaleToPValue(lnp0,mu,f)
   ELSE
     x = PoissonScaleToPValue(lnp0,N,mu)

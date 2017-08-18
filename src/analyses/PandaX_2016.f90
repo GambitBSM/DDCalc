@@ -20,11 +20,9 @@ FUNCTION PandaX_2016_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
-  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
-  INTEGER, PARAMETER :: NEFF = 1
+  INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
   ! Efficiency curves energy tabulation points
   REAL*8, PARAMETER :: E(NE)                                            &
@@ -65,24 +63,14 @@ FUNCTION PandaX_2016_Init(intervals) RESULT(D)
       0.31204d0, 0.28997d0, 0.26706d0, 0.24325d0, 0.21851d0, 0.19279d0, &
       0.16606d0, 0.13956d0, 0.12110d0, 0.10394d0, 0.08823d0, 0.07409d0, &
       0.06164d0, 0.05107d0, 0.04250d0, 0.03549d0, 0.02964d0, 0.02427d0 /)
-  ! Efficiency (first and only interval)
-  REAL*8, PARAMETER :: EFF1(NE) = EFF0
   ! Efficiencies array (2D)
-  REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
-      = RESHAPE( (/ EFF0(:), EFF1(:) /) ,SHAPE(EFF))
+  INTEGER, PARAMETER :: NELEM=1
+  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
+      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
 
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  Z = 54
-  CALL GetNiso(Z,Niso) ! this assigns Niso
-  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
-  END DO
-
-  CALL SetDetector(D,mass=334.3d0,time=98.7d0,Nevents=3,                &
-                   background=4.8d0,Nelem=1,Zelem=(/Z/),               &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
+  CALL SetDetector(D,mass=334.3d0,time=98.7d0,Nevents=(/3/),                &
+                   background=(/4.8d0/),Nelem=NELEM,Zelem=(/54/),               &
+                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PandaX 2016]'
   

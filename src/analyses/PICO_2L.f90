@@ -22,11 +22,9 @@ FUNCTION PICO_2L_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
-  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
-  INTEGER, PARAMETER :: NEFF = 1
+  INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 3.3d0
   ! Efficiency curves energy tabulation points
   REAL*8, PARAMETER :: E(NE)                                            &
@@ -66,27 +64,17 @@ FUNCTION PICO_2L_Init(intervals) RESULT(D)
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, &
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, &
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0 /)
-  ! Efficiency (first and only interval)
-  REAL*8, PARAMETER :: EFF1(NE) = EFF0
   ! Efficiencies array (2D)
-  REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
-      = RESHAPE( (/ EFF0(:), EFF1(:) /) ,SHAPE(EFF))
+  INTEGER, PARAMETER :: NELEM=1
+  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
+      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
 
   ! The fiducial mass is reduced to account for the fluorine fraction.
   ! NOTE: PICO_2L does not attempt background subtraction
 
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  Z = 9
-  CALL GetNiso(Z,Niso) ! this assigns Niso
-  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
-  END DO
-
-  CALL SetDetector(D,mass=1.57d0,time=66.3d0,Nevents=1,                 &
-                   background=0.0d0,Nelem=1,Zelem=(/Z/),                &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
+  CALL SetDetector(D,mass=1.57d0,time=66.3d0,Nevents=(/1/),                 &
+                   background=(/0.0d0/),Nelem=NELEM,Zelem=(/9/),                &
+                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PICO_2L]'
   

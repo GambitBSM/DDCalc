@@ -1205,7 +1205,7 @@ SUBROUTINE DDCalc_MainConstraintsSI()
   IF (ABS(Gn) .LT. 1d-8) Gn = 0d0
   
   ! Calculate allowed signal rates
-  CALL FeldmanCousinsPoissonCI(lnp,Detector%Nevents,Detector%MuBackground,s1,s2)
+  CALL FeldmanCousinsPoissonCI(lnp,Detector%Nevents(0),Detector%MuBackground(0),s1,s2)
   
   ! Write out header.
   IF (VerbosityLevel .GE. 2) THEN
@@ -1286,7 +1286,7 @@ SUBROUTINE DDCalc_MainConstraintsSD()
   IF (ABS(Gn) .LT. 1d-8) Gn = 0d0
   
   ! Calculate allowed signal rates
-  CALL FeldmanCousinsPoissonCI(lnp,Detector%Nevents,Detector%MuBackground,s1,s2)
+  CALL FeldmanCousinsPoissonCI(lnp,Detector%Nevents(0),Detector%MuBackground(0),s1,s2)
   
   ! Write out header.
   IF (VerbosityLevel .GE. 2) THEN
@@ -1522,11 +1522,7 @@ FUNCTION InitializeCommandLine(WIMP, Halo, intervals) RESULT(Detector)
   
   ! Initialize halo.
   Halo = DDCalc_InitHaloCommandLine()
-  
-  ! Initialize detector isotopes, efficiencies, array sizing, etc.
-  Detector = DDCalc_ChooseAnalysisCommandLine(intervals=intervals0)
-  CALL DDCalc_InitDetectorDataCommandLine(Detector)
-  
+    
 END FUNCTION
 
 

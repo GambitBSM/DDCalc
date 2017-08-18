@@ -16,16 +16,12 @@ USE DDOutput
 
 IMPLICIT NONE
 
-PUBLIC :: DDCalc_GetDetector,DDCalc_SetDetector,&
-          DDCalc_InitDetectorDataCommandLine
+PUBLIC :: DDCalc_GetDetector,DDCalc_SetDetector
 INTERFACE DDCalc_GetDetector
   MODULE PROCEDURE GetDetector
 END INTERFACE
 INTERFACE DDCalc_SetDetector
   MODULE PROCEDURE SetDetector
-END INTERFACE
-INTERFACE DDCalc_InitDetectorDataCommandLine
-  MODULE PROCEDURE InitDetectorDataCommandLine
 END INTERFACE
 
 CONTAINS
@@ -42,28 +38,28 @@ CONTAINS
 ! Required input argument:
 !     file       The file to load efficiencies from.
 !     Niso       Number of isotopes of the experiment under consideration
+!     Nbins      Number of intervals/bins expected.
 ! Required output arguments:
 !     NE         Number of recoil energy tabulation points loaded
 !     E          Allocatable array to contain energies [keV].
 !                Allocated to size [1:NE].
-!     Neff       Number of interval/bin efficiencies loaded.
 !     eff        Allocatable array to contain efficiency curves for
 !                the total range and each interval/bin.  Allocated to
-!                size [1:NE,0:Neff].
+!                size [1:NE,0:Nbins].
 ! 
 ! IMPORTANT:
 ! Currently, this function assigns the same efficiency to all isotopes.
 ! In case one wants to use isotope-dependent efficiencies loaded from files,
 ! the function has to be expanded.
 !
-SUBROUTINE LoadEfficiencyFile(file,Niso,NE,E,Neff,eff)
+SUBROUTINE LoadEfficiencyFile(file,Niso,Nbins,NE,E,eff)
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file
-  INTEGER, INTENT(IN) :: Niso
-  INTEGER, INTENT(OUT) :: NE,Neff
+  INTEGER, INTENT(IN) :: Niso,Nbins
+  INTEGER, INTENT(OUT) :: NE
   REAL*8, ALLOCATABLE, INTENT(OUT) :: E(:),eff(:,:,:)
   LOGICAL :: status
-  INTEGER :: Kcol,Keff,Nrow,Ncol,Nvalid,Kiso
+  INTEGER :: Kcol,Keff,Nrow,Ncol,Nvalid,Kiso,Neff
   REAL*8, ALLOCATABLE :: data(:,:)
   
   ! Load table from file
@@ -90,17 +86,23 @@ SUBROUTINE LoadEfficiencyFile(file,Niso,NE,E,Neff,eff)
   
   ! Now get efficiencies
   Neff = Nvalid - 1
-  ALLOCATE(eff(Niso,NE,0:Neff))
-  Keff = 0
-  DO Kcol = 2,Ncol
-    IF (ALL(data(:,Kcol) .GE. 0d0) .AND. ALL(data(:,Kcol) .LE. 1.00001d0) &
-        .AND. (Keff .LE. Neff)) THEN
-      DO Kiso = 1,Niso
-        eff(Kiso,:,Keff) = data(:,Kcol)
-      END DO
-      Keff = Keff + 1
-    END IF
-  END DO
+  IF ( Neff .EQ. Nbins ) THEN
+    ALLOCATE(eff(Niso,NE,0:Neff))
+    Keff = 0
+    DO Kcol = 2,Ncol
+      IF (ALL(data(:,Kcol) .GE. 0d0) .AND. ALL(data(:,Kcol) .LE. 1.00001d0) &
+          .AND. (Keff .LE. Neff)) THEN
+        DO Kiso = 1,Niso
+          eff(Kiso,:,Keff) = data(:,Kcol)
+        END DO
+        Keff = Keff + 1
+      END IF
+    END DO
+  ELSE
+    WRITE(0,*) 'ERROR: Number of entries in file ' // TRIM(file) // ' does not agree with expectation.'
+    STOP
+  END IF
+
   
 END SUBROUTINE
 
@@ -138,11 +140,10 @@ END SUBROUTINE
 !   E           Allocatable real array to be filled with recoil energies
 !               [keV]. Allocated to size [1:NE].
 !   eff_file    File from which efficiencies were read
-!   Neff        Number of subintervals for which efficiencies are
-!               available (0 for only total interval)
+!   Nbins       Number of subintervals (0 for only total interval)
 !   eff         Allocatable dimension=2 array containing efficiencies
 !               as a function of recoil energy. Allocated to size
-!               [1:NE,0:Neff], where the first index is over recoil
+!               [1:NE,0:Nbins], where the first index is over recoil
 !               energies and the second index is over the sub-interval
 !               number (0 for the total interval).
 !   Wsi,Wsd     Allocatable dimension=3 array containing weighted form
@@ -153,15 +154,15 @@ END SUBROUTINE
 ! 
 SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,fiso,Miso,NE,E,                   &
-                       eff_file,Neff,eff,                    &
+                       eff_file,Nbins,eff,                              &
                        Wsi,Wsd,intervals)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(IN) :: D
   LOGICAL, INTENT(OUT), OPTIONAL :: intervals
   CHARACTER(LEN=*), INTENT(OUT), OPTIONAL :: eff_file
-  INTEGER, INTENT(OUT), OPTIONAL :: Nevents,Niso,NE,Neff
+  INTEGER, INTENT(OUT), OPTIONAL :: Nevents(:),Niso,NE,Nbins
   INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Ziso(:),Aiso(:)
-  REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background
+  REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background(:)
   REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: fiso(:),Miso(:),E(:),   &
           eff(:,:,:),Wsi(:,:,:),Wsd(:,:,:)
   
@@ -202,9 +203,9 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   
   ! Efficiencies
   IF (PRESENT(eff_file)) eff_file = D%eff_file
-  IF (PRESENT(Neff))     Neff     = D%Neff
+  IF (PRESENT(Nbins))     Nbins     = D%Nbins
   IF (PRESENT(eff)) THEN
-    ALLOCATE(eff(D%Niso,D%NE,0:D%Neff))
+    ALLOCATE(eff(D%Niso,D%NE,0:D%Nbins))
     eff = D%eff
   END IF
   
@@ -239,8 +240,14 @@ END SUBROUTINE
 !   mass        Detector fiducial mass [kg]
 !   time        Detector exposure time [day]
 !   exposure    Detector exposure [kg day]
-!   Nevents     Number of observed events
-!   background  Average expected background events
+!   Nbins       Number of sub-intervals/bins in data (0 if total only).
+!   Nevents     Array of size [0:Nbins] containing the number of
+!               observed events for each interval. The entry in position 0
+!               gives the total number of observed events
+!   background  Array of size [0:Nbins] containing the average expected 
+!               background for each interval. The entry in position 0
+!               gives the total number of expected background events.
+!               If this is set to -1, the maximum gap method will be used.
 ! Optional isotope-related input arguments.  Niso must be given for
 ! any of the arrays to be used, regardless if the number has changed.
 ! If Niso changes, then all of the A/Z/f arrays must be specified for
@@ -268,97 +275,97 @@ END SUBROUTINE
 !               This defines the energies used for calculating dR/dE
 !               and its integral.
 ! Optional efficiency curve(s) arguments.  Efficiencies can be provided
-! by file or by providing tabulation data.  If tabulation data is given,
-! all of NE, E, Neff, and eff must be provided.
+! by file or by providing tabulation data.
 !   eff_file    File from which efficiencies shoud be read.
 !   eff_filename Sets the stored file name _without_ loading any data
 !               from the file.
-!   Neff        Number of sub-interval/bin efficiencies in efficiency
-!               data (0 if total only).
-!   eff         Array of size [1:NE,0:Neff] containing efficiencies
+!   eff         Array of size [1:NE,0:Nbins] containing efficiencies
 !               as a function of recoil energy, where the first index
 !               is over recoil energies and the second index is over
 !               the sub-interval number (0 for the total interval).
 ! Optional analysis-related arguments.
 !   intervals   Specify if rates for sub-intervals should be calculated;
 !               otherwise, only the full interval is used for
-!               calculations (default: true).  This basically specifies
-!               if maximum gap or a Poisson is used in exclusion
-!               constraints.
+!               calculations (default: true).
 !   Emin        If given, sets all efficiencies below the given energy
 !               [keV] to zero, removing all contributions from recoils
 !               at lower energies.
 !
 
-SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
+SUBROUTINE SetDetector(D,mass,time,exposure,                            &
+                       Nbins,Nevents,background,                        &
                        Niso,Ziso,Aiso,fiso,Nelem,Zelem,stoich,          &
-                       NE,E,                                            &
-                       eff_file,eff_filename,Neff,eff,       &
+                       NE,E,eff_file,eff_filename,eff,                  &
                        intervals,Emin)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(INOUT) :: D
   CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: eff_file,eff_filename
   LOGICAL, INTENT(IN), OPTIONAL :: intervals
-  INTEGER, INTENT(IN), OPTIONAL :: Nevents,Niso,Nelem,NE,Neff
+  INTEGER, INTENT(IN), OPTIONAL :: Nevents(:),Niso,Nelem,NE,Nbins
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
-  REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,background,Emin
+  REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,background(:),Emin
   REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,:,0:)
   LOGICAL :: iso_change,E_change,eff_change
-  INTEGER :: KE,Kiso,Neff0
+  INTEGER :: KE,Kiso,Neff,ind_elem,ind_iso,ind,Niso_temp
   INTEGER, ALLOCATABLE :: stoich0(:)
- 
-
-  ! Some of the formally optional input arguments are actually mandatory for the code to work.
-  ! Check whether they are all present, and if not set InitSuccess to false
-  !
-  ! E and NE have to be given.
-  IF ( (.NOT. PRESENT(E)) .OR. (.NOT. PRESENT(NE)) ) THEN
-    D%InitSuccess = .False.
-    RETURN
-  END IF
-  ! NE has to be positive
-  IF ( PRESENT(NE) ) THEN
-    IF (.NOT. NE > 0) THEN
-      D%InitSuccess = .False.
-      RETURN      
-    END IF
-  END IF
-  ! Either (eff and Neff) or eff_file have to be given in order to specify the efficiencies
-  IF (.NOT. PRESENT(eff_file)) THEN
-    IF ( (.NOT. PRESENT(eff)) .OR. (.NOT. PRESENT(Neff)) ) THEN
-      D%InitSuccess = .False.
-      RETURN
-    END IF
-  END IF
-
-
  
   ! Indicate if quantities changed, indicating need for
   ! array resizing and initialization
   iso_change = .FALSE.
   E_change   = .FALSE.
   eff_change = .FALSE.
- 
 
-  ! Exposures
-  IF (PRESENT(mass)) THEN
-    D%mass     = mass
-    D%exposure = D%mass * D%time
+  ! Energy binning
+  IF ( (PRESENT(E)) .AND. (PRESENT(NE)) ) THEN
+    IF (NE > 0) THEN
+      IF (ALLOCATED(D%E) .AND. (NE .NE. D%NE)) DEALLOCATE(D%E)
+      IF (.NOT. ALLOCATED(D%E)) ALLOCATE(D%E(NE))
+      D%NE = NE
+      D%E = E(1:NE)
+      IF (ALLOCATED(D%E_cache)) DEALLOCATE(D%E_cache)
+      ALLOCATE(D%E_cache(D%NE))
+      D%E_cache = D%E
+      E_change = .TRUE.
+    END IF
   END IF
-  IF (PRESENT(time)) THEN
-    D%time     = time
-    D%exposure = D%mass * D%time
+
+  IF (.NOT. D%NE > 0) THEN
+    D%InitSuccess = .False.
+    RETURN      
   END IF
-  IF (PRESENT(exposure)) THEN
-    D%mass     = -1d0
-    D%time     = -1d0
-    D%exposure = exposure
-  END IF
-  
+
   ! Observed events and expected background events
-  IF (PRESENT(Nevents))    D%Nevents      = Nevents
-  IF (PRESENT(background)) D%MuBackground = background
-  
+  IF ( PRESENT(Nbins) ) THEN
+    IF (Nbins .EQ. D%Nbins) THEN
+      IF (PRESENT(Nevents)) THEN
+        D%Nevents = Nevents(0:Nbins)
+      END IF
+      IF (PRESENT(background)) THEN
+        D%MuBackground = background(0:Nbins)
+      END IF
+    ELSE
+      IF (ALLOCATED(D%Nevents)) DEALLOCATE(D%Nevents)
+      IF (ALLOCATED(D%MuBackground)) DEALLOCATE(D%MuBackground)
+      ALLOCATE(D%Nevents(0:Nbins),D%MuBackground(0:Nbins))
+      D%Nbins = Nbins
+      IF (PRESENT(Nevents)) THEN
+        D%Nevents = Nevents(0:Nbins)
+      ELSE
+        D%Nevents = -1
+      END IF
+      IF (PRESENT(background)) THEN
+        D%MuBackground = background(0:Nbins)
+      ELSE
+        D%MuBackground = 0d0
+      END IF
+    END IF
+  END IF
+
+  IF ( D%Nbins < 0) THEN
+    D%InitSuccess = .False.
+    RETURN      
+  END IF
+
   ! Isotope data
   IF (PRESENT(Niso)) THEN
     IF (Niso .EQ. D%Niso) THEN
@@ -391,6 +398,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
       iso_change = .TRUE.
     END IF
   END IF
+
   IF (PRESENT(Nelem) .AND. PRESENT(Zelem)) THEN
     ALLOCATE(stoich0(Nelem))
     IF (PRESENT(stoich)) THEN
@@ -403,35 +411,41 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
     iso_change = .TRUE.
   END IF
   
-  ! Energies
-  IF (ALLOCATED(D%E) .AND. (NE .NE. D%NE)) DEALLOCATE(D%E)
-  IF (.NOT. ALLOCATED(D%E)) ALLOCATE(D%E(NE))
-  D%NE = NE
-  D%E = E(1:NE)
-  IF (ALLOCATED(D%E_cache)) DEALLOCATE(D%E_cache)
-  ALLOCATE(D%E_cache(D%NE))
-  D%E_cache = D%E
-  E_change = .TRUE.
+  IF (.NOT. D%Niso > 0) THEN
+    D%InitSuccess = .False.
+    RETURN      
+  END IF
 
-  
   ! Set efficiencies
-  ! ...from file
+  ! ...from file (note that right now only one efficiency can be provided for all isotopes)
   IF (PRESENT(eff_file)) THEN
     IF (eff_file .NE. '') THEN
       D%eff_file = eff_file
-      CALL LoadEfficiencyFile(eff_file,D%Niso,D%NE,D%E,D%Neff,D%eff)
+      CALL LoadEfficiencyFile(eff_file,D%Niso,D%Nbins,D%NE,D%E,D%eff)
       eff_change = .TRUE.
+      D%InitSuccess = .TRUE.
     END IF
   ! ...by arguments
-  ELSE IF (PRESENT(Neff) .AND. PRESENT(eff)) THEN
+  ELSE IF (PRESENT(eff)) THEN
     IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
-    ALLOCATE(D%eff(D%Niso,NE,0:Neff))
-    D%Neff  = Neff
-    D%eff   = eff(1:D%Niso,1:NE,0:Neff)
+    ALLOCATE(D%eff(D%Niso,NE,0:Nbins))
+    IF (PRESENT(Nelem) .AND. PRESENT(Zelem)) THEN
+      ind = 1
+      DO ind_elem = 1,Nelem
+        CALL GetNiso(Zelem(ind_elem),Niso_temp) ! this assigns Niso_temp
+        DO ind_iso = 1,Niso_temp
+          D%eff(ind,1:NE,0:Nbins) = eff(ind_elem,1:NE,0:Nbins)
+          ind = ind + 1
+        END DO
+      END DO
+    ELSE
+      D%eff   = eff(1:D%Niso,1:NE,0:Nbins)
+    END IF
     eff_change = .TRUE.
+    D%InitSuccess = .TRUE.
   END IF
   
-  ! Saved efficiency file name
+  ! Save efficiency file name
   IF (PRESENT(eff_filename)) D%eff_file = eff_filename
   
   ! Include sub-intervals?
@@ -447,7 +461,21 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
     D%E = MAX(D%E_cache,Emin)
     E_change = .TRUE.
   END IF
-  
+
+  ! Exposures
+  IF (PRESENT(mass)) THEN
+    D%mass     = mass
+    D%exposure = D%mass * D%time
+  END IF
+  IF (PRESENT(time)) THEN
+    D%time     = time
+    D%exposure = D%mass * D%time
+  END IF
+  IF (PRESENT(exposure)) THEN
+    D%mass     = -1d0
+    D%time     = -1d0
+    D%exposure = exposure
+  END IF
   
   ! Calculate weighted form factors (SI)
   IF (ALLOCATED(D%Wsi)) DEALLOCATE(D%Wsi)
@@ -457,7 +485,6 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
                  EToQ(D%E,D%Miso(Kiso)),D%Wsi(:,:,Kiso))
   END DO
 
-  
   ! Calculate weighted form factors (SD)
   IF (ALLOCATED(D%Wsd)) DEALLOCATE(D%Wsd)
   ALLOCATE(D%Wsd(-1:1,D%NE,D%Niso))
@@ -465,11 +492,9 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
     CALL CalcWSD(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
                  EToQ(D%E,D%Miso(Kiso)),D%Wsd(:,:,Kiso))
   END DO
-
   
   ! Resize halo velocity arrays if necessary
-  IF ((iso_change .OR. E_change) .AND. (D%Niso .GE. 0)                 &
-      .AND. (D%NE .GE. 0)) THEN
+  IF (iso_change .OR. E_change) THEN
     IF (ALLOCATED(D%vmin)) DEALLOCATE(D%vmin)
     ALLOCATE(D%vmin(D%NE,D%Niso))
     IF (ALLOCATED(D%eta))  DEALLOCATE(D%eta)
@@ -479,150 +504,38 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
   ! Number of intervals/bins to do calculations for.
   ! Used for array sizing below.
   IF (D%intervals) THEN
-    Neff0 = D%Neff
+    Neff = D%Nbins
   ELSE
-    Neff0 = 0
+    Neff = 0
   END IF
   
-
   ! Resize dRdEiso if necessary
-  IF (PRESENT(NE) .AND. PRESENT(Niso)) THEN
-    IF (ALLOCATED(D%dRdEiso)) DEALLOCATE(D%dRdEiso)
-    ALLOCATE(D%dRdEiso(NE,Niso))
-  ELSE IF ((iso_change .OR. E_change) .AND. (D%Niso .GE. 0)            &
-           .AND. (D%NE .GE. 0)) THEN
+  IF (iso_change .OR. E_change) THEN
     IF (ALLOCATED(D%dRdEiso)) DEALLOCATE(D%dRdEiso)
     ALLOCATE(D%dRdEiso(D%NE,D%Niso))
   END IF
 
-
   ! Resize rate arrays if necessary
-  IF ((E_change .OR. eff_change) .AND. (D%NE .GE. 0)                   &
-      .AND. (D%Neff .GE. 0)) THEN
+  IF (E_change .OR. eff_change) THEN
     IF (ALLOCATED(D%R)) DEALLOCATE(D%R)
-    ALLOCATE(D%R(0:Neff0))
+    ALLOCATE(D%R(0:Neff))
   END IF
   
   ! Resize event arrays if necessary
-  IF (eff_change .AND. (D%Neff .GE. 0)) THEN
+  IF (eff_change) THEN
     IF (ALLOCATED(D%MuSignal)) DEALLOCATE(D%MuSignal)
-    ALLOCATE(D%MuSignal(0:Neff0))
+    ALLOCATE(D%MuSignal(0:Neff))
   END IF
   
   ! Set all calculable quantities to zero
-  IF ((iso_change .OR. E_change .OR. eff_change)                        &
-       .AND. (D%Niso .GE. 0) .AND. (D%NE .GE. 0)                      &
-       .AND. (D%Neff .GE. 0)) THEN
+  IF (iso_change .OR. E_change .OR. eff_change) THEN
     D%vmin        = 0d0
     D%eta         = 0d0
     D%dRdEiso     = 0d0
     D%R           = 0d0
     D%MuSignal    = 0d0
   END IF
-
-  ! Everything went fine up to here, so set InitSuccess to True
-  D%InitSuccess = .TRUE.
   
 END SUBROUTINE
-
-
-!-----------------------------------------------------------------------
-! Initializes the detector setup from command-line parameters.
-! 
-! Possible options:
-!   --mass=<value>       ! Detector fiducial mass [kg]
-!   --time=<value>       ! Detector exposure time [day]
-!   --exposure=<value>   ! Detector exposure [kg day]
-!   --events=<N>         ! Number of observed events
-!   --background=<value> ! Average expected background events
-! Isotope-related options specifying the atomic number, atomic mass
-! number, and mass fraction of the isotopes.  Must specify all three
-! and they must have the same number of isotopes for changes to take
-! effect:
-!   --isotope-Z=<Z1>,<Z2>,<Z3>,...
-!   --isotope-A=<A1>,<A2>,<A3>,...
-!   --isotope-f=<f1>,<f2>,<f3>,...
-! Use naturally occurring isotopes for the elements in the given
-! compound specified by atomic numbers and the stoichiometry.  If
-! stoichiometry is not given, it is assumed to be 1 for each element
-! (equal abundances):
-!   --element-Z=<Z1>,<Z2>,<Z3>,...
-!   --stoichiometry=<stoich1>,<stoich2>,<stoich3>,...
-! Shortcuts for specific materials by name (using natural abundances):
-!   --argon
-!   --germanium
-!   --sodium-iodide
-!   --silicon
-!   --xenon
-! Efficiency related options:
-!   --file=<file>        ! File from which tabulated efficiencies should be read.
-!                        ! First column is E [keV], any following consecutive
-!                        ! columns containing values above 1.0 are ignored, and
-!                        ! the remaining columns are taken to be efficiency curves.
-!                        ! First efficiency is for full range, remaining efficiencies
-!                        ! are for sub-intervals.  If not given, a default is used.
-!   --no-intervals       ! Disable use of sub-intervals, even if available in file.
-!   --Emin=<value>       ! If given, sets all efficiencies below the given energy
-!                        ! [keV] to zero, removing all contributions from recoils
-!                        ! at lower energies.  Not reversible.
-! 
-SUBROUTINE InitDetectorDataCommandLine(Detector)
-
-  IMPLICIT NONE
-  TYPE(DetectorStruct), INTENT(INOUT) :: Detector
-  INTEGER :: Nevents,Niso,Nelem,N1,N2,N3
-  INTEGER, ALLOCATABLE :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
-  REAL*8 :: mass,time,exposure,background,Emin
-  REAL*8, ALLOCATABLE :: fiso(:)
-  
-  Niso = -1
-    
-  ! Update isotopes
-  IF (GetLongArgIntegers('isotope-Z',Ziso,N1)                           &
-      .AND. GetLongArgIntegers('isotope-A',Aiso,N2)                     &
-      .AND. GetLongArgReals('isotope-f',fiso,N3)) THEN
-    IF ((N1 .EQ. N2) .AND. (N1 .EQ. N3)) THEN
-      Niso = N1
-      CALL SetDetector(Detector,Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso)
-    END IF
-  ELSE IF (GetLongArgIntegers('element-Z',Zelem,Nelem)) THEN
-    IF (GetLongArgIntegers('stoichiometry',stoich,N2)) THEN
-      IF (N2 .EQ. Nelem) THEN
-        CALL SetDetector(Detector,Nelem=Nelem,Zelem=Zelem,stoich=stoich)
-      END IF
-    ELSE
-      IF (ALLOCATED(stoich)) DEALLOCATE(stoich)
-      ALLOCATE(stoich(Nelem))
-      stoich = 1
-      CALL SetDetector(Detector,Nelem=Nelem,Zelem=Zelem,stoich=stoich)
-    END IF
-  ELSE IF (GetLongArg('argon')) THEN
-    CALL SetDetector(Detector,Nelem=1,Zelem=(/18/))
-  ELSE IF (GetLongArg('germanium')) THEN
-    CALL SetDetector(Detector,Nelem=1,Zelem=(/32/))
-  ELSE IF (GetLongArg('silicon')) THEN
-    CALL SetDetector(Detector,Nelem=1,Zelem=(/14/))
-  ELSE IF (GetLongArg('xenon')) THEN
-    CALL SetDetector(Detector,Nelem=1,Zelem=(/54/))
-  ELSE IF (GetLongArg('sodium-iodide')) THEN
-    CALL SetDetector(Detector,Nelem=2,Zelem=(/11,53/),stoich=(/1,1/))
-  END IF
-  
-  ! Update exposures
-  IF (GetLongArgReal('mass',mass))         CALL SetDetector(Detector,mass=mass)
-  IF (GetLongArgReal('time',time))         CALL SetDetector(Detector,time=time)
-  IF (GetLongArgReal('exposure',exposure)) CALL SetDetector(Detector,exposure=exposure)
-  
-  ! Update observed events and expected background events
-  IF (GetLongArgInteger('events',Nevents))     CALL SetDetector(Detector,Nevents=Nevents)
-  IF (GetLongArgReal('background',background)) CALL SetDetector(Detector,background=background)
-  
-  ! Set an energy threshold
-  IF (GetLongArgReal('Emin',Emin)) THEN
-    CALL SetDetector(Detector,Emin=Emin)
-  END IF
-  
-END SUBROUTINE
-
   
 END MODULE

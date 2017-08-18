@@ -76,13 +76,10 @@ SUBROUTINE GetRates(D,Nevents,background,signal,signal_si,signal_sd,    &
   REAL*8, INTENT(OUT), OPTIONAL :: background,signal,signal_si,signal_sd,&
           rate
   REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: binsignal(:),binrate(:)
-  INTEGER :: Neff
-    
-  Neff = D%Neff
   
   ! Observed events and expected background events
-  IF (PRESENT(Nevents))    Nevents    = D%Nevents
-  IF (PRESENT(background)) background = D%MuBackground
+  IF (PRESENT(Nevents))    Nevents    = D%Nevents(0)
+  IF (PRESENT(background)) background = D%MuBackground(0)
   
   ! Signal events
   IF (PRESENT(signal))    signal    = D%MuSignal(0)
@@ -93,18 +90,18 @@ SUBROUTINE GetRates(D,Nevents,background,signal,signal_si,signal_sd,    &
   IF (PRESENT(rate))    rate    = D%R(0)
   
   ! Bins
-  IF (PRESENT(Nbins)) Nbins = Neff
+  IF (PRESENT(Nbins)) Nbins = D%Nbins
   
   ! Signal events by bin
   IF (PRESENT(binsignal)) THEN
-    ALLOCATE(binsignal(Neff))
-    binsignal = D%MuSignal(1:Neff)
+    ALLOCATE(binsignal(D%Nbins))
+    binsignal = D%MuSignal(1:D%Nbins)
   END IF
   
   ! Signal rates by bin
   IF (PRESENT(binrate)) THEN
-    ALLOCATE(binrate(Neff))
-    binrate = D%MuSignal(1:Neff)
+    ALLOCATE(binrate(D%Nbins))
+    binrate = D%MuSignal(1:D%Nbins)
   END IF
   
 END SUBROUTINE
@@ -186,7 +183,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   TYPE(DetectorStruct), INTENT(INOUT) :: D
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   TYPE(HaloStruct), INTENT(IN) :: Halo
-  INTEGER :: Kiso, KE, Keff, Neff0
+  INTEGER :: Kiso, KE, Keff, Neff
 
   ! Update mean inverse speed, set dRdEiso to zero
   D%vmin = EToVmin(D%NE,D%E,WIMP%m,D%Niso,D%Miso)
@@ -269,9 +266,9 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   ! If intervals=.FALSE. then efficiency index is over [0:0]
   ! (total only).
   IF (D%intervals) THEN
-    Neff0 = D%Neff
+    Neff = D%Nbins
   ELSE
-    Neff0 = 0
+    Neff = 0
   END IF
 
   ! Integrate (efficiency-weighted) to find total rates.
@@ -280,7 +277,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   ! Cycle over E bins and efficiency curves.
   DO KE = 1,D%NE-1
     DO Kiso = 1,D%Niso
-      DO Keff = 0,Neff0
+      DO Keff = 0,Neff
         D%R(Keff) = D%R(Keff)                                 &
             + 0.5d0 * (D%E(KE+1) - D%E(KE))                   &
               * (D%eff(Kiso,KE,Keff)*D%dRdEiso(KE,Kiso)           &

@@ -1,5 +1,5 @@
 GFORTRAN module version '10' created from DDTypes.f90
-MD5:d3d6ac4704c651cf478ce3e23d8731cc -- If you edit this, you'll get what you deserve.
+MD5:735dee26230caa61833abe9c524a5ba2 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -57,35 +57,35 @@ UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0
 '0.554ccccccccccc@2')) (20 'exposure' (REAL 8 0 0 0 REAL ()) () (
 UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
 UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.27516666666666@4'))
-(21 'nevents' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
-0 0 INTEGER ()) 0 '-1')) (22 'mubackground' (REAL 8 0 0 0 REAL ()) () (
-UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
-UNKNOWN-ACCESS (CONSTANT (REAL 8 0 0 0 REAL ()) 0 '0.00000000000000@0'))
-(23 'niso' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
-0 0 INTEGER ()) 0 '-1')) (24 'ziso' (INTEGER 4 0 0 0 INTEGER ()) (1 0
-DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN
-0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (25 'aiso' (INTEGER 4 0 0
-0 INTEGER ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
+(21 'nevents' (INTEGER 4 0 0 0 INTEGER ()) (1 0 DEFERRED () ()) (
+UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
+DIMENSION) UNKNOWN-ACCESS ()) (22 'mubackground' (REAL 8 0 0 0 REAL ())
+(1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (23 'niso' (
+INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
+0 '-1')) (24 'ziso' (INTEGER 4 0 0 0 INTEGER ()) (1 0 DEFERRED () ()) (
+UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
+DIMENSION) UNKNOWN-ACCESS ()) (25 'aiso' (INTEGER 4 0 0 0 INTEGER ()) (
+1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (26 'fiso' (REAL 8
+0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())
-(26 'fiso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
+(27 'miso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
-UNKNOWN-ACCESS ()) (27 'miso' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ())
-(UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
-DIMENSION) UNKNOWN-ACCESS ()) (28 'ne' (INTEGER 4 0 0 0 INTEGER ()) () (
-UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
-UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '-1')) (29 'e' (
-REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())
-(30 'e_cache' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
+UNKNOWN-ACCESS ()) (28 'ne' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '-1')) (29 'e' (REAL 8 0 0 0
+REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (30
+'e_cache' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ()) (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
 UNKNOWN-ACCESS ()) (31 'eff_file' (CHARACTER 1 0 0 0 CHARACTER ((
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1024'))) () (UNKNOWN-FL
 UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
 CONSTANT (CHARACTER 1 0 0 0 CHARACTER (())) 0 1024
 '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                '))
-(32 'neff' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
+(32 'nbins' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
 0 0 INTEGER ()) 0 '-1')) (33 'eff' (REAL 8 0 0 0 REAL ()) (3 0 DEFERRED
 () () () () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN

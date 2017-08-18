@@ -74,9 +74,9 @@ FUNCTION SIMPLE_2014_Init(intervals) RESULT(D)
 
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
-  CALL SetDetector(D,exposure=18.24d0,Nevents=8,background=12.7d0,      &
+  CALL SetDetector(D,exposure=18.24d0,Nevents=(/8/),background=(/12.7d0/),      &
                    Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,             &
-                   NE=NE,E=E,Neff=0,eff=EFF_AllIso,                      &
+                   NE=NE,E=E,Nbins=0,eff=EFF_AllIso,                      &
                    intervals=.FALSE.)
   D%eff_file = '[SIMPLE 2014]'
   

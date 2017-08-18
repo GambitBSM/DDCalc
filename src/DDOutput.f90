@@ -217,9 +217,9 @@ SUBROUTINE WriteDetectorHeader(Detector,extra_lines)
   ! Exposure, observed events, expected background events
   WRITE(*,'(A,1PG12.4)') COMMENT_PREFIX &
       // 'Detector exposure [kg day]            =',Detector%exposure
-  IF (Detector%Nevents .GE. 0) THEN
+  IF (Detector%Nevents(0) .GE. 0) THEN
     WRITE(*,'(A,I6)') COMMENT_PREFIX &
-      // 'Observed events                       =',Detector%Nevents
+      // 'Observed events                       =',Detector%Nevents(0)
   END IF
   WRITE(*,'(A,F11.4)') COMMENT_PREFIX &
       // 'Average expected background events    =',Detector%MuBackground
@@ -239,10 +239,10 @@ SUBROUTINE WriteDetectorHeader(Detector,extra_lines)
   ! Efficiencies and intervals/bins
   WRITE(*,'(A,A)') COMMENT_PREFIX &
       // 'Efficiency file                       = ',TRIM(Detector%eff_file)
-  !IF (Detector%Neff .GT. 0) THEN
-  IF (Detector%intervals .AND. (Detector%Neff .GT. 0)) THEN
+  !IF (Detector%Nbins .GT. 0) THEN
+  IF (Detector%intervals .AND. (Detector%Nbins .GT. 0)) THEN
     WRITE(*,'(A,I6)') COMMENT_PREFIX &
-      // 'Number of bins/sub-intervals          =',Detector%Neff
+      // 'Number of bins/sub-intervals          =',Detector%Nbins
   END IF
   WRITE(*,'(A)') COMMENT_PREFIX
   
@@ -341,7 +341,7 @@ SUBROUTINE WriteLogPValueHeader(Detector,extra_lines)
   TYPE(DetectorStruct), INTENT(IN) :: Detector
   INTEGER, INTENT(IN), OPTIONAL :: extra_lines
   
-  IF (Detector%intervals .AND. (Detector%Neff .EQ. Detector%Nevents+1)) THEN
+  IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
     WRITE(*,'(A)') COMMENT_PREFIX &
         // 'The log of the p-value for the given parameters is given below,'
     WRITE(*,'(A)') COMMENT_PREFIX &
@@ -404,7 +404,7 @@ SUBROUTINE WriteEventsAndLikelihoodsHeader(Detector,extra_lines)
         // '  signal(SD)   Average expected spin-dependent signal events.'
     WRITE(*,'(A)') COMMENT_PREFIX &
         // '  log(L)       Log-likelihood using the Poisson distribution (signal+background).'
-    IF (Detector%intervals .AND. (Detector%Neff .EQ. Detector%Nevents+1)) THEN
+    IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
       WRITE(*,'(A)') COMMENT_PREFIX &
         // '  log(p)       Log of the p-value determined using the maximum gap method;'
       WRITE(*,'(A)') COMMENT_PREFIX &
@@ -473,7 +473,7 @@ SUBROUTINE WriteEventsAndLikelihoodsData(Detector,WIMP)
   IF (ABS(VerbosityLevel) .GE. 2) THEN
     WRITE(*,'(A,1(2X,I5,2X),3(1X,1PG11.4),2(1X,1PG11.4))')              &
         DATA_PREFIX,                                                    &
-        Detector%Nevents,Detector%MuBackground,           &
+        Detector%Nevents(0),Detector%MuBackground,           &
         lnLike,lnp
   END IF
  
@@ -744,7 +744,7 @@ SUBROUTINE WriteEventsByMassColumnHeader(Detector)
         '----- full range ------'
     ! Events for sub-intervals
     IF (Detector%intervals) THEN
-      DO Keff = 1,Detector%Neff
+      DO Keff = 1,Detector%Nbins
         WRITE(*,'(1X,A1)',ADVANCE='NO') '|'
         WRITE(*,'(1(1X,A14,I3,A6))',ADVANCE='NO')                       &
             '----- interval',Keff,' -----'
@@ -777,7 +777,7 @@ SUBROUTINE WriteEventsByMassColumnHeader(Detector)
   ! Events for sub-intervals
   IF (VerbosityLevel .GE. 3) THEN
     IF (Detector%intervals) THEN
-      DO Keff = 1,Detector%Neff
+      DO Keff = 1,Detector%Nbins
         WRITE(*,'(1X,A1)',ADVANCE='NO') ' '
         WRITE(*,'(2(1X,A11))',ADVANCE='NO') ' events(SI)',' events(SD)'
       END DO
@@ -1225,7 +1225,7 @@ SUBROUTINE WriteLimitsSIHeader(lnp,thetaG,Detector,extra_lines)
         // 'section(s) that are not excluded.  Cross-sections are excluded if their'
     WRITE(*,'(A)') COMMENT_PREFIX &
         // 'p-value is smaller than the given p-value, where the p-value is'
-    IF (Detector%intervals .AND. (Detector%Neff .EQ. Detector%Nevents+1)) THEN
+    IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
       WRITE(*,'(A)') COMMENT_PREFIX &
         // 'determined using the maximum gap method; see Yellin, Phys. Rev. D 66,'
       WRITE(*,'(A)') COMMENT_PREFIX &
@@ -1392,7 +1392,7 @@ SUBROUTINE WriteLimitsSDHeader(lnp,thetaG,Detector,extra_lines)
         // 'section(s) that are not excluded.  Cross-sections are excluded if their'
     WRITE(*,'(A)') COMMENT_PREFIX &
         // 'p-value is smaller than the given p-value, where the p-value is'
-    IF (Detector%intervals .AND. (Detector%Neff .EQ. Detector%Nevents+1)) THEN
+    IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
       WRITE(*,'(A)') COMMENT_PREFIX &
         // 'determined using the maximum gap method; see Yellin, Phys. Rev. D 66,'
       WRITE(*,'(A)') COMMENT_PREFIX &

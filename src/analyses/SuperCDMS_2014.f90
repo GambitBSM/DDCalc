@@ -26,11 +26,10 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
-  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER :: K
   INTEGER, PARAMETER :: NE = 1112
+  INTEGER, PARAMETER :: NELEM=1
   ! Efficiency curves energy tabulation points
   ! NOTE: Converted from phonon energies using Lindhard
   REAL*8, PARAMETER :: E(NE)                                            &
@@ -622,6 +621,9 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
   ! Will build array of efficiencies below
   INTEGER :: Nintervals
   REAL*8, ALLOCATABLE :: eff(:,:)
+  REAL*8, ALLOCATABLE :: EFFF(:,:,:)
+  INTEGER, ALLOCATABLE :: Nevents(:)
+  REAL*8, ALLOCATABLE :: background(:)
   
   ! Fill in efficiencies
   ! Interval efficiencies are just total efficiency with interval
@@ -649,32 +651,38 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
       END WHERE
     END DO
   END IF
+
+  ALLOCATE(Nevents(0:Nintervals))
+  ALLOCATE(background(0:Nintervals))
+
+  Nevents=0
+  background=0
+
+  IF (INCLUDE_T5Z3) THEN
+    Nevents(0)=11
+    background(0)=6.1d0
+  ELSE
+    Nevents(0)=8
+    background(0)=6.07d0
+  END IF
   
-
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  Z = 32
-  CALL GetNiso(Z,Niso) ! this assigns Niso
-  ALLOCATE(EFF_AllIso(Niso,NE,0:Nintervals))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0:) = eff(:,0:)
-  END DO
-
-
+  ! Efficiencies array (2D)
+  ALLOCATE(EFFF(NELEM,NE,0:Nintervals))                                
+  EFFF(0,:,0:) = eff(:,0:)
 
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
   IF (INCLUDE_T5Z3) THEN
     ! These settings are for the analysis with all detectors
-    CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents=11,              &
-                     background=6.1d0,Nelem=1,Zelem=(/Z/),             &
-                     NE=NE,E=E,Neff=Nintervals,eff=EFF_AllIso,           &
+    CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents=Nevents,              &
+                     background=background,Nelem=NELEM,Zelem=(/32/),             &
+                     NE=NE,E=E,Nbins=Nintervals,eff=EFFF,           &
                      intervals=intervals)
   ELSE
     ! These settings are for the analysis without t5z3
-    CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents=8,               &
-                     background=6.07d0,Nelem=1,Zelem=(/Z/),            &
-                     NE=NE,E=E,Neff=Nintervals,eff=EFF_AllIso,           &
+    CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents=Nevents,               &
+                     background=background,Nelem=NELEM,Zelem=(/32/),            &
+                     NE=NE,E=E,Nbins=Nintervals,eff=EFFF,           &
                      intervals=intervals)
   END IF
   

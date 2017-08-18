@@ -26,11 +26,9 @@ FUNCTION LUX_2013_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
-  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
-  INTEGER, PARAMETER :: NEFF = 2
+  INTEGER, PARAMETER :: NBINS = 2
   ! Efficiency curves energy tabulation points
   REAL*8, PARAMETER :: E(NE)                                            &
       =       (/ 0.10000d0, 0.10471d0, 0.10965d0, 0.11482d0, 0.12023d0, &
@@ -232,24 +230,15 @@ FUNCTION LUX_2013_Init(intervals) RESULT(D)
   !    0.00000d0, 0.00000d0 /)
   ! END: 10-50% NR BAND <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ! Efficiencies array (2D)
-  REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
-      = RESHAPE( (/ EFF0(:), EFF1(:), EFF2(:) /) ,SHAPE(EFF))
-  
-
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  Z = 54
-  CALL GetNiso(Z,Niso) ! this assigns Niso
-  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
-  END DO
+  INTEGER, PARAMETER :: NELEM=1
+  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
+      = RESHAPE( (/ (/ EFF0(:), EFF1(:), EFF2(:) /) /) ,SHAPE(EFF))
 
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
-  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents=1,                  &
-                   background=0.64d0,Nelem=1,Zelem=(/Z/),              &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
+  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents=(/1/),                  &
+                   background=(/0.64d0/),Nelem=NELEM,Zelem=(/54/),              &
+                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
                    intervals=intervals)
   D%eff_file = '[LUX 2013]'
   

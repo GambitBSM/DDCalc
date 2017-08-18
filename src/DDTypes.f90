@@ -135,10 +135,10 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Events -------------------------------------
   ! Observed number of events
-  INTEGER :: Nevents = -1   
+  INTEGER, ALLOCATABLE :: Nevents(:)
   
   ! Average expected background events
-  REAL*8 :: MuBackground = 0d0  
+  REAL*8, ALLOCATABLE  :: MuBackground(:)  
   
   ! Isotopes -----------------------------------
   ! Number of isotopes
@@ -168,9 +168,9 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Number of S1 bins/intervals with efficiencies.
   ! Will calculate rates for each bin/interval plus total.
-  INTEGER :: Neff = -1
+  INTEGER :: Nbins = -1
   
-  ! Array of size [1:Niso,1:NE,0:Neff] with the third index for the S1
+  ! Array of size [1:Niso,1:NE,0:Nbins] with the third index for the S1
   ! bin/interval (zero for full range)
   REAL*8, ALLOCATABLE :: eff(:,:,:)
   
@@ -228,13 +228,13 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Integrated rate --------
   ! Efficiency-corrected rates.  Array is of size
-  ! [0:Neff] with the index being that of the S1 bin/interval
+  ! [0:Nbins] with the index being that of the S1 bin/interval
   ! efficiency curve used in the integral (0 for full range).
   ! [cpd/kg]
   REAL*8, ALLOCATABLE :: R(:)
   
   ! Events -------------------------------------
-  ! Expected number of signal events.  Arrays of size [0:Neff].
+  ! Expected number of signal events.  Arrays of size [0:Nbins].
   REAL*8, ALLOCATABLE :: MuSignal(:) 
   
 END TYPE

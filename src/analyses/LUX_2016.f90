@@ -33,11 +33,9 @@ FUNCTION LUX_2016_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
-  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
-  INTEGER, PARAMETER :: NEFF = 1
+  INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
   ! Efficiency curves energy tabulation points
   REAL*8, PARAMETER :: E(NE)                                            &
@@ -78,28 +76,16 @@ FUNCTION LUX_2016_Init(intervals) RESULT(D)
       0.39410d0, 0.37610d0, 0.31950d0, 0.27650d0, 0.22310d0, 0.16820d0, &
       0.12230d0, 0.06659d0, 0.03409d0, 0.01530d0, 0.00730d0, 0.00280d0, &
       0.00080d0, 0.00000d0, 0.00010d0, 0.00000d0, 0.00000d0, 0.00000d0 /)
-  ! Efficiency (first and only interval)
-  REAL*8, PARAMETER :: EFF1(NE) = EFF0
   ! Efficiencies array (2D)
-  REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
-      = RESHAPE( (/ EFF0(:), EFF1(:) /) ,SHAPE(EFF))
+  INTEGER, PARAMETER :: NELEM=1
+  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
+      = RESHAPE( (/ (/ EFF0(:) /) /), SHAPE(EFF))
   ! Note that LUX 2016 doesn't have a well-defined fiducial mass (it varies with time).
   ! We calculate the average mass from the known duration (332 days) and the known exposure (33500 kg-days).
   
-
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  Z = 54
-  CALL GetNiso(Z,Niso) ! this assigns Niso
-  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
-  END DO
-
-
-  CALL SetDetector(D,mass=100.9d0,time=332.0d0,Nevents=1,               &
-                   background=2.3d0,Nelem=1,Zelem=(/Z/),               &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
+  CALL SetDetector(D,mass=100.9d0,time=332.0d0,Nevents=(/1/),           &
+                   background=(/2.3d0/),Nelem=NELEM,Zelem=(/54/),       &
+                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                       &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[LUX 2016]'
   

@@ -27,11 +27,9 @@ FUNCTION LUX_2015_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
-  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
-  INTEGER, PARAMETER :: NEFF = 1
+  INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
   ! Efficiency curves energy tabulation points
   REAL*8, PARAMETER :: E(NE)                                            &
@@ -74,26 +72,15 @@ FUNCTION LUX_2015_Init(intervals) RESULT(D)
       0.40436d0, 0.40477d0, 0.40460d0, 0.40370d0, 0.40276d0, 0.40180d0, &
       0.40080d0, 0.39977d0, 0.39870d0, 0.39760d0, 0.39646d0, 0.39528d0, &
       0.39522d0, 0.39662d0, 0.39806d0, 0.39955d0, 0.40110d0, 0.40269d0 /)
-  ! Efficiency (first and only interval)
-  REAL*8, PARAMETER :: EFF1(NE) = EFF0
   ! Efficiencies array (2D)
-  REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
-      = RESHAPE( (/ EFF0(:), EFF1(:) /) ,SHAPE(EFF))
+  INTEGER, PARAMETER :: NELEM=1
+  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
+      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
 
 
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  Z = 54
-  CALL GetNiso(Z,Niso) ! this assigns Niso
-  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
-  END DO
-
-
-  CALL SetDetector(D,mass=118.0d0,time=85.3d0,Nevents=0,                &
-                   background=0.64d0,Nelem=1,Zelem=(/Z/),              &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
+  CALL SetDetector(D,mass=118.0d0,time=85.3d0,Nevents=(/0/),                &
+                   background=(/0.64d0/),Nelem=NELEM,Zelem=(/54/),              &
+                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[LUX 2015]'
   
