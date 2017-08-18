@@ -1,11 +1,3 @@
-SUBROUTINE MyTest(a,b,c)
-    IMPLICIT NONE
-    INTEGER, INTENT(IN) :: a,b,c
-
-    WRITE (*,*) 100*a+10*b+c
-
-END SUBROUTINE
-
 
 
 
@@ -26,6 +18,7 @@ PROGRAM DDTest
   USE DDHalo
   USE DDOutput
   USE DDTabulation
+  USE DDNuclear
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: Detector
@@ -41,14 +34,14 @@ PROGRAM DDTest
   !CALL DDCalc_SetWIMP_Higgsportal(WIMP, 20d0, 1d-8, -0.5d-8, 5d-6, -0.6d-6)
   Halo = DDCalc_InitHalo()
 
-  Detector = LUX_2016_Init(.true.)
-  WRITE (*,*) Detector%InitSuccess
-  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-  WRITE (*,*) Detector%MuSignal
-  !WRITE (*,*) Detector%E
-  !WRITE (*,*) Detector%eff(100,1)
-  !WRITE (*,*) Detector%eff(100,2)
 
+  Detector = PICO_60_F_Init(.true.)
+  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
+  WRITE (*,*) Detector%MuSignal  
+
+  Detector = PICO_60_I_Init(.true.)
+  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
+  WRITE (*,*) Detector%MuSignal\
 
 
 END PROGRAM

@@ -57,12 +57,12 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
   TYPE(DetectorStruct) :: Detector
 
   ! Add your new analysis here.
-  IF      (GetLongArg('XENON100-2012'))  THEN
+  IF (GetLongArg('LUX-2016')) THEN
+    Detector = LUX_2016_Init(intervals)
+  ELSE IF      (GetLongArg('XENON100-2012'))  THEN
     Detector = XENON100_2012_Init(intervals)
   ELSE IF (GetLongArg('LUX-2013'))       THEN
     Detector = LUX_2013_Init(intervals)
-  ELSE IF (GetLongArg('LUX-2016')) THEN
-    Detector = LUX_2016_Init(intervals)
   ELSE IF (GetLongArg('PandaX-2016'))    THEN
     Detector = PandaX_2016_Init(intervals)
   ELSE IF (GetLongArg('LUX-2015'))       THEN

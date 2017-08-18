@@ -26,6 +26,8 @@ FUNCTION DARWIN_Xe_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
+  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
+  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
   INTEGER, PARAMETER :: NEFF = 1
@@ -91,11 +93,21 @@ FUNCTION DARWIN_Xe_Init(intervals) RESULT(D)
   REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
       = RESHAPE( (/ EFF0(:), EFF1(:) /) ,SHAPE(EFF))
   
+
+  ! Define efficieny for all isotopes.
+  ! In this case, this means simply assigning the same efficiency to all isotopes.
+  Z = 54
+  CALL GetNiso(Z,Niso) ! this assigns Niso
+  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
+  DO Kiso = 1,Niso
+    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
+  END DO
+
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=12d3,time=2d0*365d0,Nevents=0,                &
-                   background=0.5d0,Nelem=1,Zelem=(/54/),               &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
+                   background=0.5d0,Nelem=1,Zelem=(/Z/),               &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
                    intervals=intervals)
   D%eff_file = '[DARWIN Xe 2015]'
   

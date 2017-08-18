@@ -26,6 +26,8 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
+  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
+  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER :: K
   INTEGER, PARAMETER :: NE = 1112
@@ -648,19 +650,31 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
     END DO
   END IF
   
+
+  ! Define efficieny for all isotopes.
+  ! In this case, this means simply assigning the same efficiency to all isotopes.
+  Z = 32
+  CALL GetNiso(Z,Niso) ! this assigns Niso
+  ALLOCATE(EFF_AllIso(Niso,NE,0:Nintervals))
+  DO Kiso = 1,Niso
+    EFF_AllIso(Kiso,:,0:) = eff(:,0:)
+  END DO
+
+
+
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
   IF (INCLUDE_T5Z3) THEN
     ! These settings are for the analysis with all detectors
     CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents=11,              &
-                     background=6.1d0,Nelem=1,Zelem=(/32/),             &
-                     NE=NE,E=E,Neff=Nintervals,eff=eff,           &
+                     background=6.1d0,Nelem=1,Zelem=(/Z/),             &
+                     NE=NE,E=E,Neff=Nintervals,eff=EFF_AllIso,           &
                      intervals=intervals)
   ELSE
     ! These settings are for the analysis without t5z3
     CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents=8,               &
-                     background=6.07d0,Nelem=1,Zelem=(/32/),            &
-                     NE=NE,E=E,Neff=Nintervals,eff=eff,           &
+                     background=6.07d0,Nelem=1,Zelem=(/Z/),            &
+                     NE=NE,E=E,Neff=Nintervals,eff=EFF_AllIso,           &
                      intervals=intervals)
   END IF
   

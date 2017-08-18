@@ -13,9 +13,42 @@ USE DDConstants
 IMPLICIT NONE
 PRIVATE
 
-PUBLIC :: IsotopeMass, EtoQ, CompoundIsotopeList, CalcWSD, CalcWSI
+PUBLIC :: IsotopeMass, EtoQ, ElementIsotopeList, GetNiso, CompoundIsotopeList, CalcWSD, CalcWSI
 
 CONTAINS
+
+
+! ----------------------------------------------------------------------
+! For the given element, returns number of isotopes
+! 
+! Input argument:
+!     Z          Atomic number of element
+! Output arguments:
+!     Niso       Number of isotopes
+!
+! [added by Sebastian Wild, August 2017] 
+! 
+SUBROUTINE GetNiso(Z,Niso)
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: Z
+  INTEGER, INTENT(OUT) :: Niso
+  INTEGER, PARAMETER :: NELEMENTS = 92 ! when changing this, change also in ElementIsotopeList
+  ! Number of stable isotopes for given element (indexed by Z)
+  INTEGER, PARAMETER :: ELEMENT_NISO(NELEMENTS) =                       &
+    (/  2,  2,  2,  1,  2,  2,  2,  3,  1,  3,  1,  3,  1,  3,  1,  4,  &
+        2,  3,  3,  6,  1,  5,  2,  4,  1,  4,  1,  5,  2,  5,  2,  5,  &
+        1,  6,  2,  6,  2,  4,  1,  5,  1,  7,  0,  7,  1,  6,  2,  8,  &
+        2, 10,  2,  8,  1,  9,  1,  7,  2,  4,  1,  7,  0,  7,  2,  7,  &
+        1,  7,  1,  6,  1,  7,  2,  6,  1,  5,  2,  7,  2,  6,  1,  7,  &
+        2,  4,  1,  0,  0,  0,  0,  0,  0,  1,  0,  3 /)
+
+  IF (Z .LE. NELEMENTS) THEN
+    Niso = ELEMENT_NISO(Z)
+  ELSE
+    Niso = 0
+  END IF
+
+END SUBROUTINE
 
 
 ! ----------------------------------------------------------------------
@@ -42,16 +75,12 @@ SUBROUTINE ElementIsotopeList(Z,Niso,Ziso,Aiso,fiso,Miso)
   ! Isotope data for all elements up to Z=92 (Uranium).
   ! Data is combined into single arrays; the ELEMENT_INDEX indicates
   ! where data for a particular element Z begins in those arrays.
-  INTEGER, PARAMETER :: NELEMENTS = 92
+  INTEGER, PARAMETER :: NELEMENTS = 92  ! when changing this, change also in GetNiso
   INTEGER, PARAMETER :: NISOTOPES = 286
+
   ! Number of stable isotopes for given element (indexed by Z)
-  INTEGER, PARAMETER :: ELEMENT_NISO(NELEMENTS) =                       &
-    (/  2,  2,  2,  1,  2,  2,  2,  3,  1,  3,  1,  3,  1,  3,  1,  4,  &
-        2,  3,  3,  6,  1,  5,  2,  4,  1,  4,  1,  5,  2,  5,  2,  5,  &
-        1,  6,  2,  6,  2,  4,  1,  5,  1,  7,  0,  7,  1,  6,  2,  8,  &
-        2, 10,  2,  8,  1,  9,  1,  7,  2,  4,  1,  7,  0,  7,  2,  7,  &
-        1,  7,  1,  6,  1,  7,  2,  6,  1,  5,  2,  7,  2,  6,  1,  7,  &
-        2,  4,  1,  0,  0,  0,  0,  0,  0,  1,  0,  3 /)
+  ! ELEMENT_NISO(NELEMENTS) is now defined in GetNiso
+
   ! First data array index for given element (indexed by Z)
   INTEGER, PARAMETER :: ELEMENT_INDEX(NELEMENTS) =                      &
     (/  1,  3,  5,  7,  8, 10, 12, 14, 17, 18, 21, 22, 25, 26, 29, 30,  &
@@ -171,7 +200,7 @@ SUBROUTINE ElementIsotopeList(Z,Niso,Ziso,Aiso,fiso,Miso)
       0.5259d0,   1.000d0,    1.000d0,    5.310d-5,   0.007114d0, 0.9928d0 /)
 
   IF (Z .LE. NELEMENTS) THEN
-    Niso = ELEMENT_NISO(Z)
+    CALL GetNiso(Z,Niso)
     ALLOCATE(Ziso(Niso),Aiso(Niso),fiso(Niso),Miso(Niso))
     I1 = ELEMENT_INDEX(Z)
     I2 = I1 + Niso - 1

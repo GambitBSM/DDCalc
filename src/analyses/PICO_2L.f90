@@ -22,6 +22,8 @@ FUNCTION PICO_2L_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
+  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
+  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NEFF = 1
@@ -73,9 +75,18 @@ FUNCTION PICO_2L_Init(intervals) RESULT(D)
   ! The fiducial mass is reduced to account for the fluorine fraction.
   ! NOTE: PICO_2L does not attempt background subtraction
 
+  ! Define efficieny for all isotopes.
+  ! In this case, this means simply assigning the same efficiency to all isotopes.
+  Z = 9
+  CALL GetNiso(Z,Niso) ! this assigns Niso
+  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
+  DO Kiso = 1,Niso
+    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
+  END DO
+
   CALL SetDetector(D,mass=1.57d0,time=66.3d0,Nevents=1,                 &
-                   background=0.0d0,Nelem=1,Zelem=(/9/),                &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
+                   background=0.0d0,Nelem=1,Zelem=(/Z/),                &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PICO_2L]'
   

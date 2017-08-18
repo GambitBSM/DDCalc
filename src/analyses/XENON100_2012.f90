@@ -26,6 +26,8 @@ FUNCTION XENON100_2012_Init(intervals) RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
+  REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
+  INTEGER :: Z, Niso, Kiso
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
   INTEGER, PARAMETER :: NEFF = 3
@@ -173,11 +175,20 @@ FUNCTION XENON100_2012_Init(intervals) RESULT(D)
   REAL*8, PARAMETER :: EFF(NE,0:NEFF)                                   &
       = RESHAPE( (/ EFF0(:), EFF1(:), EFF2(:), EFF3(:) /) ,SHAPE(EFF))
   
+  ! Define efficieny for all isotopes.
+  ! In this case, this means simply assigning the same efficiency to all isotopes.
+  Z = 54
+  CALL GetNiso(Z,Niso) ! this assigns Niso
+  ALLOCATE(EFF_AllIso(Niso,NE,0:NEFF))
+  DO Kiso = 1,Niso
+    EFF_AllIso(Kiso,:,0:) = EFF(:,0:)
+  END DO
+
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=34d0,time=224.6d0,Nevents=2,                  &
-                   background=1.0d0,Nelem=1,Zelem=(/54/),               &
-                   NE=NE,E=E,Neff=NEFF,eff=EFF,                   &
+                   background=1.0d0,Nelem=1,Zelem=(/Z/),               &
+                   NE=NE,E=E,Neff=NEFF,eff=EFF_AllIso,                   &
                    intervals=intervals)
   D%eff_file = '[XENON100 2012]'
   

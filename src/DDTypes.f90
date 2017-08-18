@@ -3,6 +3,11 @@ MODULE DDTypes
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ! DDTypes
 !    Global types for DDCalc
+!
+! If changed, recompile e.g. via
+!   rm -f ddtypes.mod && cd src/ && gfortran -c DDTypes.f90 && rm -f DDTypes.o && mv ddtypes.mod .. && cd .. && make clean && make
+! from the DDCalc main directory.
+!
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 IMPLICIT NONE
@@ -165,9 +170,9 @@ TYPE, PUBLIC :: DetectorStruct
   ! Will calculate rates for each bin/interval plus total.
   INTEGER :: Neff = -1
   
-  ! Array of size [1:NE,0:Neff] with the second index for the S1
+  ! Array of size [1:Niso,1:NE,0:Neff] with the third index for the S1
   ! bin/interval (zero for full range)
-  REAL*8, ALLOCATABLE :: eff(:,:)
+  REAL*8, ALLOCATABLE :: eff(:,:,:)
   
   ! Indicates if rates for intervals/bins are to also be calculated
   ! in addition to the total rate.  Needed for maximum gap analysis,

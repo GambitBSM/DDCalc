@@ -41,6 +41,7 @@ CONTAINS
 ! 
 ! Required input argument:
 !     file       The file to load efficiencies from.
+!     Niso       Number of isotopes of the experiment under consideration
 ! Required output arguments:
 !     NE         Number of recoil energy tabulation points loaded
 !     E          Allocatable array to contain energies [keV].
@@ -50,13 +51,16 @@ CONTAINS
 !                the total range and each interval/bin.  Allocated to
 !                size [1:NE,0:Neff].
 ! 
-SUBROUTINE LoadEfficiencyFile(file,NE,E,Neff,eff)
+! FIXME: update this function with the new index convention for eff
+!
+SUBROUTINE LoadEfficiencyFile(file,Niso,NE,E,Neff,eff)
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file
+  INTEGER, INTENT(IN) :: Niso
   INTEGER, INTENT(OUT) :: NE,Neff
-  REAL*8, ALLOCATABLE, INTENT(OUT) :: E(:),eff(:,:)
+  REAL*8, ALLOCATABLE, INTENT(OUT) :: E(:),eff(:,:,:)
   LOGICAL :: status
-  INTEGER :: Kcol,Keff,Nrow,Ncol,Nvalid
+  INTEGER :: Kcol,Keff,Nrow,Ncol,Nvalid,Kiso
   REAL*8, ALLOCATABLE :: data(:,:)
   
   ! Load table from file
@@ -83,12 +87,14 @@ SUBROUTINE LoadEfficiencyFile(file,NE,E,Neff,eff)
   
   ! Now get efficiencies
   Neff = Nvalid - 1
-  ALLOCATE(eff(NE,0:Neff))
+  ALLOCATE(eff(Niso,NE,0:Neff))
   Keff = 0
   DO Kcol = 2,Ncol
     IF (ALL(data(:,Kcol) .GE. 0d0) .AND. ALL(data(:,Kcol) .LE. 1.00001d0) &
         .AND. (Keff .LE. Neff)) THEN
-      eff(:,Keff) = data(:,Kcol)
+      DO Kiso = 1,Niso
+        eff(Kiso,:,Keff) = data(:,Kcol)
+      END DO
       Keff = Keff + 1
     END IF
   END DO
@@ -154,7 +160,7 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Ziso(:),Aiso(:)
   REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background
   REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: fiso(:),Miso(:),E(:),   &
-          eff(:,:),Wsi(:,:,:),Wsd(:,:,:)
+          eff(:,:,:),Wsi(:,:,:),Wsd(:,:,:)
   
   ! Exposures
   IF (PRESENT(mass))     mass     = D%mass
@@ -195,7 +201,7 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   IF (PRESENT(eff_file)) eff_file = D%eff_file
   IF (PRESENT(Neff))     Neff     = D%Neff
   IF (PRESENT(eff)) THEN
-    ALLOCATE(eff(D%NE,0:D%Neff))
+    ALLOCATE(eff(D%Niso,D%NE,0:D%Neff))
     eff = D%eff
   END IF
   
@@ -293,7 +299,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
   INTEGER, INTENT(IN), OPTIONAL :: Nevents,Niso,Nelem,NE,Neff
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,background,Emin
-  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,0:)
+  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,:,0:)
   LOGICAL :: iso_change,E_change,eff_change
   INTEGER :: KE,Kiso,Neff0
   INTEGER, ALLOCATABLE :: stoich0(:)
@@ -404,22 +410,21 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nevents,background,         &
   D%E_cache = D%E
   E_change = .TRUE.
 
- 
   
   ! Set efficiencies
   ! ...from file
   IF (PRESENT(eff_file)) THEN
     IF (eff_file .NE. '') THEN
       D%eff_file = eff_file
-      CALL LoadEfficiencyFile(eff_file,D%NE,D%E,D%Neff,D%eff)
+      CALL LoadEfficiencyFile(eff_file,D%Niso,D%NE,D%E,D%Neff,D%eff)
       eff_change = .TRUE.
     END IF
   ! ...by arguments
   ELSE IF (PRESENT(Neff) .AND. PRESENT(eff)) THEN
     IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
-    ALLOCATE(D%eff(NE,0:Neff))
+    ALLOCATE(D%eff(D%Niso,NE,0:Neff))
     D%Neff  = Neff
-    D%eff   = eff(1:NE,0:Neff)
+    D%eff   = eff(1:D%Niso,1:NE,0:Neff)
     eff_change = .TRUE.
   END IF
   
