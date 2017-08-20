@@ -34,8 +34,8 @@ PROGRAM DDTest
   !CALL DDCalc_SetWIMP_Higgsportal(WIMP, 20d0, 1d-8, -0.5d-8, 5d-6, -0.6d-6)
   Halo = DDCalc_InitHalo()
 
-
   Detector = PICO_60_F_Init(.true.)
+
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
   WRITE (*,*) Detector%MuSignal  
 

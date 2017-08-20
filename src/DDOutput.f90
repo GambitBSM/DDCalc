@@ -222,7 +222,7 @@ SUBROUTINE WriteDetectorHeader(Detector,extra_lines)
       // 'Observed events                       =',Detector%Nevents(0)
   END IF
   WRITE(*,'(A,F11.4)') COMMENT_PREFIX &
-      // 'Average expected background events    =',Detector%MuBackground
+      // 'Average expected background events    =',Detector%Backgr(0)
   WRITE(*,'(A)') COMMENT_PREFIX
   
   ! Detector isotopes
@@ -473,7 +473,7 @@ SUBROUTINE WriteEventsAndLikelihoodsData(Detector,WIMP)
   IF (ABS(VerbosityLevel) .GE. 2) THEN
     WRITE(*,'(A,1(2X,I5,2X),3(1X,1PG11.4),2(1X,1PG11.4))')              &
         DATA_PREFIX,                                                    &
-        Detector%Nevents(0),Detector%MuBackground,           &
+        Detector%Nevents(0),Detector%Backgr(0),                         &
         lnLike,lnp
   END IF
  

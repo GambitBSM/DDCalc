@@ -64,13 +64,12 @@ FUNCTION PandaX_2016_Init(intervals) RESULT(D)
       0.16606d0, 0.13956d0, 0.12110d0, 0.10394d0, 0.08823d0, 0.07409d0, &
       0.06164d0, 0.05107d0, 0.04250d0, 0.03549d0, 0.02964d0, 0.02427d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:) /),SHAPE(EFF))
 
-  CALL SetDetector(D,mass=334.3d0,time=98.7d0,Nevents=(/3/),                &
-                   background=(/4.8d0/),Nelem=NELEM,Zelem=(/54/),               &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
+  CALL SetDetector(D,mass=334.3d0,time=98.7d0,Nevents_tot=3,            &
+                   Backgr_tot=4.8d0,Nelem=1,Zelem=(/54/),               &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PandaX 2016]'
   

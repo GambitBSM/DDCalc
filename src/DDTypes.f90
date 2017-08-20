@@ -105,7 +105,7 @@ END TYPE
 ! a function of energy.
 TYPE, PUBLIC :: DetectorStruct
   
-  ! flag which indicates whether the detector has been successfully initialized.
+  ! Flag that indicates whether the detector has been successfully initialized.
   ! If this remains false after calling SetDetector, it means that some of the 
   ! required input arguments have not been specified.
   LOGICAL :: InitSuccess = .FALSE.
@@ -125,21 +125,21 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Exposure -----------------------------------
   ! Detector fiducial mass [kg]
-  REAL*8 :: mass = 118d0
+  REAL*8 :: mass = -1d0
   
   ! Detector exposure time [day]
-  REAL*8 :: time = 85.3d0
+  REAL*8 :: time = -1d0
   
   ! Total detector exposure [kg*day]
-  REAL*8 :: exposure = 118d0*85.3d0
+  REAL*8 :: exposure = -1d0
   
   ! Events -------------------------------------
   ! Observed number of events
   INTEGER, ALLOCATABLE :: Nevents(:)
   
   ! Average expected background events
-  REAL*8, ALLOCATABLE  :: MuBackground(:)  
-  
+  REAL*8, ALLOCATABLE  :: Backgr(:)   
+ 
   ! Isotopes -----------------------------------
   ! Number of isotopes
   INTEGER :: Niso = -1
@@ -178,7 +178,7 @@ TYPE, PUBLIC :: DetectorStruct
   ! in addition to the total rate.  Needed for maximum gap analysis,
   ! but unnecessary for likelihood.  This flag is ignored if the
   ! efficiencies for intervals/bins are not provided.
-  LOGICAL :: intervals = .TRUE.
+  LOGICAL :: intervals = .FALSE.
   
   
   ! Form factors -------------------------------
@@ -214,9 +214,6 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Tabulated mean inverse speed (eta) [s/km] at the above vmin.
   REAL*8, ALLOCATABLE :: eta(:,:)
-  
-
-
 
   ! structure for the differential rates,
   ! separately for each isotope of the experiment.

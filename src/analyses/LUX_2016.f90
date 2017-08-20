@@ -77,15 +77,14 @@ FUNCTION LUX_2016_Init(intervals) RESULT(D)
       0.12230d0, 0.06659d0, 0.03409d0, 0.01530d0, 0.00730d0, 0.00280d0, &
       0.00080d0, 0.00000d0, 0.00010d0, 0.00000d0, 0.00000d0, 0.00000d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:) /) /), SHAPE(EFF))
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:) /), SHAPE(EFF))
   ! Note that LUX 2016 doesn't have a well-defined fiducial mass (it varies with time).
   ! We calculate the average mass from the known duration (332 days) and the known exposure (33500 kg-days).
   
-  CALL SetDetector(D,mass=100.9d0,time=332.0d0,Nevents=(/1/),           &
-                   background=(/2.3d0/),Nelem=NELEM,Zelem=(/54/),       &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                       &
+  CALL SetDetector(D,mass=100.9d0,time=332.0d0,Nevents_tot=1,           &
+                   Backgr_tot=2.3d0,Nelem=1,Zelem=(/54/),               &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[LUX 2016]'
   

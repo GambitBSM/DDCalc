@@ -64,19 +64,11 @@ FUNCTION SIMPLE_2014_Init(intervals) RESULT(D)
   END DO
   eff(:,0) = 1d0 - EXP(-Gamma*(1d0-Ethresh/MAX(E,Ethresh)))
   
-
-  ! Define efficieny for all isotopes.
-  ! In this case, this means simply assigning the same efficiency to all isotopes.
-  ALLOCATE(EFF_AllIso(Niso,NE,0:0))
-  DO Kiso = 1,Niso
-    EFF_AllIso(Kiso,:,0) = eff(:,0)
-  END DO
-
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
-  CALL SetDetector(D,exposure=18.24d0,Nevents=(/8/),background=(/12.7d0/),      &
-                   Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,             &
-                   NE=NE,E=E,Nbins=0,eff=EFF_AllIso,                      &
+  CALL SetDetector(D,exposure=18.24d0,Nevents_tot=8,Backgr_tot=12.7d0,      &
+                   Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,                 &
+                   NE=NE,E=E,Nbins=0,eff_all=eff,                           &
                    intervals=.FALSE.)
   D%eff_file = '[SIMPLE 2014]'
   

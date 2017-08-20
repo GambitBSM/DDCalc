@@ -54,7 +54,7 @@ FUNCTION LogLikelihood(D) RESULT(lnlike)
     
   ! Get observed events and expected events
   N = D%Nevents(0)
-  b = D%MuBackground(0)
+  b = D%Backgr(0)
   s = D%MuSignal(0)
 
   IF (b .EQ. 0d0) THEN

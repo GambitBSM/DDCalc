@@ -73,14 +73,13 @@ FUNCTION LUX_2015_Init(intervals) RESULT(D)
       0.40080d0, 0.39977d0, 0.39870d0, 0.39760d0, 0.39646d0, 0.39528d0, &
       0.39522d0, 0.39662d0, 0.39806d0, 0.39955d0, 0.40110d0, 0.40269d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:) /),SHAPE(EFF))
 
 
-  CALL SetDetector(D,mass=118.0d0,time=85.3d0,Nevents=(/0/),                &
-                   background=(/0.64d0/),Nelem=NELEM,Zelem=(/54/),              &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
+  CALL SetDetector(D,mass=118.0d0,time=85.3d0,Nevents_tot=0,             &
+                   Backgr_tot=0.64d0,Nelem=1,Zelem=(/54/),               &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[LUX 2015]'
   

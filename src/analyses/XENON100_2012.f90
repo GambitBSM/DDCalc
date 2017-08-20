@@ -170,16 +170,14 @@ FUNCTION XENON100_2012_Init(intervals) RESULT(D)
       0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, &
       0.00000d0, 0.00000d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:), EFF1(:), EFF2(:), EFF3(:) /) /),SHAPE(EFF))
-
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:), EFF1(:), EFF2(:), EFF3(:) /),SHAPE(EFF))
 
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
-  CALL SetDetector(D,mass=34d0,time=224.6d0,Nevents=(/2,0,0,0/),          &
-                   background=(/1.0d0,0d0,0d0,0d0/),Nelem=NELEM,Zelem=(/54/), &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                    &
+  CALL SetDetector(D,mass=34d0,time=224.6d0,Nevents_tot=2,              &
+                   Backgr_tot=1.0d0,Nelem=1,Zelem=(/54/),               &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
                    intervals=intervals)
   D%eff_file = '[XENON100 2012]'
   

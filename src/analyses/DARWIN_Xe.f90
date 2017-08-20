@@ -86,15 +86,14 @@ FUNCTION DARWIN_Xe_Init(intervals) RESULT(D)
       0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, &
       0.00000d0, 0.00000d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:) /),SHAPE(EFF))
 
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
-  CALL SetDetector(D,mass=12d3,time=2d0*365d0,Nevents=(/0/),                &
-                   background=(/0.5d0/),Nelem=NELEM,Zelem=(/54/),               &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
+  CALL SetDetector(D,mass=12d3,time=2d0*365d0,Nevents_tot=0,             &
+                   Backgr_tot=0.5d0,Nelem=1,Zelem=(/54/),                &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
                    intervals=intervals)
   D%eff_file = '[DARWIN Xe 2015]'
   

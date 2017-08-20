@@ -77,9 +77,14 @@ SUBROUTINE GetRates(D,Nevents,background,signal,signal_si,signal_sd,    &
           rate
   REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: binsignal(:),binrate(:)
   
+  IF ( .NOT. D%InitSuccess ) THEN
+    WRITE(*,*) 'ERROR: Cannot get information from a detector that has not been correctly initialized.'
+    STOP      
+  END IF
+
   ! Observed events and expected background events
   IF (PRESENT(Nevents))    Nevents    = D%Nevents(0)
-  IF (PRESENT(background)) background = D%MuBackground(0)
+  IF (PRESENT(background)) background = D%Backgr(0)
   
   ! Signal events
   IF (PRESENT(signal))    signal    = D%MuSignal(0)
@@ -184,6 +189,11 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   TYPE(HaloStruct), INTENT(IN) :: Halo
   INTEGER :: Kiso, KE, Keff, Neff
+
+  IF ( .NOT. D%InitSuccess ) THEN
+    WRITE(*,*) 'ERROR: Cannot calculate rates for a detector that has not been correctly initialized.'
+    STOP      
+  END IF
 
   ! Update mean inverse speed, set dRdEiso to zero
   D%vmin = EToVmin(D%NE,D%E,WIMP%m,D%Niso,D%Miso)

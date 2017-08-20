@@ -29,7 +29,6 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
   LOGICAL, INTENT(IN) :: intervals
   INTEGER :: K
   INTEGER, PARAMETER :: NE = 1112
-  INTEGER, PARAMETER :: NELEM=1
   ! Efficiency curves energy tabulation points
   ! NOTE: Converted from phonon energies using Lindhard
   REAL*8, PARAMETER :: E(NE)                                            &
@@ -621,10 +620,7 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
   ! Will build array of efficiencies below
   INTEGER :: Nintervals
   REAL*8, ALLOCATABLE :: eff(:,:)
-  REAL*8, ALLOCATABLE :: EFFF(:,:,:)
-  INTEGER, ALLOCATABLE :: Nevents(:)
-  REAL*8, ALLOCATABLE :: background(:)
-  
+
   ! Fill in efficiencies
   ! Interval efficiencies are just total efficiency with interval
   ! energy range and zero elsewhere (ignoring energy resolution).
@@ -652,37 +648,19 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
     END DO
   END IF
 
-  ALLOCATE(Nevents(0:Nintervals))
-  ALLOCATE(background(0:Nintervals))
-
-  Nevents=0
-  background=0
-
-  IF (INCLUDE_T5Z3) THEN
-    Nevents(0)=11
-    background(0)=6.1d0
-  ELSE
-    Nevents(0)=8
-    background(0)=6.07d0
-  END IF
-  
-  ! Efficiencies array (2D)
-  ALLOCATE(EFFF(NELEM,NE,0:Nintervals))                                
-  EFFF(0,:,0:) = eff(:,0:)
-
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
   IF (INCLUDE_T5Z3) THEN
     ! These settings are for the analysis with all detectors
-    CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents=Nevents,              &
-                     background=background,Nelem=NELEM,Zelem=(/32/),             &
-                     NE=NE,E=E,Nbins=Nintervals,eff=EFFF,           &
+    CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents_tot=11,          &
+                     Backgr_tot=6.1d0,Nelem=1,Zelem=(/32/),             &
+                     NE=NE,E=E,Nbins=Nintervals,eff_all=eff,            &
                      intervals=intervals)
   ELSE
     ! These settings are for the analysis without t5z3
-    CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents=Nevents,               &
-                     background=background,Nelem=NELEM,Zelem=(/32/),            &
-                     NE=NE,E=E,Nbins=Nintervals,eff=EFFF,           &
+    CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents_tot=8,           &
+                     Backgr_tot=6.07d0,Nelem=1,Zelem=(/32/),            &
+                     NE=NE,E=E,Nbins=Nintervals,eff_all=eff,            &
                      intervals=intervals)
   END IF
   

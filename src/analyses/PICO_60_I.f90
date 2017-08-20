@@ -67,16 +67,15 @@ FUNCTION PICO_60_I_Init(intervals) RESULT(D)
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, &
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:) /),SHAPE(EFF))
 
   ! The fiducial mass is reduced to account for the iodine fraction.
   ! It is furthermore reduced by a trial factor of 1.8.
 
-  CALL SetDetector(D,mass=5.18d0,time=92.8d0,Nevents=(/0/),                 &
-                   background=(/0.0d0/),Nelem=NELEM,Zelem=(/53/),               &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
+  CALL SetDetector(D,mass=5.18d0,time=92.8d0,Nevents_tot=0,             &
+                   Backgr_tot=0.0d0,Nelem=1,Zelem=(/53/),               &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PICO_60 I]'
   

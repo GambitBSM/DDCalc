@@ -65,16 +65,15 @@ FUNCTION PICO_2L_Init(intervals) RESULT(D)
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, &
       1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0, 1.00000d0 /)
   ! Efficiencies array (2D)
-  INTEGER, PARAMETER :: NELEM=1
-  REAL*8, PARAMETER :: EFF(NELEM,NE,0:NBINS)                                   &
-      = RESHAPE( (/ (/ EFF0(:) /) /),SHAPE(EFF))
+  REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
+      = RESHAPE( (/ EFF0(:) /),SHAPE(EFF))
 
   ! The fiducial mass is reduced to account for the fluorine fraction.
   ! NOTE: PICO_2L does not attempt background subtraction
 
-  CALL SetDetector(D,mass=1.57d0,time=66.3d0,Nevents=(/1/),                 &
-                   background=(/0.0d0/),Nelem=NELEM,Zelem=(/9/),                &
-                   NE=NE,E=E,Nbins=NBINS,eff=EFF,                   &
+  CALL SetDetector(D,mass=1.57d0,time=66.3d0,Nevents_tot=1,              &
+                   Backgr_tot=0.0d0,Nelem=1,Zelem=(/9/),                 &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
                    intervals=intervals,Emin=EMIN)
   D%eff_file = '[PICO_2L]'
   
