@@ -28,6 +28,7 @@ extern "C"
   int C_DDCalc_pico_2l_init(const bool&);
   int C_DDCalc_pico_60_f_init(const bool&);
   int C_DDCalc_pico_60_i_init(const bool&);
+  int C_DDCalc_pico_60_init(const bool&);
   int C_DDCalc_pico_60_2017_init(const bool&);
   int C_DDCalc_supercdms_2014_init(const bool&);
   int C_DDCalc_simple_2014_init(const bool&);

@@ -129,7 +129,7 @@ PROGRAM DDCalc_exampleF
   ! Give explicit list of isotopes, along with their mass fractions.
   !CALL DDCalc_SetDetector(MyDetector,Niso=7,Ziso=(/.../),Aiso=(/.../),fiso=(/.../))
   ! Change parameters.
-  CALL DDCalc_SetDetector(MyDetector,mass=118d0,time=85.3d0,Nevents=1,background=0.64d0)
+  CALL DDCalc_SetDetector(MyDetector,mass=118d0,time=85.3d0,Nevents_tot=1,Backgr_tot=0.64d0)
   ! Load efficiency curves from file.  First column is recoil energy
   ! [keV], the next column with values in [0,1] is the total detection
   ! efficiency.  Optionally (intervals=.TRUE.), additional columns are
