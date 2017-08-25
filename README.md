@@ -14,7 +14,7 @@ it can be found in the [GAMBIT DarkBit paper](DarkBitPaper.pdf):
 T Bringmann, J Conrad, JM Cornell, LA Dal, J Edsjö, B Farmer,
 F Kahlhoefer, A Kvellestad, A Putze, C Savage, P Scott, C Weniger,
 M White & S Wild, DarkBit: A GAMBIT module for computing dark matter
-observables and likelihoods, *European Physical Journal C* (2017).
+observables and likelihoods, EPJC submitted (2017), arXiv:1705.07920.
 
 If you write a paper that uses DDCalc, please cite this paper.
 
@@ -24,33 +24,37 @@ Experiments
 
 The experimental results implemented in DDCalc at this time are:
 
+  * Xenon1T 2017: 1042*34.2 kg-days (Xe)  
+    E. Aprile et al., [arxiv:1705.06655]
 
-  TPC-based results
-  ---
+  * LUX 2016: 33500 kg-days (Xe)  
+    D.S. Akerib et al., PRL 118, 021303 (2017) [arxiv:1608.07648]
 
-  * XENON100 2012: 34*224.6 kg-days  
-    E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
+  * PandaX 2016: 34*224.6 kg-days (Xe)  
+    A. Tan et al., PRL 117, 121303 (2016) [arxiv:1607.07400]
 
-  * LUX 2013: 118*85.3 kg-days  
+  * LUX 2015: 118*85.3 kg-days (Xe)  
+    D.S. Akerib et al., PRL 116, 161301 (2016) [arXiv:1512.03506]
+
+  * LUX 2013: 118*85.3 kg-days (Xe)  
     D.S. Akerib et al., PRL 112, 091303 (2014) [arxiv:1310.8214]
 
-  * DARWIN projections (argon & xenon)  
-    J. Conrad et al., in preparation.
+  * XENON100 2012: 34*224.6 kg-days (Xe)  
+    E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
 
-
-  Non-TPC results
-  ---
-
-  * PICO: 60 (CF3) and 2L (C3F8)  
+  * PICO: 60 (CF3), 2L (C3F8) and 60 (C3F8)
     C. Amole et al., PRD 93, 052014 (2016) [arXiv:1510.07754]  
-    C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729]  
-    C. Amole et al., PRL 114, 231302 (2015) [arXiv:1503.00008]
+    C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729] 
+    C. Amole et al., arXiv:1702.07666 
 
   * SuperCDMS 2014: 577 kg-days (Ge)  
     R. Agnese et al., PRL 112, 241302 (2014) [arxiv:1402.7137]
 
   * SIMPLE 2014: 18.24 kg-days (C2ClF5)  
     M. Felizardo et al., PRD 89, 072013 (2014) [arXiv:1404.4309]
+
+  * DARWIN projections (argon & xenon)  
+    J. Conrad et al., in preparation.
 
 
 Citation Policy
@@ -61,7 +65,10 @@ found in the 'DDCalc.bib' file.
 
 The DDCalc software itself is presented in the GAMBIT DarkBit paper:
 
-  <insert>
+T Bringmann, J Conrad, JM Cornell, LA Dal, J Edsjö, B Farmer,
+F Kahlhoefer, A Kvellestad, A Putze, C Savage, P Scott, C Weniger,
+M White & S Wild, DarkBit: A GAMBIT module for computing dark matter
+observables and likelihoods, EPJC submitted (2017), arXiv:1705.07920.
 
 Constraints are generated using the Feldman-Cousins method for a
 likelihood-based analysis with background subtraction, or using the
@@ -74,15 +81,10 @@ please cite the associated paper:
   S. Yellin, PRD 66, 032005 (2002) [physics/0203002]  
     http://inspirehep.net/record/583791  
 
-
-Efficiencies for the liquid noble time-projection chamber (TPC)
-experiments are generated using the TPCMC software, which itself uses
+Efficiencies for liquid noble gas time-projection chamber (TPC)
+experiments can be generated using the TPCMC software, which itself uses
 the NEST model.  If using any TPC experimental results that rely on
-TPCMC-generated efficiencies (noted below), these papers should be
-cited:
-
-  TPCMC:  
-    <insert>
+TPCMC-generated efficiencies, these papers should be cited:
 
   NEST:  
     M. Szydagis et al., JINST 6, P10002 (2011) [arxiv:1106.1613]  
@@ -133,9 +135,9 @@ or by looking at the 'doc/DDCalc_run.help' file.
 
 As a quick example, try:
 
-  ./DDCalc_run --LUX-2013 --limits-SI --verbosity=3
+  ./DDCalc_run --Xenon1T-2017 --limits-SI --verbosity=3
 
-This will use the LUX 2013 results (--LUX-2013) to generate
+This will use the Xenon1T results (--Xenon1T-2017) to generate
 upper limits on the spin-independent WIMP-nucleon cross-section
 using the maximum gap method (--limits-SI). The last flag
 (--verbosity=3) gives more detailed output.  Likelihood constraints
@@ -223,7 +225,7 @@ The following have contributed to the development and
 testing of the DDCalc package:
 
   * Felix Kahlhoefer, DESY  
-    LUX 2015/16, PICO, Panda X
+    LUX 2015/16, PICO, Panda X, Xenon1T
 
   * Lauren Hsu, FermiLab  
     SuperCDMS.

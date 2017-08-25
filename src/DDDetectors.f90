@@ -514,14 +514,14 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     eff_change = .TRUE.
     D%InitSuccess = .TRUE.
   END IF
-  
+
   ! Save efficiency file name
   IF (PRESENT(eff_filename)) D%eff_file = eff_filename
 
   IF (.NOT. D%InitSuccess) THEN
     RETURN
   END IF
-  
+
   ! Include sub-intervals?
   IF (PRESENT(intervals) .AND. D%Nbins .GT. 0) THEN
     IF (intervals .NEQV. D%intervals) eff_change = .TRUE.

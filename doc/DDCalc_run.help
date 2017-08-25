@@ -3,7 +3,7 @@ OVERVIEW
 ========
 
 The routines in this program generate spectra, expected events,
-likelihoods, and/or exclusion limits for the LUX 2013 data set (default)
+likelihoods, and/or exclusion limits for the Xenon1T 2017 data set (default)
 or possibly some other experimental result. The type of data returned
 depends on the switch provided (only one of which may be given):
 
@@ -96,13 +96,13 @@ resolution, and analysis cuts).
 The efficiency \phi(E) is not calculated by this program and must be
 supplied via a file containing tabulated values.  However, a few pre-
 calculated efficiency curves are provided for specific experiments and
-results (default being the LUX 2013 result).
+results (default being the Xenon1T 2017 result).
 
 The maximum gap method (S. Yellin, Phys. Rev. D 66, 032005 (2002)
 [physics/0203002]) is a means to constrain WIMP parameters based upon
 the expected signal in the gaps between observed events.  If [xmin,xmax]
 is the full analysis range in the observable (usually the size of the
-prompt scintillation signal S1 in TPC experiments like LUX) and events
+prompt scintillation signal S1 in TPC experiments like Xenon1T) and events
 are observed at x=x1,x2,...,xN, the maximum gap method uses the expected
 signal in the sub-intervals [xmin,x1], [x1,x2], [x2,x3], ..., [xN,xmax]
 as well as the expected signal over the full range [xmin,xmax].  To
@@ -114,7 +114,7 @@ be observed in [x{k-1},xk], accounting for any trigger efficiencies and
 other cuts.  By definition, the efficiencies for the intervals should
 add up to the efficiency for the full analysis range.  These sub-
 interval efficiencies are provided for a few specific experiments and
-results (default again being the LUX 2013 result).
+results (default again being the Xenon1T 2017 result).
 
 
 LIKELIHOODS/P-VALUES
@@ -450,15 +450,33 @@ detector exposures, isotopic compositions, efficiencies, etc. to match
 that of the given experimental analysis.  Settings can be modified via
 the detector options described later.
 
+   --Xenon1T-2017
+         Sets the detector and analysis to that of the Xenon1T 2017
+         result (E. Aprile et al., arxiv:1705.06655) with pre-calculated
+         efficiencies.
+
+   --LUX-2016
+         Sets the detector and analysis to that of the LUX 2016
+         result (D.S. Akerib et al., arxiv:1608.07648) with pre-calculated
+         efficiencies.
+
+   --PandaX-2016
+         Sets the detector and analysis to that of the PandaX 2016
+         result (A. Tan et al., arxiv:1607.07400).
+
+   --LUX-2015
+         Sets the detector and analysis to that of the LUX 2015
+         result (D.S. Akerib et al., arXiv:1512.03506).
+
+   --LUX-2013
+         Sets the detector and analysis to that of the LUX 2013
+         result (D.S. Akerib et al., arxiv:1310.8214).  Efficiencies
+         were pre-calculated using TPCMC.
+
    --XENON100-2012
          Sets the detector and analysis to that of the XENON100 2012
          result (E. Aprile et al., arxiv:1207.5988).  Efficiencies
-         were pre-calculated using TPCMC (C. Savage, arxiv:15MM.xxxx).
-
-   --LUX-2013 [default]
-         Sets the detector and analysis to that of the LUX 2013
-         result (D.S. Akerib et al., arxiv:1310.8214).  Efficiencies
-         were pre-calculated using TPCMC (C. Savage, arxiv:15MM.xxxx).
+         were pre-calculated using TPCMC.
 
    --SuperCDMS-2014
          Sets the detector and analysis to that of the SuperCDMS 2014
@@ -473,35 +491,54 @@ the detector options described later.
    --DARWIN-Ar-2015
          Sets the detector and analysis to that of the xenon case for
          the proposed DARWIN argon-based detector (2015 estimates) (J.
-         Conrad et al., arxiv:15MM.xxxx).  Efficiencies were pre-
-         calculated using TPCMC (C. Savage, arxiv:15MM.xxxx).
+         Aalbers et al., arxiv:1606.07001).  Efficiencies were pre-
+         calculated using TPCMC.
 
    --DARWIN-Xe-2015
          Sets the detector and analysis to that of the xenon case for
          the proposed DARWIN xenon-based detector (2015 estimates) (J.
-         Conrad et al., arxiv:15MM.xxxx).  Efficiencies were pre-
-         calculated using TPCMC (C. Savage, arxiv:15MM.xxxx).
+         Aalbers et al., arxiv:1606.07001).  Efficiencies were pre-
+         calculated using TPCMC.
+
+   --PICO-2L
+         Sets the detector and analysis to that of the PICO 2L
+         result (C. Amole et al., arxiv:1601.03729).
+
+   --PICO-60_F
+         Sets the detector and analysis to that of the PICO 60
+         result (C. Amole et al., arxiv:1510.07754), including only
+         fluorine.
+
+   --PICO-60_I
+         Sets the detector and analysis to that of the PICO 60
+         result (C. Amole et al., arxiv:1510.07754), including only
+         iodine.
+
+   --PICO-60_2017
+         Sets the detector and analysis to that of the PICO 60 2017
+         result (C. Amole et al., arxiv:1702.07666), including only
+         iodine.
 
 
 General detector options.  The detector isotopic composition and analysis
 efficiency options are in their own later sections.  Defaults generally
 correspond to the LUX 2013 detector and analysis:
 
-   --background=<val> [0.64]
+   --background=<val> [0.36]
          The average expected number of background events in the
          analysis region.
 
-   --events=<N> [1]
+   --events=<N> [0]
          The number of observed events in the analysis region.
 
-   --exposure=<val> [118*85.3]
+   --exposure=<val> [1042*34.2]
          The detector's fiducial exposure [kg day].  Set equal to
          mass*time unless explicitly set here (see --mass, --time).
 
-   --mass=<val> [118]
+   --mass=<val> [1042]
          The detector's fiducial mass [kg].
 
-   --time=<val> [85.3]
+   --time=<val> [34.2]
          The detector's exposure time [day].
 
 
@@ -537,7 +574,7 @@ stoichiometry, or an explicit list of isotopes:
 
 Detector efficiency options:
 
-   --Emin=<val> [0]
+   --Emin=<val> [1.1d0]
          Applies a minimum energy threshold for rate calculations
          [keV].  This effectively takes:
              \phi(E) -> \Theta(E-Emin) \phi(E)
@@ -579,5 +616,6 @@ Detector efficiency options:
         C Savage        University of Utah / NORDITA  (2014 - 2015)
         P Scott         Imperial College London       (2016 ->    )
         F Kahlhoefer    DESY                          (2014 - 2017)
+	S Wild		DESY			      (2017 ->    )
         ddcalc@projects.hepforge.org
  

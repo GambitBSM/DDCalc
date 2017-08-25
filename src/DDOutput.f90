@@ -212,6 +212,11 @@ SUBROUTINE WriteDetectorHeader(Detector,extra_lines)
   TYPE(DetectorStruct), INTENT(IN) :: Detector
   INTEGER, INTENT(IN), OPTIONAL :: extra_lines
   
+  IF ( .NOT. Detector%InitSuccess ) THEN
+    WRITE(*,*) 'ERROR: Cannot get information from a detector that has not been correctly initialized.'
+    STOP      
+  END IF
+
   !WRITE(*,'(A)') COMMENT_LINE
   
   ! Exposure, observed events, expected background events

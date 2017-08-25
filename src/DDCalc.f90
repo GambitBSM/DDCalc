@@ -1522,6 +1522,9 @@ FUNCTION InitializeCommandLine(WIMP, Halo, intervals) RESULT(Detector)
   
   ! Initialize halo.
   Halo = DDCalc_InitHaloCommandLine()
+
+  ! Initialize detector
+  Detector = DDCalc_ChooseAnalysisCommandLine(intervals=intervals0)
     
 END FUNCTION
 

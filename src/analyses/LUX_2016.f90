@@ -7,7 +7,6 @@ MODULE LUX_2016
 
 USE DDTypes
 USE DDDetectors
-USE DDNuclear
 
 IMPLICIT NONE
 

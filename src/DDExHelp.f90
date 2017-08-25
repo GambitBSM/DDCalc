@@ -57,7 +57,7 @@ END FUNCTION
 ! Optional input arguments:
 !   eff_file    File from which efficiencies shoud be read.  If not
 !               given or set to '', an internal default will be used
-!               (the LUX 2013 result).  Non-empty value takes precedence
+!               (the Xenon1T 2017 result).  Non-empty value takes precedence
 !               over --file option.
 !   intervals   Specify if sub-intervals should be loaded from the
 !               efficiency file (if available); otherwise, only the

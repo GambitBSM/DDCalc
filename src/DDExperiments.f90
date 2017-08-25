@@ -22,18 +22,21 @@ USE Darwin_Ar
 USE Darwin_Xe
 USE LUX_2016
 USE PandaX_2016
+USE Xenon1T_2017
 USE LUX_2015
 USE PICO_2L
 USE PICO_60_F
 USE PICO_60_I
+USE PICO_60
+USE PICO_60_2017
 
 IMPLICIT NONE
 
 ! Change these if you want to pick a different analysis as the default.
 INTERFACE DDCalc_InitDefaultDetector
-  MODULE PROCEDURE LUX_2013_Init
+  MODULE PROCEDURE Xenon1T_2017_Init
 END INTERFACE
-CHARACTER(LEN=*), PARAMETER :: default_filename = '[LUX 2013 (default)]'
+CHARACTER(LEN=*), PARAMETER :: default_filename = '[Xenon1T 2017 (default)]'
 
 CONTAINS
 
@@ -65,6 +68,8 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = LUX_2013_Init(intervals)
   ELSE IF (GetLongArg('PandaX-2016'))    THEN
     Detector = PandaX_2016_Init(intervals)
+  ELSE IF (GetLongArg('Xenon1T-2017'))   THEN
+    Detector = Xenon1T_2017_Init(intervals)
   ELSE IF (GetLongArg('LUX-2015'))       THEN
     Detector = LUX_2015_Init(intervals)
   ELSE IF (GetLongArg('PICO-2L'))        THEN
@@ -73,6 +78,10 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = PICO_60_F_Init(intervals)
   ELSE IF (GetLongArg('PICO-60_I'))      THEN
     Detector = PICO_60_I_Init(intervals)
+  ELSE IF (GetLongArg('PICO-60'))        THEN
+    Detector = PICO_60_Init(intervals)
+  ELSE IF (GetLongArg('PICO-60_2017'))   THEN
+    Detector = PICO_60_2017_Init(intervals)
   ELSE IF (GetLongArg('SuperCDMS-2014')) THEN !(low-energy analysis)
     Detector = SuperCDMS_2014_Init(intervals) 
   ELSE IF (GetLongArg('SIMPLE-2014'))    THEN

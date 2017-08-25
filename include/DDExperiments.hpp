@@ -23,10 +23,12 @@ extern "C"
   int C_DDCalc_lux_2013_init(const bool&);
   int C_DDCalc_lux_2016_init(const bool&);
   int C_DDCalc_pandax_2016_init(const bool&);
+  int C_DDCalc_xenon1t_2017_init(const bool&);
   int C_DDCalc_lux_2015_init(const bool&);
   int C_DDCalc_pico_2l_init(const bool&);
   int C_DDCalc_pico_60_f_init(const bool&);
   int C_DDCalc_pico_60_i_init(const bool&);
+  int C_DDCalc_pico_60_2017_init(const bool&);
   int C_DDCalc_supercdms_2014_init(const bool&);
   int C_DDCalc_simple_2014_init(const bool&);
   int C_DDCalc_darwin_ar_init(const bool&);
@@ -66,6 +68,11 @@ namespace DDCalc
     C_DDCalc_pandax_2016_init(intervals);
   }
 
+  int Xenon1T_2017_Init(const bool intervals=true)
+  {
+    C_DDCalc_xenon1t_2017_init(intervals);
+  }
+
   int LUX_2015_Init(const bool intervals=true)
   {
     C_DDCalc_lux_2015_init(intervals);
@@ -84,6 +91,16 @@ namespace DDCalc
   int PICO_60_I_Init(const bool intervals=true)
   {
     C_DDCalc_pico_60_i_init(intervals);
+  }
+
+  int PICO_60_Init(const bool intervals=true)
+  {
+    C_DDCalc_pico_60_init(intervals);
+  }
+
+  int PICO_60_2017_Init(const bool intervals=true)
+  {
+    C_DDCalc_pico_60_2017_init(intervals);
   }
   
   int SuperCDMS_2014_Init(const bool intervals=true)
