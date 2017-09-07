@@ -110,6 +110,14 @@ TYPE, PUBLIC :: DetectorStruct
   ! required input arguments have not been specified.
   LOGICAL :: InitSuccess = .FALSE.
 
+  ! Flag which tells other routines whether this detector is currently set up for
+  ! MaxGap, TotalPoisson or BinnedPoisson. This flag should not be edited manually from the outside,
+  ! it's value is solely determined by the presence and values of Nevents_tot and Nevents_bin
+  ! -1: no correct statistics method defined
+  ! 0: TotalPoisson
+  ! 1: BinnedPoisson
+  ! 2: MaxGap
+  INTEGER :: StatisticFlag = -1
 
   ! Label --------------------------------------
   ! Label for the experimental result contained in this structure.

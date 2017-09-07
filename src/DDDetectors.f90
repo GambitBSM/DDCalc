@@ -331,7 +331,6 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   E_change   = .FALSE.
   eff_change = .FALSE.
 
-
   ! Check whether any unallowed changes to the already initialized detector are attempted...
   IF (D%InitSuccess) THEN
     IF ( (PRESENT(Niso)) .OR. (PRESENT(Ziso)) .OR. (PRESENT(Aiso)) .OR. (PRESENT(fiso)) &
@@ -363,54 +362,100 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     RETURN      
   END IF
 
-  ! Observed events and expected background events
 
+
+
+  ! Change of Nbins
+  ! Notice that if Nbins is changed, D%StatisticFlag is set to -1.
+  ! Hence, in order for the detector to be correctly initalized, one also has to provide Nevents_tot or Nevents_bin
   IF ( PRESENT(Nbins) ) THEN
-    IF (Nbins .EQ. D%Nbins) THEN
-      IF ( PRESENT(Nevents_tot) ) THEN
-        D%Nevents(0) = Nevents_tot
-      END IF
-      IF ( PRESENT(Backgr_tot) ) THEN
-        D%Backgr(0) = Backgr_tot
-      END IF
-      IF (Nbins .GT. 0) THEN
-        IF (PRESENT(Nevents_bin)) THEN
-          D%Nevents(1:) = Nevents_bin(:)
-        END IF
-        IF (PRESENT(Backgr_bin)) THEN
-          D%Backgr(1:) = Backgr_bin(:)
-        END IF
-      END IF
-    ELSE
+    IF (Nbins .NE. D%Nbins) THEN
       IF (ALLOCATED(D%Nevents)) DEALLOCATE(D%Nevents)
       IF (ALLOCATED(D%Backgr)) DEALLOCATE(D%Backgr)
-      D%Nbins = Nbins
       D%InitSuccess = .False. ! If Nbins is changed, a new efficiency array must be provided
       ALLOCATE(D%Nevents(0:Nbins),D%Backgr(0:Nbins))
-      IF ( PRESENT(Nevents_tot) ) THEN
-        D%Nevents(0) = Nevents_tot
-      ELSE
-        D%Nevents(0) = -1
-      END IF
+      D%StatisticFlag = -1
+    END IF
+    D%Nbins = Nbins
+  END IF
+
+
+  ! Read in observed and background events, which then also defines the StatisticFlag and the intervals flag
+  IF ( PRESENT(Nevents_tot) ) THEN
+    IF ( PRESENT(Nevents_bin) ) THEN
+      WRITE (*,*) 'Error: both Nevents_tot and Nevents_bin are given as arguments.'
+      D%StatisticFlag = -1
+      D%InitSuccess = .False.
+      RETURN      
+    END IF
+    IF (Nevents_tot .LT. 0) THEN
+      D%StatisticFlag = 2 ! MaxGap
+      D%intervals = .true.
+      D%Nevents(0) = Nevents_tot
+      D%Backgr(0) = 0d0 !irrelevant for MaxGap
+    ELSE
+      D%StatisticFlag = 0 ! TotalPoisson
+      D%intervals = .false.
+      D%Nevents(0) = Nevents_tot
+      ! Set background events
       IF ( PRESENT(Backgr_tot) ) THEN
         D%Backgr(0) = Backgr_tot
       ELSE
         D%Backgr(0) = 0
       END IF
-      IF (Nbins .GT. 0) THEN
-        IF (PRESENT(Nevents_bin)) THEN
-          D%Nevents(1:) = Nevents_bin(:)
-        ELSE
-          D%Nevents(1:) = 0
-        END IF
-        IF (PRESENT(Backgr_bin)) THEN
-          D%Backgr(1:) = Backgr_bin(:)
-        ELSE
-          D%Backgr(1:) = 0d0
-        END IF
-      END IF
+    END IF
+    ! info about binned observed/background events is irrelevant for MaxGap and TotalPoisson, so just set it to zero
+    IF (D%Nbins .GT. 0) THEN
+      D%Nevents(1:) = 0
+      D%Backgr(1:) = 0d0
     END IF
   END IF
+  IF ( PRESENT(Nevents_bin) ) THEN
+    IF (D%Nbins .LT. 1) THEN
+      D%InitSuccess = .False.
+      RETURN      
+    END IF
+    D%StatisticFlag = 1 ! BinnedPoisson
+    D%intervals = .true.
+    D%Nevents(0) = SUM(Nevents_bin(:))
+    D%Nevents(1:) = Nevents_bin(:)
+    IF (PRESENT(Backgr_bin)) THEN
+      D%Backgr(0) = SUM(Backgr_bin(:))
+      D%Backgr(1:) = Backgr_bin(:)
+    ELSE
+      D%Backgr(:) = 0.0
+    END IF
+  END IF
+  IF ( PRESENT(Backgr_tot) .AND. PRESENT(Backgr_bin) ) THEN
+    WRITE (*,*) 'Error: both Backgr_tot and Backgr_bin are given as arguments.'
+    D%StatisticFlag = -1
+    D%InitSuccess = .False.
+    RETURN    
+  END IF
+  IF ( (.NOT. PRESENT(Nevents_tot)) .AND. (.NOT. PRESENT(Nevents_bin)) ) THEN !check whether simply the background events should be updated
+    IF (PRESENT(Backgr_tot)) THEN
+      IF (D%StatisticFlag .NE. 0) THEN ! total number of background events only makes sense for TotalPoisson
+        D%InitSuccess = .False.
+        RETURN      
+      END IF
+      D%Backgr(0) = Backgr_tot
+    END IF
+    IF (PRESENT(Backgr_bin)) THEN
+      IF (D%StatisticFlag .NE. 1) THEN ! binned number of background events only makes sense for BinnedPoisson
+        D%InitSuccess = .False.
+        RETURN      
+      END IF
+      D%Backgr(0) = SUM(Backgr_bin(:))
+      D%Backgr(1:) = Backgr_bin(:)
+    END IF
+  END IF
+
+  ! Check whether D%StatisticFlag has a valid value
+  IF (D%StatisticFlag .LT. 0) THEN
+    D%InitSuccess = .False.
+    RETURN 
+  END IF
+
 
   IF ( D%Nbins < 0) THEN
     D%InitSuccess = .False.
@@ -530,11 +575,6 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     RETURN
   END IF
 
-  ! Include sub-intervals?
-  IF (PRESENT(intervals) .AND. D%Nbins .GT. 0) THEN
-    IF (intervals .NEQV. D%intervals) eff_change = .TRUE.
-    D%intervals = intervals
-  END IF
   
   ! Apply threshold cut.
   ! We move all E < Emin tabulation points to Emin.

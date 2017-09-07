@@ -41,6 +41,19 @@ PROGRAM DDTest
   Detector = DummyExp_Init(.true.)
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
+  WRITE (*,*) 'intervals =', Detector%intervals
+  WRITE (*,*) 'StatisticFlag =', Detector%StatisticFlag
+  WRITE (*,*) 'exposure =', Detector%exposure
+  WRITE (*,*) 'Nevents =', Detector%Nevents
+  WRITE (*,*) 'Backgr =', Detector%Backgr
+  WRITE (*,*) 'MuSignal =',Detector%MuSignal
+  WRITE (*,*) 'eff=',Detector%eff(3,50,:)
+
+  WRITE (*,*) '---- change ----'
+  CALL DDCalc_SetDetector(Detector, Nevents_tot = -1)
+  WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
+  WRITE (*,*) 'intervals =', Detector%intervals
+  WRITE (*,*) 'StatisticFlag =', Detector%StatisticFlag
   WRITE (*,*) 'exposure =', Detector%exposure
   WRITE (*,*) 'Nevents =', Detector%Nevents
   WRITE (*,*) 'Backgr =', Detector%Backgr
