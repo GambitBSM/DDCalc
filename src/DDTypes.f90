@@ -135,10 +135,10 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Events -------------------------------------
   ! Observed number of events
-  INTEGER, ALLOCATABLE :: Nevents(:)
+  INTEGER, ALLOCATABLE :: Nevents(:) ! Nevents(0) is the total number of observed events, Nevents(1:) the binned observed backgroundevents
   
   ! Average expected background events
-  REAL*8, ALLOCATABLE  :: Backgr(:)   
+  REAL*8, ALLOCATABLE  :: Backgr(:)   ! Backgr(0) is the total number of background events, Nevents(1:) the binned background events
  
   ! Isotopes -----------------------------------
   ! Number of isotopes

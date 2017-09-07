@@ -322,15 +322,26 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,Backgr_tot,Backgr_bin(:),Emin
   REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,:,0:),eff_all(:,0:)
-  LOGICAL :: iso_change,E_change,eff_change
+  LOGICAL :: E_change,eff_change
   INTEGER :: KE,Kiso,Neff,ind_elem,ind_iso,ind,Niso_temp
   INTEGER, ALLOCATABLE :: stoich0(:)
 
   ! Indicate if quantities changed, indicating need for
   ! array resizing and initialization
-  iso_change = .FALSE.
   E_change   = .FALSE.
   eff_change = .FALSE.
+
+
+  ! Check whether any unallowed changes to the already initialized detector are attempted...
+  IF (D%InitSuccess) THEN
+    IF ( (PRESENT(Niso)) .OR. (PRESENT(Ziso)) .OR. (PRESENT(Aiso)) .OR. (PRESENT(fiso)) &
+             .OR. (PRESENT(Nelem)) .OR. (PRESENT(Zelem)) .OR. (PRESENT(stoich)) ) THEN
+      WRITE (*,*) 'Unallowed change to already initialized detector structure.'
+      D%InitSuccess = .False.
+      RETURN      
+    END IF
+  END IF
+
 
   ! Energy binning
   IF ( (PRESENT(E)) .AND. (PRESENT(NE)) ) THEN
@@ -411,19 +422,14 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     IF (Niso .EQ. D%Niso) THEN
       IF (PRESENT(Ziso)) THEN
         D%Ziso = Ziso(1:Niso)
-        iso_change = .TRUE.
       END IF
       IF (PRESENT(Aiso)) THEN
         D%Aiso = Aiso(1:Niso)
-        iso_change = .TRUE.
       END IF
       IF (PRESENT(fiso)) THEN
         D%fiso = fiso(1:Niso)
-        iso_change = .TRUE.
       END IF
-      IF (iso_change) THEN
-        D%Miso = IsotopeMass(D%Ziso,D%Aiso)
-      END IF
+      D%Miso = IsotopeMass(D%Ziso,D%Aiso)
     ELSE IF (PRESENT(Ziso) .AND. PRESENT(Aiso) .AND. PRESENT(fiso)) THEN
       IF (ALLOCATED(D%Ziso)) DEALLOCATE(D%Ziso)
       IF (ALLOCATED(D%Aiso)) DEALLOCATE(D%Aiso)
@@ -436,7 +442,6 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       D%fiso = fiso(1:Niso)
       D%Miso = IsotopeMass(D%Ziso,D%Aiso)
       D%InitSuccess = .False. ! If Niso is changed, a new efficiency array must be provided
-      iso_change = .TRUE.
     END IF
   END IF
 
@@ -450,7 +455,6 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     CALL CompoundIsotopeList(Nelem,Zelem,stoich0,                       &
                              D%Niso,D%Ziso,D%Aiso,D%fiso,D%Miso)
     D%InitSuccess = .False. ! If Niso is changed, a new efficiency array must be provided
-    iso_change = .TRUE.
   END IF
   
   IF (.NOT. D%Niso > 0) THEN
@@ -468,6 +472,10 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     D%exposure = D%mass * D%time
   END IF
   IF (PRESENT(exposure)) THEN
+    IF (PRESENT(mass) .OR. PRESENT(time)) THEN
+      D%InitSuccess = .False.
+      RETURN           
+    END IF
     D%mass     = -1d0
     D%time     = -1d0
     D%exposure = exposure
@@ -553,7 +561,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   END DO
   
   ! Resize halo velocity arrays if necessary
-  IF (iso_change .OR. E_change) THEN
+  IF (E_change) THEN
     IF (ALLOCATED(D%vmin)) DEALLOCATE(D%vmin)
     ALLOCATE(D%vmin(D%NE,D%Niso))
     IF (ALLOCATED(D%eta))  DEALLOCATE(D%eta)
@@ -569,7 +577,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   END IF
   
   ! Resize dRdEiso if necessary
-  IF (iso_change .OR. E_change) THEN
+  IF (E_change) THEN
     IF (ALLOCATED(D%dRdEiso)) DEALLOCATE(D%dRdEiso)
     ALLOCATE(D%dRdEiso(D%NE,D%Niso))
   END IF
@@ -587,7 +595,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   END IF
   
   ! Set all calculable quantities to zero
-  IF (iso_change .OR. E_change .OR. eff_change) THEN
+  IF (E_change .OR. eff_change) THEN
     D%vmin        = 0d0
     D%eta         = 0d0
     D%dRdEiso     = 0d0

@@ -34,6 +34,7 @@ extern "C"
   int C_DDCalc_simple_2014_init(const bool&);
   int C_DDCalc_darwin_ar_init(const bool&);
   int C_DDCalc_darwin_xe_init(const bool&);
+  int C_DDCalc_dummyexp_init(const bool&);
 
 }
   
@@ -122,6 +123,11 @@ namespace DDCalc
   int DARWIN_Xe_Init(const bool intervals=true)
   {
     C_DDCalc_darwin_xe_init(intervals);
+  }
+  
+  int DummyExp_Init(const bool intervals=true)
+  {
+    C_DDCalc_dummyexp_init(intervals);
   }
     
 }
