@@ -249,11 +249,25 @@ END SUBROUTINE
 !   exposure    Detector exposure [kg day]
 !   Nbins       Number of sub-intervals/bins in data (0 if total only).
 !   Nevents_tot Total number of observed events
+!		If this is specified and negative, MaxGap will be used,
+!		(the actual value of Nevents_tot is then irrelevant)
+!		and intervals will be set to true.
+!		If this is specified and non-negative, TotalPoisson will
+!		will be used, and intervals will be set to false.
 !   Nevents_bin Array of size [1:Nbins] containing the number of
 !               observed events for each interval.
+!		If this is specified, BinnedPoisson will be used,
+!		and intervals will be set to true. Nevents_tot is then automatically
+!		be calculated from Nevents_bin
+!
+!       NOTE: only either Nevents_tot or Nevents_bin are allowed as arguments!
+!
 !   Backgr_tot  Total number of expected background events
 !   Backgr_bin  Array of size [1:Nbins] containing the average expected 
 !               background for each interval.
+!       
+!       NOTE: only either Nevents_tot or Nevents_bin are allowed as arguments!
+!
 ! Optional isotope-related input arguments.  Niso must be given for
 ! any of the arrays to be used, regardless if the number has changed.
 ! If Niso changes, then all of the A/Z/f arrays must be specified for

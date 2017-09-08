@@ -1,7 +1,3 @@
-
-
-
-
 PROGRAM DDTest
 
   USE DDCALC
@@ -33,23 +29,10 @@ PROGRAM DDTest
   !CALL DDCalc_SetWIMP_Higgsportal(WIMP, 20d0, 1d-8, -0.5d-8, 5d-6, -0.6d-6)
   Halo = DDCalc_InitHalo()
 
-  Detector = LUX_2013_Init(.true.)
-  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-  WRITE (*,*) Detector%MuSignal
-
-  Detector = DummyExp_Init(.true.)
-  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-  WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
-  WRITE (*,*) 'intervals =', Detector%intervals
-  WRITE (*,*) 'StatisticFlag =', Detector%StatisticFlag
-  WRITE (*,*) 'exposure =', Detector%exposure
-  WRITE (*,*) 'Nevents =', Detector%Nevents
-  WRITE (*,*) 'Backgr =', Detector%Backgr
-  WRITE (*,*) 'MuSignal =',Detector%MuSignal
 
 
-  WRITE (*,*) '---- change ----'
-  CALL DDCalc_SetDetector(Detector, Emin = 2.6d0)
+  Detector = XENON100_2012_Init(.true.)
+  CALL DDCalc_SetDetector(Detector, Nevents_tot = 6)
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
   WRITE (*,*) 'intervals =', Detector%intervals
@@ -58,7 +41,8 @@ PROGRAM DDTest
   WRITE (*,*) 'Nevents =', Detector%Nevents
   WRITE (*,*) 'Backgr =', Detector%Backgr
   WRITE (*,*) 'MuSignal =',Detector%MuSignal
-
-
+  WRITE (*,*) 'Likelihood =',EXP(DDCalc_LogLikelihood(Detector))
+  !WRITE (*,*) 'Likelihood =',EXP(DDCalc_LogPValue(Detector)) 
 
 END PROGRAM
+

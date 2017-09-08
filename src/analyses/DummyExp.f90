@@ -153,8 +153,8 @@ FUNCTION DummyExp_Init(intervals) RESULT(D)
 !                   Backgr_tot=0.64d0,Nelem=1,Zelem=(/54/),               &
 !                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
 !                   intervals=intervals)
-  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=5,               &
-                   Backgr_bin=(/0.4d0,0.5d0/), &
+  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=8,               &
+                   Backgr_tot = 1.3d0, &
                    Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
                    intervals=intervals)

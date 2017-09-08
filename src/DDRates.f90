@@ -269,8 +269,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   END IF
 
 
-
-
   ! ...................... CALCULATE INTEGRATED RATE ............................
   ! Number of intervals/bins to do calculations for.
   ! If intervals=.FALSE. then efficiency index is over [0:0]
@@ -298,7 +296,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
 
   ! calculate number of events for all Keff
   D%MuSignal(:) = D%exposure * D%R
-
 
 END SUBROUTINE
 

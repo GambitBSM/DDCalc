@@ -34,10 +34,15 @@ CONTAINS
 
 ! ----------------------------------------------------------------------
 ! Calculates the log-likelihood for the current WIMP mass and couplings.
-! Uses a Poisson distribution in the number of observed events N:
+! For a StatisticFlag corresponding to TotalPoisson, it
+! uses a Poisson distribution in the number of observed events N:
 !    P(N|s+b)
 ! where s is the average expected signal and b is the average expected
 ! background.
+! For a StatisticFlag corresponding to the BinnedPoisson, it calculates
+! the LogLikelihood correpsonding to the binned Poisson distribution,
+! taking into account the expected background in each bin.
+! For a StatisticFlag corresponding to MaxGap, it throws an error.
 ! 
 ! Optional input argument:
 !   D           The DetectorStruct structure containing detector
@@ -49,26 +54,45 @@ FUNCTION LogLikelihood(D) RESULT(lnlike)
   IMPLICIT NONE
   REAL*8 :: lnlike
   TYPE(DetectorStruct), INTENT(IN) :: D
-  INTEGER :: N
+  INTEGER :: N,ibin
   REAL*8 :: b,s,mu
     
-  ! Get observed events and expected events
-  N = D%Nevents(0)
-  b = D%Backgr(0)
-  s = D%MuSignal(0)
 
-  IF (b .EQ. 0d0) THEN
-    b = N - s
-    IF (b .LT. 0) THEN
-      b = 0
+  ! Decide between MaxGap, TotalPoisson and BinnedPoisson
+  IF (D%StatisticFlag .EQ. -1) THEN
+    WRITE(*,*) 'ERROR: Cannot calculate p-value for a detector that has no correct StatisticFlag.'
+    STOP 
+  ELSE IF (D%StatisticFlag .EQ. 0) THEN !TotalPoisson
+    N = D%Nevents(0)
+    b = D%Backgr(0)
+    s = D%MuSignal(0)
+    IF (b .EQ. 0d0) THEN
+      b = N - s
+      IF (b .LT. 0) THEN
+        b = 0
+      END IF
     END IF
+    mu = s + b
+    lnlike = PoissonLogPDF(N,mu) ! Poisson likelihood (routine handles special cases)
+  ELSE IF (D%StatisticFlag .EQ. 1) THEN !BinnedPoisson
+    lnlike = 0.0
+    DO ibin = 1,D%Nbins
+      N = D%Nevents(ibin)
+      b = D%Backgr(ibin)
+      s = D%MuSignal(ibin)
+      IF (b .EQ. 0d0) THEN
+        b = N - s
+        IF (b .LT. 0) THEN
+          b = 0
+        END IF
+      END IF
+      mu = s + b
+      lnlike = lnlike + PoissonLogPDF(N,mu) ! Poisson likelihood (routine handles special cases)
+    END DO
+  ELSE IF (D%StatisticFlag .EQ. 2) THEN !MaxGap
+    WRITE(*,*) 'ERROR: Cannot calculate LogLikelihood for a detector initialized with MaxGap.'
+    STOP 
   END IF
-
-  mu = s + b
-  
-  ! Poisson likelihood (routine handles special cases)
-  lnlike = PoissonLogPDF(N,mu)
-  
 END FUNCTION
 
 !-----------------------------------------------------------------------
@@ -86,13 +110,9 @@ END FUNCTION
 
 ! ----------------------------------------------------------------------
 ! Calculates the log of the p-value for the current WIMP mass and
-! couplings (NO BACKGROUND SUBTRACTION).  Uses the maximum gap method
-! if efficiencies were provided in the efficiencies file for the
-! intervals, otherwise uses a Poisson distribution in the number of
-! observed events N:
-!    P(N|s)
-! where s is the average expected signal (background contributions are
-! ignored).
+! couplings (NO BACKGROUND SUBTRACTION).  Depending on D%StatisticFlag, it
+! uses the maximum gap method, the total Poisson or binned Poisson method.
+! In the Poisson case, background contributions are ignored in this function!
 ! 
 ! Optional input argument:
 !   D           The DetectorStruct structure containing detector
@@ -104,18 +124,25 @@ FUNCTION LogPValue(D) RESULT(lnp)
   IMPLICIT NONE
   REAL*8 :: lnp
   TYPE(DetectorStruct), INTENT(IN) :: D
-  INTEGER :: N,I
+  INTEGER :: N,I,ibin
   REAL*8 :: s,mu
     
-  ! Get observed events and expected events
-  N  = D%Nevents(0)
-  mu = D%MuSignal(0)
   
   ! Decide between MaxGap, TotalPoisson and BinnedPoisson
-  IF (D%Nevents(0) .LT. 0) THEN
-    lnp = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins)))
-  ELSE
+  IF (D%StatisticFlag .EQ. -1) THEN
+    WRITE(*,*) 'ERROR: Cannot calculate p-value for a detector that has no correct StatisticFlag.'
+    STOP 
+  ELSE IF (D%StatisticFlag .EQ. 0) THEN !TotalPoisson
+    N  = D%Nevents(0)
+    mu = D%MuSignal(0)
     lnp = LogPoissonP(N,mu)
+  ELSE IF (D%StatisticFlag .EQ. 1) THEN !BinnedPoisson
+    lnp = 0.0
+    DO ibin = 1,D%Nbins
+      lnp = lnp + PoissonLogPDF(D%Nevents(ibin),D%MuSignal(ibin)) ! Poisson likelihood (routine handles special cases)
+    END DO    
+  ELSE IF (D%StatisticFlag .EQ. 2) THEN !MaxGap
+    lnp = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins)))
   END IF
   
 END FUNCTION
@@ -176,11 +203,14 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   END IF
   
   ! Decide between maxgap and Poisson
-  IF (D%Nevents(0) .LT. 0) THEN
+  IF (D%StatisticFlag .EQ. 2) THEN
     f = MAXVAL(D%MuSignal(1:D%Nbins)) / mu
     x = MaximumGapScaleToPValue(lnp0,mu,f)
-  ELSE
+  ELSE IF (D%StatisticFlag .EQ. 0) THEN
     x = PoissonScaleToPValue(lnp0,N,mu)
+  ELSE
+    WRITE (*,*) 'Illegal use of ScaleToPValue.'
+    STOP
   END IF
   
 END FUNCTION
