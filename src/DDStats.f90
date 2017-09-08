@@ -111,7 +111,7 @@ FUNCTION LogPValue(D) RESULT(lnp)
   N  = D%Nevents(0)
   mu = D%MuSignal(0)
   
-  ! Decide between maxgap and Poisson
+  ! Decide between MaxGap, TotalPoisson and BinnedPoisson
   IF (D%Nevents(0) .LT. 0) THEN
     lnp = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins)))
   ELSE

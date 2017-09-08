@@ -136,12 +136,16 @@ FUNCTION DummyExp_Init(intervals) RESULT(D)
       0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, 0.00000d0, &
       0.00000d0, 0.00000d0 /)
 
-
-
-
-
   REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
       = RESHAPE( (/ (/ EFF0(:), EFF1(:), EFF2(:) /) /) ,SHAPE(EFF))
+
+
+
+
+
+
+
+
 
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
@@ -149,7 +153,7 @@ FUNCTION DummyExp_Init(intervals) RESULT(D)
 !                   Backgr_tot=0.64d0,Nelem=1,Zelem=(/54/),               &
 !                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
 !                   intervals=intervals)
-  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_bin=(/2,4/),               &
+  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=5,               &
                    Backgr_bin=(/0.4d0,0.5d0/), &
                    Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &

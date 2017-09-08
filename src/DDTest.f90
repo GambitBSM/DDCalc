@@ -24,7 +24,6 @@ PROGRAM DDTest
   TYPE(DetectorStruct) :: Detector
   TYPE(WIMPStruct) :: WIMP
   TYPE(HaloStruct) :: Halo
-
   WRITE (*,*) 'This is DDTest.'
  
   WIMP = DDCalc_InitWIMP()
@@ -47,10 +46,11 @@ PROGRAM DDTest
   WRITE (*,*) 'Nevents =', Detector%Nevents
   WRITE (*,*) 'Backgr =', Detector%Backgr
   WRITE (*,*) 'MuSignal =',Detector%MuSignal
-  WRITE (*,*) 'eff=',Detector%eff(3,50,:)
+
 
   WRITE (*,*) '---- change ----'
-  CALL DDCalc_SetDetector(Detector, Nevents_tot = -1)
+  CALL DDCalc_SetDetector(Detector, Emin = 2.6d0)
+  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
   WRITE (*,*) 'intervals =', Detector%intervals
   WRITE (*,*) 'StatisticFlag =', Detector%StatisticFlag
@@ -58,7 +58,7 @@ PROGRAM DDTest
   WRITE (*,*) 'Nevents =', Detector%Nevents
   WRITE (*,*) 'Backgr =', Detector%Backgr
   WRITE (*,*) 'MuSignal =',Detector%MuSignal
-  WRITE (*,*) 'eff=',Detector%eff(3,50,:)
+
 
 
 END PROGRAM

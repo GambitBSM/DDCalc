@@ -298,7 +298,8 @@ END SUBROUTINE
 !               taken to have the size [1:Nelem,1:NE,0:Nbins] and the same
 !               efficiency will be used for all isotopes of each element
 ! Optional analysis-related arguments.
-!   intervals   Specify if rates for sub-intervals should be calculated;
+!   intervals   [OUTDATED, NOT RELEVANT ANYMORE]
+!		Specify if rates for sub-intervals should be calculated;
 !               otherwise, only the full interval is used for
 !               calculations (default: false).
 !               For this to have effect, Nbins must be greater than zero.
@@ -379,8 +380,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     D%Nbins = Nbins
   END IF
 
-
-  ! Read in observed and background events, which then also defines the StatisticFlag and the intervals flag
+  ! Read in observed events, which then also defines the StatisticFlag and the intervals flag
   IF ( PRESENT(Nevents_tot) ) THEN
     IF ( PRESENT(Nevents_bin) ) THEN
       WRITE (*,*) 'Error: both Nevents_tot and Nevents_bin are given as arguments.'
@@ -392,22 +392,14 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       D%StatisticFlag = 2 ! MaxGap
       D%intervals = .true.
       D%Nevents(0) = Nevents_tot
-      D%Backgr(0) = 0d0 !irrelevant for MaxGap
     ELSE
       D%StatisticFlag = 0 ! TotalPoisson
       D%intervals = .false.
       D%Nevents(0) = Nevents_tot
-      ! Set background events
-      IF ( PRESENT(Backgr_tot) ) THEN
-        D%Backgr(0) = Backgr_tot
-      ELSE
-        D%Backgr(0) = 0
-      END IF
     END IF
-    ! info about binned observed/background events is irrelevant for MaxGap and TotalPoisson, so just set it to zero
+    ! info about binned observed events is irrelevant for MaxGap and TotalPoisson, so just set it to zero
     IF (D%Nbins .GT. 0) THEN
       D%Nevents(1:) = 0
-      D%Backgr(1:) = 0d0
     END IF
   END IF
   IF ( PRESENT(Nevents_bin) ) THEN
@@ -415,40 +407,44 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       D%InitSuccess = .False.
       RETURN      
     END IF
+    IF (D%Nbins .NE. SIZE(Nevents_bin)) THEN
+      WRITE (*,*) 'Error: wrong size of Nevents_bin'
+      D%InitSuccess = .False.
+      RETURN     
+    END IF
     D%StatisticFlag = 1 ! BinnedPoisson
     D%intervals = .true.
     D%Nevents(0) = SUM(Nevents_bin(:))
     D%Nevents(1:) = Nevents_bin(:)
+  END IF
+
+  ! Read in background events
+  IF ( PRESENT(Backgr_tot) ) THEN
     IF (PRESENT(Backgr_bin)) THEN
-      D%Backgr(0) = SUM(Backgr_bin(:))
-      D%Backgr(1:) = Backgr_bin(:)
-    ELSE
-      D%Backgr(:) = 0.0
+      WRITE (*,*) 'Error: both Backgr_tot and Backgr_bin are given as arguments.'
+      D%StatisticFlag = -1
+      D%InitSuccess = .False.
+      RETURN  
+    END IF
+    D%Backgr(0) = Backgr_tot
+    IF (D%Nbins .GT. 0) THEN
+      D%Backgr(1:) = 0
     END IF
   END IF
-  IF ( PRESENT(Backgr_tot) .AND. PRESENT(Backgr_bin) ) THEN
-    WRITE (*,*) 'Error: both Backgr_tot and Backgr_bin are given as arguments.'
-    D%StatisticFlag = -1
-    D%InitSuccess = .False.
-    RETURN    
-  END IF
-  IF ( (.NOT. PRESENT(Nevents_tot)) .AND. (.NOT. PRESENT(Nevents_bin)) ) THEN !check whether simply the background events should be updated
-    IF (PRESENT(Backgr_tot)) THEN
-      IF (D%StatisticFlag .NE. 0) THEN ! total number of background events only makes sense for TotalPoisson
-        D%InitSuccess = .False.
-        RETURN      
-      END IF
-      D%Backgr(0) = Backgr_tot
+  IF (PRESENT(Backgr_bin)) THEN
+    IF (D%Nbins .LT. 1) THEN
+      D%InitSuccess = .False.
+      RETURN      
     END IF
-    IF (PRESENT(Backgr_bin)) THEN
-      IF (D%StatisticFlag .NE. 1) THEN ! binned number of background events only makes sense for BinnedPoisson
-        D%InitSuccess = .False.
-        RETURN      
-      END IF
-      D%Backgr(0) = SUM(Backgr_bin(:))
-      D%Backgr(1:) = Backgr_bin(:)
+    IF (D%Nbins .NE. SIZE(Backgr_bin)) THEN
+      WRITE (*,*) 'Error: wrong size of Backgr_bin'
+      D%InitSuccess = .False.
+      RETURN     
     END IF
+    D%Backgr(0) = SUM(Backgr_bin(:))
+    D%Backgr(1:) = Backgr_bin(:)
   END IF
+
 
   ! Check whether D%StatisticFlag has a valid value
   IF (D%StatisticFlag .LT. 0) THEN
@@ -542,27 +538,39 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     END IF
   ! ...by arguments
   ELSE IF (PRESENT(eff)) THEN
+    ! check whether eff has the correct dimensions
+    IF ((SIZE(eff,2) .NE. D%NE) .OR. (SIZE(eff,3) .NE. (D%Nbins+1))) THEN
+      WRITE (*,*) 'Wrong dimension of eff'
+      D%InitSuccess = .False.
+      RETURN  
+    END IF
     IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
-    ALLOCATE(D%eff(D%Niso,NE,0:Nbins))
+    ALLOCATE(D%eff(D%Niso,D%NE,0:D%Nbins))
     IF (PRESENT(Nelem) .AND. PRESENT(Zelem)) THEN
       ind = 1
       DO ind_elem = 1,Nelem
         CALL GetNiso(Zelem(ind_elem),Niso_temp) ! this assigns Niso_temp
         DO ind_iso = 1,Niso_temp
-          D%eff(ind,1:NE,0:Nbins) = eff(ind_elem,1:NE,0:Nbins)
+          D%eff(ind,1:D%NE,0:D%Nbins) = eff(ind_elem,1:D%NE,0:D%Nbins)
           ind = ind + 1
         END DO
       END DO
     ELSE
-      D%eff   = eff(1:D%Niso,1:NE,0:Nbins)
+      D%eff   = eff(1:D%Niso,1:D%NE,0:D%Nbins)
     END IF
     eff_change = .TRUE.
     D%InitSuccess = .TRUE.
   ELSE IF (PRESENT(eff_all)) THEN
+    ! check whether eff_all has the correct dimensions
+    IF ((SIZE(eff_all,1) .NE. D%NE) .OR. (SIZE(eff_all,2) .NE. (D%Nbins+1))) THEN
+      WRITE (*,*) 'Wrong dimension of eff_all'
+      D%InitSuccess = .False.
+      RETURN  
+    END IF
     IF (ALLOCATED(D%eff))  DEALLOCATE(D%eff)
-    ALLOCATE(D%eff(D%Niso,NE,0:Nbins))
+    ALLOCATE(D%eff(D%Niso,D%NE,0:D%Nbins))
     DO ind = 1,D%Niso
-      D%eff(ind,1:NE,0:Nbins) = eff_all(1:NE,0:Nbins)
+      D%eff(ind,1:D%NE,0:D%Nbins) = eff_all(1:D%NE,0:D%Nbins)
     END DO
     eff_change = .TRUE.
     D%InitSuccess = .TRUE.
