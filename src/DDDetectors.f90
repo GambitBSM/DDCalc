@@ -337,7 +337,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,Backgr_tot,Backgr_bin(:),Emin
   REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,:,0:),eff_all(:,0:)
-  LOGICAL :: E_change,eff_change
+  LOGICAL :: E_change,eff_change,intervals_change
   INTEGER :: KE,Kiso,Neff,ind_elem,ind_iso,ind,Niso_temp
   INTEGER, ALLOCATABLE :: stoich0(:)
 
@@ -345,6 +345,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   ! array resizing and initialization
   E_change   = .FALSE.
   eff_change = .FALSE.
+  intervals_change = .FALSE.
 
   ! Check whether any unallowed changes to the already initialized detector are attempted...
   IF (D%InitSuccess) THEN
@@ -406,10 +407,12 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       D%StatisticFlag = 2 ! MaxGap
       D%intervals = .true.
       D%Nevents(0) = Nevents_tot
+      intervals_change = .true.
     ELSE
       D%StatisticFlag = 0 ! TotalPoisson
       D%intervals = .false.
       D%Nevents(0) = Nevents_tot
+      intervals_change = .true.
     END IF
     ! info about binned observed events is irrelevant for MaxGap and TotalPoisson, so just set it to zero
     IF (D%Nbins .GT. 0) THEN
@@ -430,6 +433,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     D%intervals = .true.
     D%Nevents(0) = SUM(Nevents_bin(:))
     D%Nevents(1:) = Nevents_bin(:)
+    intervals_change = .true.
   END IF
 
   ! Read in background events
@@ -645,25 +649,26 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   END IF
 
   ! Resize rate arrays if necessary
-  IF (E_change .OR. eff_change) THEN
+  IF (E_change .OR. eff_change .OR. intervals_change) THEN
     IF (ALLOCATED(D%R)) DEALLOCATE(D%R)
     ALLOCATE(D%R(0:Neff))
   END IF
   
   ! Resize event arrays if necessary
-  IF (eff_change) THEN
+  IF (eff_change .OR. intervals_change) THEN
     IF (ALLOCATED(D%MuSignal)) DEALLOCATE(D%MuSignal)
     ALLOCATE(D%MuSignal(0:Neff))
   END IF
   
   ! Set all calculable quantities to zero
-  IF (E_change .OR. eff_change) THEN
+  IF (E_change .OR. eff_change .OR. intervals_change) THEN
     D%vmin        = 0d0
     D%eta         = 0d0
     D%dRdEiso     = 0d0
     D%R           = 0d0
     D%MuSignal    = 0d0
   END IF
+
   
 END SUBROUTINE
   

@@ -21,7 +21,7 @@ FUNCTION DummyExp_Init(intervals) RESULT(D)
   TYPE(DetectorStruct) :: D
   LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
-  INTEGER, PARAMETER :: NBINS = 2
+  INTEGER, PARAMETER :: NBINS = 2 ! 2
   ! Efficiency curves energy tabulation points
   REAL*8, PARAMETER :: E(NE)                                            &
       =       (/ 0.10000d0, 0.10471d0, 0.10965d0, 0.11482d0, 0.12023d0, &
@@ -153,7 +153,7 @@ FUNCTION DummyExp_Init(intervals) RESULT(D)
 !                   Backgr_tot=0.64d0,Nelem=1,Zelem=(/54/),               &
 !                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
 !                   intervals=intervals)
-  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=8,               &
+  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=11,               &
                    Backgr_tot = 1.3d0, &
                    Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &

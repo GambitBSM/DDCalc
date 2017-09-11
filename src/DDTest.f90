@@ -31,8 +31,8 @@ PROGRAM DDTest
 
 
 
-  Detector = XENON100_2012_Init(.true.)
-  CALL DDCalc_SetDetector(Detector, Nevents_tot = 6)
+  Detector = DummyExp_Init(.true.)
+  CALL DDCalc_SetDetector(Detector, Nevents_tot = -1)
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
   WRITE (*,*) 'intervals =', Detector%intervals
@@ -41,8 +41,10 @@ PROGRAM DDTest
   WRITE (*,*) 'Nevents =', Detector%Nevents
   WRITE (*,*) 'Backgr =', Detector%Backgr
   WRITE (*,*) 'MuSignal =',Detector%MuSignal
-  WRITE (*,*) 'Likelihood =',EXP(DDCalc_LogLikelihood(Detector))
+  !WRITE (*,*) 'Likelihood =',EXP(DDCalc_LogLikelihood(Detector))
   !WRITE (*,*) 'Likelihood =',EXP(DDCalc_LogPValue(Detector)) 
+
+
 
 END PROGRAM
 
