@@ -29,6 +29,7 @@ USE PICO_60_F
 USE PICO_60_I
 USE PICO_60
 USE PICO_60_2017
+USE CRESST_II
 USE DummyExp
 
 IMPLICIT NONE
@@ -90,6 +91,8 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = DARWIN_Xe_Init(intervals)
   ELSE IF (GetLongArg('DARWIN-Ar'))      THEN
     Detector = DARWIN_Ar_Init(intervals)
+  ELSE IF (GetLongArg('CRESST_II'))      THEN
+    Detector = CRESST_II_Init(intervals)
   ELSE IF (GetLongArg('DummyExp'))      THEN
     Detector = DummyExp_Init(intervals)
   ELSE                                   !Default

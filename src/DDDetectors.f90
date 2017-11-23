@@ -47,7 +47,7 @@ SUBROUTINE LoadEfficiencyFile(file,Nbins,NE,eff)
   IMPLICIT NONE
   CHARACTER(LEN=*), INTENT(IN) :: file
   INTEGER, INTENT(IN) :: Nbins, NE
-  REAL*8, INTENT(OUT) :: eff(:,:)
+  REAL*8, INTENT(OUT) :: eff(:,0:)
   LOGICAL :: status
   INTEGER :: Kcol,Keff,Nrow,Ncol,Nvalid,Neff
   REAL*8, ALLOCATABLE :: data(:,:)
@@ -66,7 +66,7 @@ SUBROUTINE LoadEfficiencyFile(file,Nbins,NE,eff)
   
   ! Find number of valid efficiency columns
   Nvalid = 0
-  DO Kcol = 2,Ncol
+  DO Kcol = 1,Ncol
     IF (ALL(data(:,Kcol) .GE. 0d0) .AND. ALL(data(:,Kcol) .LE. 1.00001d0)) Nvalid = Nvalid + 1
   END DO
   IF (Nvalid .LE. 0) THEN
@@ -76,9 +76,10 @@ SUBROUTINE LoadEfficiencyFile(file,Nbins,NE,eff)
   
   ! Now get efficiencies
   Neff = Nvalid - 1
+
   IF ( Neff .EQ. Nbins ) THEN
     Keff = 0
-    DO Kcol = 2,Ncol
+    DO Kcol = 1,Ncol
       IF (ALL(data(:,Kcol) .GE. 0d0) .AND. ALL(data(:,Kcol) .LE. 1.00001d0) &
           .AND. (Keff .LE. Neff)) THEN
           eff(:,Keff) = data(:,Kcol)
@@ -89,7 +90,7 @@ SUBROUTINE LoadEfficiencyFile(file,Nbins,NE,eff)
     WRITE(0,*) 'ERROR: Number of entries in file ' // TRIM(file) // ' does not agree with expectation.'
     STOP
   END IF
-  
+
 END SUBROUTINE
 
 SUBROUTINE LoadEnergyFile(file,NE,E)
@@ -109,7 +110,8 @@ SUBROUTINE LoadEnergyFile(file,NE,E)
   END IF
 
   NE = Nrow
-  
+
+  ALLOCATE(E(NE))
   E(:) = data(:,1)
   
 END SUBROUTINE
@@ -269,7 +271,7 @@ END SUBROUTINE
 !   Backgr_bin  Array of size [1:Nbins] containing the average expected 
 !               background for each interval.
 !       
-!       NOTE: only either Nevents_tot or Nevents_bin are allowed as arguments!
+!       NOTE: only either Backgr_tot or Backgr_bin are allowed as arguments!
 !
 ! Optional isotope-related input arguments.  Niso must be given for
 ! any of the arrays to be used, regardless if the number has changed.
@@ -367,9 +369,12 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     END IF
   END IF
 
-
-  ! Energy binning
-  IF ( (PRESENT(E)) .AND. (PRESENT(NE)) ) THEN
+  IF (PRESENT(E_file)) THEN
+    IF (E_file .NE. '') THEN
+      CALL LoadEnergyFile(E_file,D%NE,D%E)
+      E_change = .TRUE.
+    END IF
+  ELSE IF ( (PRESENT(E)) .AND. (PRESENT(NE)) ) THEN
     IF (NE > 0) THEN
       IF (ALLOCATED(D%E) .AND. (NE .NE. D%NE)) DEALLOCATE(D%E)
       IF (.NOT. ALLOCATED(D%E)) ALLOCATE(D%E(NE))
@@ -557,7 +562,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   IF (PRESENT(eff_file_all)) THEN
     IF (eff_file_all .NE. '') THEN
       ALLOCATE(eff_all_new(D%NE,0:D%Nbins))
-      CALL LoadEfficiencyFile(eff_file_all,D%NE,D%Nbins,eff_all_new)
+      CALL LoadEfficiencyFile(eff_file_all,D%Nbins,D%NE,eff_all_new(:,0:))
       eff_change = .TRUE.
     END IF
   ELSE IF (PRESENT(eff_all)) THEN
@@ -599,7 +604,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
 
       DO file_number = 1,eff_files
         IF (eff_file(file_number) .NE. '') THEN
-          CALL LoadEfficiencyFile(eff_file(file_number),D%NE,D%Nbins,eff_new(file_number,:,:))
+          CALL LoadEfficiencyFile(eff_file(file_number),D%Nbins,D%NE,eff_new(file_number,:,0:))
           eff_change = .TRUE.
         END IF
       END DO
