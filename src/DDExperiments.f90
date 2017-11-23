@@ -37,7 +37,6 @@ IMPLICIT NONE
 INTERFACE DDCalc_InitDefaultDetector
   MODULE PROCEDURE Xenon1T_2017_Init
 END INTERFACE
-CHARACTER(LEN=*), PARAMETER :: default_filename = '[Xenon1T 2017 (default)]'
 
 CONTAINS
 
@@ -95,7 +94,6 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = DummyExp_Init(intervals)
   ELSE                                   !Default
     Detector = DDCalc_InitDefaultDetector(intervals)
-    CALL SetDetector(Detector,eff_filename=default_filename)
   END IF
 
 END FUNCTION

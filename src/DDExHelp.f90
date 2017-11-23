@@ -88,7 +88,7 @@ FUNCTION ChooseAnalysisCommandLine(eff_file,intervals) RESULT(Detector)
   
   ! If given, load efficiency file
   IF (TRIM(eff_file0) .NE. '') THEN
-    CALL SetDetector(Detector,eff_file=eff_file0,intervals=intervals0)
+    CALL SetDetector(Detector,eff_file_all=eff_file0,intervals=intervals0)
   END IF
 
 END FUNCTION

@@ -31,7 +31,7 @@ PROGRAM DDTest
 
 
 
-  Detector = DummyExp_Init(.true.)
+  Detector = PICO_60_Init(.true.)
   CALL DDCalc_SetDetector(Detector, Nevents_tot = -1)
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
