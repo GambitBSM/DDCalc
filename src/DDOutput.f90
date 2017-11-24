@@ -26,7 +26,7 @@ PUBLIC :: WriteCommandHeader, WriteHaloHeader, WriteDetectorHeader, &
           WriteEventsByMassData, WriteSpectrumHeader, WriteSpectrumData, &
           WriteSpectrumColumnHeader, WriteInteractiveHeader, WriteEventsAndLikelihoodsData, &
           WriteEventsAndLikelihoodsColumnHeader, WriteEventsAndLikelihoodsHeader, &
-          WriteLogLikelihoodHeader, WriteLogPValueHeader
+          WriteLogLikelihoodHeader
        
 CONTAINS
 
@@ -335,37 +335,6 @@ END SUBROUTINE
 
 
 !-----------------------------------------------------------------------
-! Write log p-value header.
-! 
-! Optional input arguments:
-!   extra_lines     Blank lines (albeit with prefix) to add after
-!                   output
-! 
-SUBROUTINE WriteLogPValueHeader(Detector,extra_lines)
-  IMPLICIT NONE
-  TYPE(DetectorStruct), INTENT(IN) :: Detector
-  INTEGER, INTENT(IN), OPTIONAL :: extra_lines
-  
-  IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'The log of the p-value for the given parameters is given below,'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'calculated using the maximum gap method.  See:'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // '  S. Yellin, PRD 66, 032005 (2002) [physics/0203002]'
-  ELSE
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'The log of the p-value for the given parameters are given below,'
-    WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'calculated using a Poisson distribution on the number of events.'
-  END IF
-  
-  IF (PRESENT(extra_lines)) CALL WriteEmptyCommentLines(extra_lines)
-  
-END SUBROUTINE
-
-
-!-----------------------------------------------------------------------
 ! Prints to standard output a header containing information regarding
 ! the events and likelihoods data to follow.
 ! 
@@ -466,20 +435,18 @@ SUBROUTINE WriteEventsAndLikelihoodsData(Detector,WIMP)
   TYPE(DetectorStruct), INTENT(IN) :: Detector
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   REAL*8 :: lnLike
-  REAL*8 :: lnp
   
   ! Get log-likelihood and p-value
   lnLike = DDCalc_LogLikelihood(Detector)
-  lnp    = DDCalc_LogPValue(Detector)
   
   ! Columns to print depend on the verbosity level.
   ! For data, only absolute value of verbosity is used.
  
   IF (ABS(VerbosityLevel) .GE. 2) THEN
-    WRITE(*,'(A,1(2X,I5,2X),3(1X,1PG11.4),2(1X,1PG11.4))')              &
+    WRITE(*,'(A,1(2X,I5,2X),3(1X,1PG11.4),1(1X,1PG11.4))')              &
         DATA_PREFIX,                                                    &
         Detector%Nevents(0),Detector%Backgr(0),                         &
-        lnLike,lnp
+        lnLike
   END IF
  
   

@@ -145,27 +145,14 @@ MODULE DDCalc
 !
 ! 4. Log-likelihood:
 !     REAL*8 FUNCTION DDCalc_LogLikelihood(Detector)
-!    Uses a Poisson distribution in the number of observed events N:
-!      P(N|s+b)
-!    where s is the average expected signal and b is the average expected
-!    background.
+!    Calculates the likelihood or the p-value depending on the StatisticFlag
+!    of the detector (see DDStats for details).
 !
-! 5. Logarithm of the p-value:
-!     REAL*8 FUNCTION DDCalc_LogPValue(Detector)
-!    Uses the maximum gap method if <Detector>_Init was called with
-!    argument intervals set .TRUE. and the anlysis contains the necessary
-!    interval information to allow such a method; otherwise uses a Poisson
-!    distribution in the number of observed events N:
-!      P(N|s),
-!    where s is the average expected signal (background contributions are
-!    ignored).
-!
-! 6. Factor by which the WIMP cross-sections must be multiplied to
+! 5. Factor by which the WIMP cross-sections must be multiplied to
 !    achieve a given p-value:
 !     REAL*8 FUNCTION DDCalc_ScaleToPValue(lnp)
 !    Calculates the factor x by which the cross-sections must be scaled
-!    (sigma -> x*sigma) to achieve the desired p-value (given as log(p)).
-!    See DDCalc_LogPValue() above for a description of the statistics.
+!    (sigma -> x*sigma) to achieve the desired p-value (given as log(p)).f
 !
 !
 ! C/C++ INTERFACE 
@@ -255,14 +242,12 @@ PUBLIC :: DDCalc_Events
 PUBLIC :: DDCalc_Background
 PUBLIC :: DDCalc_Signal
 PUBLIC :: DDCalc_LogLikelihood
-PUBLIC :: DDCalc_LogPValue
 PUBLIC :: DDCalc_ScaleToPValue
 ! C/C++ Wrappers
 PUBLIC :: C_DDCalc_Events
 PUBLIC :: C_DDCalc_Background
 PUBLIC :: C_DDCalc_Signal
 PUBLIC :: C_DDCalc_LogLikelihood
-PUBLIC :: C_DDCalc_LogPValue
 PUBLIC :: C_DDCalc_ScaleToPValue
 
 ! Memory cleanup for C/C++ interface
@@ -288,8 +273,6 @@ PUBLIC :: DDCalc_MainEventsAndLikelihoods
 PUBLIC :: DDCalc_MainEventsAndLikelihoodsInteractive                  
 PUBLIC :: DDCalc_MainLogLikelihood
 PUBLIC :: DDCalc_MainLogLikelihoodInteractive
-PUBLIC :: DDCalc_MainLogPValue
-PUBLIC :: DDCalc_MainLogPValueInteractive
 !PUBLIC :: DDCalc_MainSpectrum
 PUBLIC :: DDCalc_MainEventsByMass
 PUBLIC :: DDCalc_MainConstraintsSI
@@ -665,14 +648,6 @@ SUBROUTINE DDCalc_Main()
       CALL DDCalc_MainLogLikelihood()
     END IF
   ! ------------------------------------
-  ! Calculates the log of the p-value (no background subtraction)
-  ELSE IF (GetLongArg('log-pvalue')) THEN
-    IF (interactive) THEN
-      CALL DDCalc_MainLogPValueInteractive()
-    ELSE
-      CALL DDCalc_MainLogPValue()
-    END IF
-  ! ------------------------------------
   ! Prints the raw recoil spectrum dR/dE
   !ELSE IF (GetLongArg('spectrum')) THEN
   !  CALL DDCalc_MainSpectrum()
@@ -807,110 +782,6 @@ SUBROUTINE DDCalc_MainLogLikelihoodInteractive()
     lnLike = DDCalc_LogLikelihood(Detector)
     ! Print results to standard output
     WRITE(*,*)  lnLike
-  END DO
-  
-END SUBROUTINE
-
-
-! ----------------------------------------------------------------------
-! Main routine to calculate log of p-value using the maximum gap method.
-! See S. Yellin, PRD 66, 032005 (2002) [physics/0203002].  Uses Poisson
-! distribution if efficiencies for sub-intervals are not available (but
-! no background subtraction!).
-! 
-SUBROUTINE DDCalc_MainLogPValue()
-
-  IMPLICIT NONE
-  TYPE(DetectorStruct) :: Detector
-  TYPE(WIMPStruct) :: WIMP
-  TYPE(HaloStruct) :: Halo
-  REAL*8 :: lnP
-  
-  ! Show usage and exit
-  IF (ShowUsageRequested()) THEN
-    CALL ShowUsage()
-    STOP
-  END IF
-  
-  ! Initializes detector, halo and WIMP structures.
-  ! Will calculate rates for sub-intervals as these are used by
-  ! maximum gap method.
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.TRUE.)
-  
-  ! Print header
-  IF (VerbosityLevel .GE. 2) THEN
-    CALL WriteCommandHeader()
-    CALL WriteWIMPHeader(WIMP)
-    CALL WriteHaloHeader(Halo)
-    CALL WriteDetectorHeader(Detector)
-    CALL WriteLogPValueHeader(Detector)
-  END IF
-  
-  ! Do rate calculations
-  CALL DDCalc_CalcRates(Detector,WIMP,Halo)
-  
-  ! Get log of p-value
-  lnP = DDCalc_LogPValue(Detector)
-  
-  ! Print results
-  WRITE(*,*)  lnP
-  
-END SUBROUTINE
-
-
-! ----------------------------------------------------------------------
-! Main routine to calculate log of p-value using the maximum gap method
-! (interactive mode).  See S. Yellin, PRD 66, 032005 (2002)
-! [physics/0203002].  Uses Poisson distribution if efficiencies for
-! sub-intervals are not available (but no background subtraction!).
-! Reads one line of input containing WIMP parameters and writes out the
-! corresponding log of the p-value, terminating when the input stream
-! ends (EOF) or a blank line is given.
-! 
-SUBROUTINE DDCalc_MainLogPValueInteractive()
-
-  IMPLICIT NONE
-  TYPE(DetectorStruct) :: Detector
-  TYPE(WIMPStruct) :: WIMP
-  TYPE(HaloStruct) :: Halo
-  REAL*8 :: lnP
-  
-  ! Show usage and exit
-  IF (ShowUsageRequested()) THEN
-    CALL ShowUsage()
-    STOP
-  END IF
-  
-  ! Initializes detector, halo and WIMP structures.
-  ! Will calculate rates for sub-intervals as these are used by
-  ! maximum gap method.
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.TRUE.)
-  
-  ! Print header
-  IF (VerbosityLevel .GE. 2) THEN
-    CALL WriteCommandHeader()
-    CALL WriteHaloHeader(Halo)
-    CALL WriteDetectorHeader(Detector)
-    CALL WriteLogPValueHeader(Detector)
-  END IF
-  
-  ! Print instructions
-  IF (VerbosityLevel .GE. 1) THEN
-    CALL WriteInteractiveHeader()
-  END IF
-  
-  ! Cycle over input.
-  ! ParseWIMPInput() reads line containing WIMP parameters from
-  ! standard input and parses it, returning false if a blank line
-  ! or EOF is found.  See ParseWIMPInput() for description of input
-  ! line.
-  DO WHILE (ParseWIMPInput(WIMP))
-    ! Do rate calculations
-    CALL DDCalc_CalcRates(Detector,WIMP,Halo)
-    ! Get log of p-value
-    lnP = DDCalc_LogPValue(Detector)
-    ! Print results to standard output
-    WRITE(*,*)  lnP
   END DO
   
 END SUBROUTINE
@@ -1108,7 +979,7 @@ SUBROUTINE DDCalc_MainEventsByMass()
   Detector = InitializeCommandLine(WIMP,Halo)
   
   ! Determine WIMP mass tabulation
-  mmin    =    1d0
+  mmin    =    1.d0
   mmax    = 1000d0
   Nm      =  -20
   use_log = .TRUE.
@@ -1178,7 +1049,7 @@ SUBROUTINE DDCalc_MainConstraintsSI()
   Detector = InitializeCommandLine(WIMP,Halo,intervals=.FALSE.)
   
   ! Determine WIMP mass tabulation
-  mmin    =    1d0
+  mmin    =    0.5d0
   mmax    = 1000d0
   Nm      =  -20
   use_log = .TRUE.
@@ -1341,9 +1212,9 @@ SUBROUTINE DDCalc_MainLimitsSI()
   Detector = InitializeCommandLine(WIMP,Halo,intervals=.TRUE.)
   
   ! Determine WIMP mass tabulation
-  mmin    =    1d0
-  mmax    = 1000d0
-  Nm      =  -20
+  mmin    =    0.5d0
+  mmax    = 5000d0
+  Nm      =  -50
   use_log = .TRUE.
   CALL GetTabulationArgs('m-tabulation',mmin,mmax,Nm,use_log)
   CALL InitTabulation(TS,mmin,mmax,Nm,use_log)

@@ -57,7 +57,6 @@ extern "C"
   double C_DDRates_ddcalc_background(const int&);   // Expected backgrounds
   double C_DDRates_ddcalc_signal(const int&);       // Expected signal
   double C_DDStats_ddcalc_loglikelihood(const int&); // Log-likelihood
-  double C_DDStats_ddcalc_logpvalue(const int&);     // Log of the p-value  
   double C_DDStats_ddcalc_scaletopvalue(const int&, const double&);
    // Factor x by which sigma -> x*sigma would yield given p-value (given as log(p))
 
@@ -200,18 +199,6 @@ namespace DDCalc
   double LogLikelihood(const int DetectorIndex)
   {
     return C_DDStats_ddcalc_loglikelihood(DetectorIndex);
-  }
-  
-  // The logarithm of the p-value, calculated without background
-  // subtraction, using either the maximum gap statistic or a Poisson
-  // statistic, depending on how the detector was initialized.  Note that
-  // this is actually a conservative upper _bound_ on the p-value in the
-  // event of an unknown background and is useful for excluding WIMP
-  // parameters.  However, since it is not a true p-value, it should not
-  // be interpreted as being related to any particular likelihood.
-  double LogPValue(const int DetectorIndex)
-  {
-    return C_DDStats_ddcalc_logpvalue(DetectorIndex);
   }
   
   // Returns a factor x by which the WIMP cross-sections must

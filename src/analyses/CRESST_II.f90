@@ -24,7 +24,7 @@ FUNCTION CRESST_II_Init(intervals) RESULT(D)
   INTEGER, PARAMETER :: NBINS = 10
   INTEGER, PARAMETER :: NELEM = 3
 
-  INTEGER, PARAMETER :: Nev_bin(Nbins) = (/6,11,13,11,9,12,5,19,8,19/)
+  INTEGER, PARAMETER :: Nev_bin(Nbins) = (/6, 17, 18, 21, 36, 57, 75, 97, 89, 84/)
   REAL*8, PARAMETER :: Bg_bin(Nbins) = (/0,0,0,0,0,0,0,0,0,0/)
 
   CALL SetDetector(D,mass=0.3d0,time=174.d0,Nevents_bin=Nev_bin,         &

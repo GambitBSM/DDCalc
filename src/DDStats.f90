@@ -15,15 +15,12 @@ USE DDTypes
 IMPLICIT NONE
 PRIVATE
 
-PUBLIC :: DDCalc_LogLikelihood,DDCalc_LogPValue,DDCalc_ScaleToPValue
-PUBLIC :: C_DDCalc_LogLikelihood,C_DDCalc_LogPValue,C_DDCalc_ScaleToPValue
+PUBLIC :: DDCalc_LogLikelihood,DDCalc_ScaleToPValue
+PUBLIC :: C_DDCalc_LogLikelihood,C_DDCalc_ScaleToPValue
 PUBLIC :: FeldmanCousinsPoissonCI
 
 INTERFACE DDCalc_LogLikelihood
   MODULE PROCEDURE LogLikelihood
-END INTERFACE
-INTERFACE DDCalc_LogPValue
-  MODULE PROCEDURE LogPValue
 END INTERFACE
 INTERFACE DDCalc_ScaleToPValue
   MODULE PROCEDURE ScaleToPValue
@@ -38,25 +35,37 @@ CONTAINS
 ! uses a Poisson distribution in the number of observed events N:
 !    P(N|s+b)
 ! where s is the average expected signal and b is the average expected
-! background.
+! background. If b = 0, the background is taken as an unconstrained
+! nuisance parameter.
 ! For a StatisticFlag corresponding to the BinnedPoisson, it calculates
 ! the LogLikelihood correpsonding to the binned Poisson distribution,
 ! taking into account the expected background in each bin.
-! For a StatisticFlag corresponding to MaxGap, it throws an error.
+! For a StatisticFlag corresponding to MaxGap, it calculates the log of
+! the p-value, ignoring backgrounds.
+! A rescaling factor x can be provided as optional argument. In this case
+! all predicted event numbers will be multiplied by x.
 ! 
-! Optional input argument:
+! Input argument:
 !   D           The DetectorStruct structure containing detector
 !               and rate date to calculate the likelihood for.  If
 !               not given, a default structure (internally stored)
 !               will be used.
-! 
-FUNCTION LogLikelihood(D) RESULT(lnlike)
+! Optional input argument:
+!   x           Rescaling factor
+!
+FUNCTION LogLikelihood(D, x) RESULT(lnlike)
   IMPLICIT NONE
   REAL*8 :: lnlike
   TYPE(DetectorStruct), INTENT(IN) :: D
+  REAL*8, INTENT(IN), OPTIONAL :: x
   INTEGER :: N,ibin
-  REAL*8 :: b,s,mu
+  REAL*8 :: b,s,mu,x0
     
+  IF (PRESENT(x)) THEN
+    x0 = x
+  ELSE
+    x0 = 1.
+  END IF
 
   ! Decide between MaxGap, TotalPoisson and BinnedPoisson
   IF (D%StatisticFlag .EQ. -1) THEN
@@ -65,7 +74,7 @@ FUNCTION LogLikelihood(D) RESULT(lnlike)
   ELSE IF (D%StatisticFlag .EQ. 0) THEN !TotalPoisson
     N = D%Nevents(0)
     b = D%Backgr(0)
-    s = D%MuSignal(0)
+    s = D%MuSignal(0)*x0
     IF (b .EQ. 0d0) THEN
       b = N - s
       IF (b .LT. 0) THEN
@@ -79,7 +88,7 @@ FUNCTION LogLikelihood(D) RESULT(lnlike)
     DO ibin = 1,D%Nbins
       N = D%Nevents(ibin)
       b = D%Backgr(ibin)
-      s = D%MuSignal(ibin)
+      s = D%MuSignal(ibin)*x0
       IF (b .EQ. 0d0) THEN
         b = N - s
         IF (b .LT. 0) THEN
@@ -90,8 +99,7 @@ FUNCTION LogLikelihood(D) RESULT(lnlike)
       lnlike = lnlike + PoissonLogPDF(N,mu) ! Poisson likelihood (routine handles special cases)
     END DO
   ELSE IF (D%StatisticFlag .EQ. 2) THEN !MaxGap
-    WRITE(*,*) 'ERROR: Cannot calculate LogLikelihood for a detector initialized with MaxGap.'
-    STOP 
+      lnlike = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins))*x0) 
   END IF
 END FUNCTION
 
@@ -107,63 +115,11 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_LogLikelihood(DetectorIndex) &
   C_DDCalc_LogLikelihood = REAL(LogLikelihood(Detectors(DetectorIndex)%p),KIND=C_DOUBLE)
 END FUNCTION
 
-
-! ----------------------------------------------------------------------
-! Calculates the log of the p-value for the current WIMP mass and
-! couplings (NO BACKGROUND SUBTRACTION).  Depending on D%StatisticFlag, it
-! uses the maximum gap method, the total Poisson or binned Poisson method.
-! In the Poisson case, background contributions are ignored in this function!
-! 
-! Optional input argument:
-!   D           The DetectorStruct structure containing detector
-!               and rate date to calculate the p-value for.  If not
-!               given, a default structure (internally stored) will
-!               be used.
-! 
-FUNCTION LogPValue(D) RESULT(lnp)
-  IMPLICIT NONE
-  REAL*8 :: lnp
-  TYPE(DetectorStruct), INTENT(IN) :: D
-  INTEGER :: N,I,ibin
-  REAL*8 :: s,mu
-    
-  
-  ! Decide between MaxGap, TotalPoisson and BinnedPoisson
-  IF (D%StatisticFlag .EQ. -1) THEN
-    WRITE(*,*) 'ERROR: Cannot calculate p-value for a detector that has no correct StatisticFlag.'
-    STOP 
-  ELSE IF (D%StatisticFlag .EQ. 0) THEN !TotalPoisson
-    N  = D%Nevents(0)
-    mu = D%MuSignal(0)
-    lnp = LogPoissonP(N,mu)
-  ELSE IF (D%StatisticFlag .EQ. 1) THEN !BinnedPoisson
-    lnp = 0.0
-    DO ibin = 1,D%Nbins
-      lnp = lnp + PoissonLogPDF(D%Nevents(ibin),D%MuSignal(ibin)) ! Poisson likelihood (routine handles special cases)
-    END DO    
-  ELSE IF (D%StatisticFlag .EQ. 2) THEN !MaxGap
-    lnp = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins)))
-  END IF
-  
-END FUNCTION
-
-!-----------------------------------------------------------------------
-! C/C++ wrapper for DDCalc_LogPValue
-!
-REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_LogPValue(DetectorIndex) &
- BIND(C,NAME='C_DDStats_ddcalc_logpvalue')
-  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
-  IMPLICIT NONE
-  INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
-  IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_LogPValue'
-  C_DDCalc_LogPValue = REAL(LogPValue(Detectors(DetectorIndex)%p),KIND=C_DOUBLE)
-END FUNCTION
-
-
 ! ----------------------------------------------------------------------
 ! Calculates the factor x by which the cross-sections must be scaled
-! (sigma -> x*sigma) to achieve the desired p-value (given as log(p)).
-! See LogPValue() above for a description of the statistics.
+! (sigma -> x*sigma) to achieve the desired likelihood or p-value 
+! (given as log(like)). See LogLikelihood() above for a description of 
+! the statistics.
 ! 
 ! Optional input arguments:
 !   D           The DetectorStruct structure containing detector
@@ -179,7 +135,7 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   TYPE(DetectorStruct), INTENT(IN) :: D
   REAL*8, INTENT(IN), OPTIONAL :: lnp
   INTEGER :: N
-  REAL*8 :: lnp0,mu,f
+  REAL*8 :: lnp0,mu,x1,lnp1,x2,lnp2,xm,lnpm
   
   ! logarithm of p-value to use
   IF (PRESENT(lnp)) THEN
@@ -201,17 +157,42 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
     x = 0d0
     RETURN
   END IF
-  
-  ! Decide between maxgap and Poisson
-  IF (D%StatisticFlag .EQ. 2) THEN
-    f = MAXVAL(D%MuSignal(1:D%Nbins)) / mu
-    x = MaximumGapScaleToPValue(lnp0,mu,f)
-  ELSE IF (D%StatisticFlag .EQ. 0) THEN
-    x = PoissonScaleToPValue(lnp0,N,mu)
+
+  ! Starting point
+  x1   = 1d0 / mu
+  lnp1 = (LogLikelihood(D,x1)-LogLikelihood(D,0.d0))
+  ! Bracket
+  IF (lnp1 .GT. lnp) THEN
+    x2   = 2d0*x1
+    lnp2 = (LogLikelihood(D,x2)-LogLikelihood(D,0.d0))
+    DO WHILE (lnp2 .GE. lnp)
+      x1   = x2
+      lnp1 = lnp2
+      x2   = 2d0*x2
+      lnp2 = (LogLikelihood(D,x2)-LogLikelihood(D,0.d0))
+    END DO
   ELSE
-    WRITE (*,*) 'Illegal use of ScaleToPValue.'
-    STOP
+    DO WHILE (lnp1 .LE. lnp)
+      x2   = x1
+      lnp2 = lnp1
+      x1   = 0.5d0*x1
+      lnp1 = (LogLikelihood(D,x1)-LogLikelihood(D,0.d0))
+    END DO
   END IF
+  
+  ! Bisection (geometric)
+  DO WHILE ((ABS(lnp2-lnp1) .GT. 1d-5) .AND. (ABS(LOG(x2/x1)) .GT. 1d-5))
+    xm   = SQRT(x1*x2)
+    lnpm = (LogLikelihood(D,xm)-LogLikelihood(D,0.d0))
+    IF (lnpm .GE. lnp) THEN
+      x1   = xm
+      lnp1 = lnpm
+    ELSE
+      x2   = xm
+      lnp2 = lnpm
+    END IF
+  END DO
+  x = 0.5d0*(x1+x2)
   
 END FUNCTION
 
@@ -226,166 +207,6 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_ScaleToPValue(DetectorIndex) &
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_ScaleToPValue'
   C_DDCalc_ScaleToPValue = REAL(ScaleToPValue(Detectors(DetectorIndex)%p),KIND=C_DOUBLE)
 END FUNCTION
-
-
-! ----------------------------------------------------------------------
-! Calculates the factor x by which the signal must be scaled (s -> x*s)
-! to achieve the desired p-value (given as log(p)) using the maximum
-! gap method.
-! 
-! NOTE: Uses quickly implemented numerical methods.  Could be much
-!       better optimized if the need arises.
-! 
-! Input arguments:
-!   lnp         The logarithm of the desired p-value.
-!   mu          The total expected number of events.
-!   f           The largest fraction of events expected in any interval
-!               (i.e. the "maximum" gap).
-! 
-PURE FUNCTION MaximumGapScaleToPValue(lnp,mu,f) RESULT(x)
-  IMPLICIT NONE
-  REAL*8 :: x
-  REAL*8, INTENT(IN) :: lnp,mu,f
-  REAL*8 :: x1,lnp1,x2,lnp2,xm,lnpm
-  
-  IF (mu .LE. 0d0) THEN
-    x = HUGE(1d0)
-    RETURN
-  END IF
-  
-  ! Should not happen...
-  IF (lnp .GE. 0d0) THEN
-    x = 0d0
-    RETURN
-  END IF
-  
-  ! Should not happen...
-  IF (f .LE. 0d0) THEN
-    x = HUGE(1d0)
-    RETURN
-  END IF
-  
-  ! Special case
-  IF (f .GE. 1d0) THEN
-    x = -lnp / mu
-    RETURN
-  END IF
-  
-  ! Starting point
-  x1   = 1d0 / mu
-  lnp1 = LogMaximumGapP(x1*mu,x1*f*mu)
-  ! Bracket
-  IF (lnp1 .GT. lnp) THEN
-    x2   = 2d0*x1
-    lnp2 = LogMaximumGapP(x2*mu,x2*f*mu)
-    DO WHILE (lnp2 .GE. lnp)
-      x1   = x2
-      lnp1 = lnp2
-      x2   = 2d0*x2
-      lnp2 = LogMaximumGapP(x2*mu,x2*f*mu)
-    END DO
-  ELSE
-    DO WHILE (lnp1 .LE. lnp)
-      x2   = x1
-      lnp2 = lnp1
-      x1   = 0.5d0*x1
-      lnp1 = LogMaximumGapP(x1*mu,x1*f*mu)
-    END DO
-  END IF
-  
-  ! Bisection (geometric)
-  DO WHILE ((ABS(lnp2-lnp1) .GT. 1d-5) .AND. (ABS(LOG(x2/x1)) .GT. 1d-5))
-    xm   = SQRT(x1*x2)
-    lnpm = LogMaximumGapP(xm*mu,xm*f*mu)
-    IF (lnpm .GE. lnp) THEN
-      x1   = xm
-      lnp1 = lnpm
-    ELSE
-      x2   = xm
-      lnp2 = lnpm
-    END IF
-  END DO
-  x = 0.5d0*(x1+x2)
-  
-END FUNCTION
-
-
-! ----------------------------------------------------------------------
-! Calculates the factor x by which the signal must be scaled (s -> x*s)
-! to achieve the desired p-value (given as log(p)) using a Poisson
-! distribution.
-! 
-! NOTE: Uses quickly implemented numerical methods.  Could be much
-!       better optimized if the need arises.
-! 
-! Input arguments:
-!   lnp         The logarithm of the desired p-value.
-!   N           Number of observed events.
-!   mu          The total expected number of events.
-! 
-PURE FUNCTION PoissonScaleToPValue(lnp,N,mu) RESULT(x)
-  IMPLICIT NONE
-  REAL*8 :: x
-  INTEGER, INTENT(IN) :: N
-  REAL*8, INTENT(IN) :: lnp,mu
-  REAL*8 :: x1,lnp1,x2,lnp2,xm,lnpm
-  
-  IF (mu .LE. 0d0) THEN
-    x = HUGE(1d0)
-    RETURN
-  END IF
-  
-  ! Should not happen...
-  IF (lnp .GE. 0d0) THEN
-    x = 0d0
-    RETURN
-  END IF
-  
-  ! Analytic formula for N=0
-  IF (N .EQ. 0) THEN
-    x = -lnp / mu
-    RETURN
-  END IF
-  
-  ! Starting point
-  x1   = N / mu
-  lnp1 = LogPoissonP(N,x1*mu)
-  
-  ! Bracket
-  IF (lnp1 .GT. lnp) THEN
-    x2   = 2d0*x1
-    lnp2 = LogPoissonP(N,x2*mu)
-    DO WHILE (lnp2 .GE. lnp)
-      x1   = x2
-      lnp1 = lnp2
-      x2   = 2d0*x2
-      lnp2 = LogPoissonP(N,x2*mu)
-    END DO
-  ELSE
-    DO WHILE (lnp1 .LE. lnp)
-      x2   = x1
-      lnp2 = lnp1
-      x1   = 0.5d0*x1
-      lnp1 = LogPoissonP(N,x1*mu)
-    END DO
-  END IF
-  
-  ! Bisection (geometric)
-  DO WHILE ((ABS(lnp2-lnp1) .GT. 1d-5) .AND. (ABS(x2-x1) .GT. 1d-5))
-    xm   = SQRT(x1*x2)
-    lnpm = LogPoissonP(N,xm*mu)
-    IF (lnpm .GE. lnp) THEN
-      x1   = xm
-      lnp1 = lnpm
-    ELSE
-      x2   = xm
-      lnp2 = lnpm
-    END IF
-  END DO
-  x = 0.5d0*(x1+x2)
-  
-END FUNCTION
-
 
 ! ----------------------------------------------------------------------
 ! Calculates the confidence interval [s1,s2] for the signal
