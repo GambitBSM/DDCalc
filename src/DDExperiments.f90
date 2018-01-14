@@ -22,6 +22,7 @@ USE Darwin_Ar
 USE Darwin_Xe
 USE LUX_2016
 USE PandaX_2016
+USE PandaX_2017
 USE Xenon1T_2017
 USE LUX_2015
 USE PICO_2L
@@ -67,6 +68,8 @@ FUNCTION AvailableAnalyses(intervals) RESULT(Detector)
     Detector = LUX_2016_Init(intervals)
   ELSE IF (GetLongArg('PandaX-2016'))    THEN
     Detector = PandaX_2016_Init(intervals)
+  ELSE IF (GetLongArg('PandaX-2017'))    THEN
+    Detector = PandaX_2017_Init(intervals)
   ELSE IF (GetLongArg('Xenon1T-2017'))   THEN
     Detector = Xenon1T_2017_Init(intervals)
   ELSE IF (GetLongArg('LUX-2015'))       THEN

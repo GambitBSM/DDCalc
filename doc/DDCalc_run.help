@@ -464,6 +464,10 @@ the detector options described later.
          Sets the detector and analysis to that of the PandaX 2016
          result (A. Tan et al., arxiv:1607.07400).
 
+   --PandaX-2017
+         Sets the detector and analysis to that of the PandaX 2017
+         result (X. Cui et al., arxiv:1708.06917).
+
    --LUX-2015
          Sets the detector and analysis to that of the LUX 2015
          result (D.S. Akerib et al., arXiv:1512.03506).
