@@ -30,8 +30,11 @@ The experimental results implemented in DDCalc at this time are:
   * LUX 2016: 33500 kg-days (Xe)  
     D.S. Akerib et al., PRL 118, 021303 (2017) [arxiv:1608.07648]
 
-  * PandaX 2016: 34*224.6 kg-days (Xe)  
+  * PandaX 2016: 334.3*98.7 kg-days (Xe)  
     A. Tan et al., PRL 117, 121303 (2016) [arxiv:1607.07400]
+
+  * PandaX 2017: 361.5*77.1 kg-days (Xe)  
+    X. Cui et al., PRL 119, 181302 (2017) [arxiv:1708.06917]
 
   * LUX 2015: 118*85.3 kg-days (Xe)  
     D.S. Akerib et al., PRL 116, 161301 (2016) [arXiv:1512.03506]

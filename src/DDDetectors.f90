@@ -248,35 +248,49 @@ END SUBROUTINE
 !   D           The DetectorStruct structure containing detector
 !               data to be modified.  If not given, a default structure
 !               (internally stored) will be used.
-! Optional input arguments:
-!   mass        Detector fiducial mass [kg]
-!   time        Detector exposure time [day]
-!   exposure    Detector exposure [kg day]
+!
+
+! The following steps are required to define a new detector
+!
+! 1) Definition of the recoil energy grid used for calculating dR/dE
+!   NE          Number of tabulated recoil energies E
+!   E           Array of size [1:NE] containing recoil energies [keV].
+!
+! 2) Definition of bins
 !   Nbins       Number of sub-intervals/bins in data (0 if total only).
-!   Nevents_tot Total number of observed events
-!		If this is specified and negative, MaxGap will be used,
-!		(the actual value of Nevents_tot is then irrelevant)
-!		and intervals will be set to true.
-!		If this is specified and non-negative, TotalPoisson will
-!		will be used, and intervals will be set to false.
+!
+! 3) Specification of the observed event numbers
+! EITHER
+!   Nevents_tot Total number of observed events.
+! OR
 !   Nevents_bin Array of size [1:Nbins] containing the number of
 !               observed events for each interval.
-!		If this is specified, BinnedPoisson will be used,
-!		and intervals will be set to true. Nevents_tot is then automatically
-!		be calculated from Nevents_bin
 !
-!       NOTE: only either Nevents_tot or Nevents_bin are allowed as arguments!
+! The statistical method to be used in the analysis depends on the information
+! on the observed events supplied by the user. There are three possibilities
+! 3a) If Nevents_tot is provided and non-negative, Total Poisson will be used.
+! 3b) If Nevents_tot is provided and negative, Maximum Gap will be used and the
+!     total number of observed events will be set to Nbins-1. Nbins = 0 results
+!     in an error message
+! 3c) If Nevents_bin is provided, Binned Poisson will be used.
+! Note that it is possible to specify Nevents_tot even if Nbins > 0, in which
+! case the information from the individual bins will be ignored.
 !
+! 4) OPTIONAL: Specification of expected backgrounds.
+! EITHER
 !   Backgr_tot  Total number of expected background events
-!   Backgr_bin  Array of size [1:Nbins] containing the average expected 
-!               background for each interval.
-!       
-!       NOTE: only either Backgr_tot or Backgr_bin are allowed as arguments!
+! OR
+!   Backgr_bin  Array of size [1:Nbins] containing the expected background for
+!   		each interval.
 !
-! Optional isotope-related input arguments.  Niso must be given for
-! any of the arrays to be used, regardless if the number has changed.
-! If Niso changes, then all of the A/Z/f arrays must be specified for
-! changes to take effect (otherwise these inputs are ignored).
+! Note that information on expected backgrounds will be ignored for Maximum Gap.
+! For Total Poisson or Binned Poisson, if no background expectation is specified
+! (or if it is specified to be zero), this is taken to mean that there is no
+! background model and hence the background expectation is taken as a nuisance
+! parameter.
+!
+! 5) Target elements
+! EITHER
 !   Niso        Number of isotopes
 !   Ziso        Integer array of size [1:Niso] containing atomic
 !               numbers.
@@ -284,51 +298,51 @@ END SUBROUTINE
 !               mass numbers.
 !   fiso        Array of size [1:Niso] containing isotope mass
 !               fractions.
-! Pre-populated isotopic abundances for compounds with given
-! stoichiometry.  The first two of these must be given to take effect
-! (otherwise these inputs are ignored).
+! OR
 !   Nelem       Number of elements in compound.
 !   Zelem       Integer array of size [1:Nelem] containing atomic
 !               numbers of compound elements.
 !   stoich      Integer array of size [1:Nelem] containing compound
 !               stoichiometry.  For example, CF3Cl would be {1,3,1}.
 !               Default is 1 for each element.
-! Optional recoil energy tabulation arguments.  Both are required for
-! changes to take effect.
-!   NE          Number of tabulated recoil energies E
-!   E           Array of size [1:NE] containing recoil energies [keV].
-!               This defines the energies used for calculating dR/dE
-!               and its integral.
-! Optional efficiency curve(s) arguments.  Efficiencies can be provided
-! by file or by providing tabulation data.
+!
+! Note that the target composition can no longer be changed after a detector
+! has been successfully initialized.
+!
+! 6) Detector exposure
+! EITHER
+!   mass        Detector fiducial mass [kg]
+!   time        Detector run-time [day]
+! OR
+!   exposure    Detector exposure [kg day]
+!
+! 7) Detector efficiencies
+! EITHER
 !   eff_all     Array of size [1:NE,0:Nbins] containing efficiencies
 !               as a function of recoil energy, where the first index
 !               is over recoil energies and the second index is over
 !               the sub-interval number (0 for the total interval).
 !               The same efficiency will be used for all target elements
 !               and isotopes.
+! OR
 !   eff         Array of size [1:Niso,1:NE,0:Nbins] containing efficiencies
 !               as a function of recoil energy as above, but specified
 !               separately for every target isotope.
 !               If eff is provided together with Nelem and Zelem, it is
 !               taken to have the size [1:Nelem,1:NE,0:Nbins] and the same
 !               efficiency will be used for all isotopes of each element
+! OR
 !  eff_file_all File from which efficiencies shoud be read. The efficiencies
 !		must have the same format as eff_all and will be interpreted
 !		in the same way, i.e. the same efficiency will be used for
 !		all target elements and isotopes.
+! OR
 !  eff_file	Array of files from which efficiencies shoud be read. The efficiencies
 !		must have the same format as eff_all and will be interpreted
 !		in the same way, i.e. eff_file should have siye [1:Niso] or
 !		[1:Nelme] depending on whether Nelem and Zelem have been specified.
-! Optional analysis-related arguments.
-!   intervals   [OUTDATED, NOT RELEVANT ANYMORE]
-!		Specify if rates for sub-intervals should be calculated;
-!               otherwise, only the full interval is used for
-!               calculations (default: false).
-!               For this to have effect, Nbins must be greater than zero.
-!               If intervals is set to true but Nevents_bin is not specified
-!               this is taken to mean that the max gap method should be used
+!
+! 8) OPTIONAL: Energy threshold
 !   Emin        If given, sets all efficiencies below the given energy
 !               [keV] to zero, removing all contributions from recoils
 !               at lower energies.
@@ -363,9 +377,8 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   IF (D%InitSuccess) THEN
     IF ( (PRESENT(Niso)) .OR. (PRESENT(Ziso)) .OR. (PRESENT(Aiso)) .OR. (PRESENT(fiso)) &
              .OR. (PRESENT(Nelem)) .OR. (PRESENT(Zelem)) .OR. (PRESENT(stoich)) ) THEN
-      WRITE (*,*) 'Unallowed change to already initialized detector structure.'
-      D%InitSuccess = .False.
-      RETURN      
+      WRITE(*,*) 'ERROR: Cannot change target composition after detector has been successfully initialized.'
+      STOP
     END IF
   END IF
 
@@ -402,6 +415,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       IF (ALLOCATED(D%Backgr)) DEALLOCATE(D%Backgr)
       D%InitSuccess = .False. ! If Nbins is changed, a new efficiency array must be provided
       ALLOCATE(D%Nevents(0:Nbins),D%Backgr(0:Nbins))
+      D%Backgr(0:) = 0
       D%StatisticFlag = -1
     END IF
     D%Nbins = Nbins
@@ -416,9 +430,14 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       RETURN      
     END IF
     IF (Nevents_tot .LT. 0) THEN
+      IF (D%Nbins .LT. 1) THEN
+        WRITE (*,*) 'Error: maximum gap method can only be used for non-zero number of bins'
+        D%InitSuccess = .False.
+        RETURN      
+      END IF
       D%StatisticFlag = 2 ! MaxGap
       D%intervals = .true.
-      D%Nevents(0) = Nevents_tot
+      D%Nevents(0) = D%Nbins - 1
       intervals_change = .true.
     ELSE
       D%StatisticFlag = 0 ! TotalPoisson
