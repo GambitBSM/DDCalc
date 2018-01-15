@@ -2,11 +2,7 @@ MODULE PandaX_2017
 
 !=======================================================================
 ! PandaX 2017 ANALYSIS ROUTINES
-<<<<<<< HEAD
-! Based upon arXiv:1607.07400.  
-=======
 ! Based upon arXiv:1708.06917.  
->>>>>>> 863d1aeecf74b27102fda7065857e4eca5ee15ce
 !=======================================================================
 
 USE DDTypes
@@ -29,10 +25,7 @@ FUNCTION PandaX_2017_Init(intervals) RESULT(D)
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
   ! Efficiency curves energy tabulation points
-<<<<<<< HEAD
-=======
   ! We use the same efficiency curves as for PandaX 2016.
->>>>>>> 863d1aeecf74b27102fda7065857e4eca5ee15ce
   REAL*8, PARAMETER :: E(NE)                                            &
       =       (/ 1.1d0,     1.14488d0, 1.19159d0, 1.24021d0, 1.29081d0, & 
       1.34348d0, 1.39829d0, 1.45534d0, 1.51472d0, 1.57653d0, 1.64085d0, &
