@@ -41,7 +41,7 @@ PROGRAM DDCalc_exampleF
   ! (who said you couldn't do OOP in Fortran?)
   TYPE(WIMPStruct) :: WIMP
   TYPE(HaloStruct) :: Halo
-  TYPE(DetectorStruct) :: MyDetector, XENON, LUX, SCDMS, SIMPLE
+  TYPE(DetectorStruct) :: XENON, LUX, SCDMS, SIMPLE
 
   ! These constants will be used to specify the type of input parameters
   INTEGER, PARAMETER :: TYPE_MG     = 1
@@ -85,11 +85,6 @@ PROGRAM DDCalc_exampleF
   ! later -- but here's how you would make a default version if needed:
   WIMP = DDCalc_InitWIMP()
 
-  ! As we are responsible adults, we also choose our own detectors below.
-  ! Here is what you'd do if you wanted to just rely on the default
-  ! (currently LUX 2013):
-  MyDetector = DDCalc_InitDetector(.TRUE.)
-
   ! Explicitly create detector objects for all the experiments to be
   ! used (set up isotopes, efficiencies, array sizing, etc.)  The   
   ! argument indicates if extra sub-interval calculations should
@@ -114,46 +109,6 @@ PROGRAM DDCalc_exampleF
   ! recoils actually contribute to the signal.
   ! EXAMPLE: Uncomment to set a minimum recoil energy of 3 keV for LUX:
   !CALL DDCalc_SetEmin(LUX,3d0)
-  
-  ! Advanced usage:
-  ! The DDCalc_SetDetector() routine overrides aspects of the detector
-  ! configuration, using optional arguments that can be specified via
-  ! keywords.  All the values used in the examples here are those used
-  ! for the LUX case, so these specific calls are not actually necessary.
-  ! 
-  ! Set element(s) to use by their atomic number, along with the
-  ! stoichiometry (assumed to be 1:1 for all elements if not given).
-  ! Spin-dependent interactions only implemented for a limited number
-  ! of isotopes.
-  CALL DDCalc_SetDetector(MyDetector,Nelem=1,Zelem=(/54/),stoich=(/1/))
-  ! Give explicit list of isotopes, along with their mass fractions.
-  !CALL DDCalc_SetDetector(MyDetector,Niso=7,Ziso=(/.../),Aiso=(/.../),fiso=(/.../))
-  ! Change parameters.
-  CALL DDCalc_SetDetector(MyDetector,mass=118d0,time=85.3d0,Nevents_tot=1,Backgr_tot=0.64d0)
-  ! Load efficiency curves from file.  First column is recoil energy
-  ! [keV], the next column with values in [0,1] is the total detection
-  ! efficiency.  Optionally (intervals=.TRUE.), additional columns are
-  ! taken to be the detection efficiency for each interval between
-  ! events.  If these columns are not available or should be ignored,
-  ! set intervals=.FALSE.  There should be Nevents+1 intervals (not
-  ! including total) if used.
-  CALL DDCalc_SetDetector(MyDetector,eff_file=TRIM(DDCALC_DIR)//&
-                          '/data/example_efficiencies.dat',   &
-                          intervals=.TRUE.)
-  ! Set the minimum recoil energy [keV] to include.
-  CALL DDCalc_SetDetector(MyDetector,Emin=0d0)
-  ! Print to screen what our extra detector analysis is, labeled as
-  ! '(special)' in the output table.
-  WRITE(*,'(A)') ''
-  WRITE(*,'(A)') 'The (special) case below is identical to the LUX 2013 analysis.'
-  
-  ! TESTING:
-  ! For comparison, set MyDetector to represent the standard LUX
-  ! case, but with a 3 keV minimum recoil energy.
-  !CALL DDCalc_SetDetector(MyDetector,Emin=3d0)
-  !WRITE(*,'(A)') ''
-  !WRITE(*,'(A)') 'The (special) case below is the LUX 2013 analysis with a 3 keV'
-  !WRITE(*,'(A)') 'minimum recoil energy imposed.'
     
   ! Optionally set the Standard Halo Model parameters:
   !   rho     Local dark matter density [GeV/cm^3]
@@ -209,7 +164,6 @@ PROGRAM DDCalc_exampleF
     CALL DDCalc_CalcRates(LUX,WIMP,Halo)
     CALL DDCalc_CalcRates(SCDMS,WIMP,Halo)
     CALL DDCalc_CalcRates(SIMPLE,WIMP,Halo)
-    CALL DDCalc_CalcRates(MyDetector,WIMP,Halo)
     
     ! Header
     WRITE(*,'(A20,5(2X,A11))') '',' XENON 2012',' LUX 2013  ',          &
@@ -224,22 +178,19 @@ PROGRAM DDCalc_exampleF
         DDCalc_Events(XENON), &
         DDCalc_Events(LUX), &
         DDCalc_Events(SCDMS), &
-        DDCalc_Events(SIMPLE), &
-        DDCalc_Events(MyDetector)
+        DDCalc_Events(SIMPLE)
     ! The average expected background.
     WRITE(*,'(A20,5(2X,1PG11.4))')  'Expected background             ', &
         DDCalc_Background(XENON), &
         DDCalc_Background(LUX), &
         DDCalc_Background(SCDMS), &
-        DDCalc_Background(SIMPLE), &
-        DDCalc_Background(MyDetector)
+        DDCalc_Background(SIMPLE)
     ! The average expected WIMP signal.
     WRITE(*,'(A20,5(2X,1PG11.4))')  'Expected signal                 ', &
         DDCalc_Signal(XENON), &
         DDCalc_Signal(LUX), &
         DDCalc_Signal(SCDMS), &
-        DDCalc_Signal(SIMPLE), &
-        DDCalc_Signal(MyDetector)
+        DDCalc_Signal(SIMPLE)
     
     ! The log-likelihoods for the current WIMP; note these are _not_
     ! multiplied by -2.  The likelihood is calculated using a Poisson
@@ -248,8 +199,7 @@ PROGRAM DDCalc_exampleF
         DDCalc_LogLikelihood(XENON), &
         DDCalc_LogLikelihood(LUX), &
         DDCalc_LogLikelihood(SCDMS), &
-        DDCalc_LogLikelihood(SIMPLE), &
-        DDCalc_LogLikelihood(MyDetector)
+        DDCalc_LogLikelihood(SIMPLE)
     
     ! The logarithm of the p-value, calculated without background
     ! subtraction, using either the maximum gap statistic or a Poisson
@@ -263,8 +213,7 @@ PROGRAM DDCalc_exampleF
         DDCalc_LogPValue(XENON), &
         DDCalc_LogPValue(LUX), &
         DDCalc_LogPValue(SCDMS), &
-        DDCalc_LogPValue(SIMPLE), &
-        DDCalc_LogPValue(MyDetector)
+        DDCalc_LogPValue(SIMPLE)
     
     ! The factor x by which the current WIMP cross- sections must be
     ! multiplied (sigma -> x*sigma, applied to all four WIMP-nucleon
@@ -279,8 +228,7 @@ PROGRAM DDCalc_exampleF
         DDCalc_ScaleToPValue(XENON), &
         DDCalc_ScaleToPValue(LUX), &
         DDCalc_ScaleToPValue(SCDMS), &
-        DDCalc_ScaleToPValue(SIMPLE), &
-        DDCalc_ScaleToPValue(MyDetector)
+        DDCalc_ScaleToPValue(SIMPLE)
     WRITE(*,'(A60)')  '  * Factor x such that sigma->x*sigma gives desired p-value'
     
     !WRITE(*,*)

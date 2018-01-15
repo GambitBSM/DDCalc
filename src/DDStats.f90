@@ -17,7 +17,7 @@ PRIVATE
 
 PUBLIC :: DDCalc_LogLikelihood,DDCalc_ScaleToPValue
 PUBLIC :: C_DDCalc_LogLikelihood,C_DDCalc_ScaleToPValue
-PUBLIC :: FeldmanCousinsPoissonCI
+PUBLIC :: FeldmanCousinsPoissonCI,LogPoissonP
 
 INTERFACE DDCalc_LogLikelihood
   MODULE PROCEDURE LogLikelihood
