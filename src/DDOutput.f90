@@ -241,14 +241,11 @@ SUBROUTINE WriteDetectorHeader(Detector,extra_lines)
       // '  Mass fraction         ',Detector%fiso
   WRITE(*,'(A)') COMMENT_PREFIX
   
-  ! Efficiencies and intervals/bins
+  ! Efficiencies and bins
   WRITE(*,'(A,A)') COMMENT_PREFIX &
       // 'Efficiency file                       = ',TRIM(Detector%eff_file)
-  !IF (Detector%Nbins .GT. 0) THEN
-  IF (Detector%intervals .AND. (Detector%Nbins .GT. 0)) THEN
-    WRITE(*,'(A,I6)') COMMENT_PREFIX &
-      // 'Number of bins/sub-intervals          =',Detector%Nbins
-  END IF
+  WRITE(*,'(A,I6)') COMMENT_PREFIX &
+      // 'Number of bins                        =',Detector%Nbins
   WRITE(*,'(A)') COMMENT_PREFIX
   
   IF (PRESENT(extra_lines)) CALL WriteEmptyCommentLines(extra_lines)
@@ -378,7 +375,7 @@ SUBROUTINE WriteEventsAndLikelihoodsHeader(Detector,extra_lines)
         // '  signal(SD)   Average expected spin-dependent signal events.'
     WRITE(*,'(A)') COMMENT_PREFIX &
         // '  log(L)       Log-likelihood using the Poisson distribution (signal+background).'
-    IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
+    IF (Detector%StatisticFlag .EQ. 2) THEN
       WRITE(*,'(A)') COMMENT_PREFIX &
         // '  log(p)       Log of the p-value determined using the maximum gap method;'
       WRITE(*,'(A)') COMMENT_PREFIX &
@@ -386,8 +383,6 @@ SUBROUTINE WriteEventsAndLikelihoodsHeader(Detector,extra_lines)
     ELSE
       WRITE(*,'(A)') COMMENT_PREFIX &
         // '  log(p)       Log of the p-value determined using the Poisson distribution'
-      WRITE(*,'(A)') COMMENT_PREFIX &
-        // '               (signal only: no background subtraction).'
     END IF
   END IF
   
@@ -714,8 +709,8 @@ SUBROUTINE WriteEventsByMassColumnHeader(Detector)
     WRITE(*,'(1X,A1)',ADVANCE='NO') ' '
     WRITE(*,'(1(1X,A23))',ADVANCE='NO')                                 &
         '----- full range ------'
-    ! Events for sub-intervals
-    IF (Detector%intervals) THEN
+    ! Events for bins
+    IF (Detector%StatisticFlag .GT. 0) THEN
       DO Keff = 1,Detector%Nbins
         WRITE(*,'(1X,A1)',ADVANCE='NO') '|'
         WRITE(*,'(1(1X,A14,I3,A6))',ADVANCE='NO')                       &
@@ -748,7 +743,7 @@ SUBROUTINE WriteEventsByMassColumnHeader(Detector)
   
   ! Events for sub-intervals
   IF (VerbosityLevel .GE. 3) THEN
-    IF (Detector%intervals) THEN
+    IF (Detector%StatisticFlag .GT. 0) THEN
       DO Keff = 1,Detector%Nbins
         WRITE(*,'(1X,A1)',ADVANCE='NO') ' '
         WRITE(*,'(2(1X,A11))',ADVANCE='NO') ' events(SI)',' events(SD)'
@@ -1197,14 +1192,14 @@ SUBROUTINE WriteLimitsSIHeader(lnp,thetaG,Detector,extra_lines)
         // 'section(s) that are not excluded.  Cross-sections are excluded if their'
     WRITE(*,'(A)') COMMENT_PREFIX &
         // 'p-value is smaller than the given p-value, where the p-value is'
-    IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
+    IF (Detector%StatisticFlag .EQ. 2) THEN
       WRITE(*,'(A)') COMMENT_PREFIX &
         // 'determined using the maximum gap method; see Yellin, Phys. Rev. D 66,'
       WRITE(*,'(A)') COMMENT_PREFIX &
         // '032005 (2002) [physics/0203002].'
     ELSE
       WRITE(*,'(A)') COMMENT_PREFIX &
-        // 'determined using the Poisson distribution (signal only: no background).'
+        // 'determined using the Poisson distribution.'
     END IF
     WRITE(*,'(A,1(2X,1PG12.4))') COMMENT_PREFIX &
         // '  p-value               =',CoerceExponent(EXP(lnp),2,4)
@@ -1364,7 +1359,7 @@ SUBROUTINE WriteLimitsSDHeader(lnp,thetaG,Detector,extra_lines)
         // 'section(s) that are not excluded.  Cross-sections are excluded if their'
     WRITE(*,'(A)') COMMENT_PREFIX &
         // 'p-value is smaller than the given p-value, where the p-value is'
-    IF (Detector%intervals .AND. (Detector%Nbins .EQ. Detector%Nevents(0)+1)) THEN
+    IF (Detector%StatisticFlag .EQ. 2) THEN
       WRITE(*,'(A)') COMMENT_PREFIX &
         // 'determined using the maximum gap method; see Yellin, Phys. Rev. D 66,'
       WRITE(*,'(A)') COMMENT_PREFIX &

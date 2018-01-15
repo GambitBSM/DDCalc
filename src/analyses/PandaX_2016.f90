@@ -16,11 +16,10 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct to the PandaX 2016 analysis.
 ! 
-FUNCTION PandaX_2016_Init(intervals) RESULT(D)
+FUNCTION PandaX_2016_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
@@ -70,21 +69,20 @@ FUNCTION PandaX_2016_Init(intervals) RESULT(D)
   CALL SetDetector(D,mass=334.3d0,time=98.7d0,Nevents_tot=3,            &
                    Backgr_tot=4.8d0,Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
-                   intervals=intervals,Emin=EMIN)
+                   Emin=EMIN)
   D%eff_file = '[PandaX 2016]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_PandaX_2016_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_PandaX_2016_Init() &
  BIND(C,NAME='C_DDCalc_pandax_2016_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = PandaX_2016_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = PandaX_2016_Init()
   C_PandaX_2016_Init = N_Detectors
 END FUNCTION
 

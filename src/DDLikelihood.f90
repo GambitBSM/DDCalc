@@ -7,7 +7,6 @@ PROGRAM DDLikelihood
   USE DDTypes
   USE DDCommandLine
   USE DDNumerical
-  USE DDExHelp
   USE DDWIMP
   USE DDDetectors
   USE DDRates
@@ -36,7 +35,7 @@ PROGRAM DDLikelihood
   CALL DDCalc_SetWIMP(WIMP,m=1d0,DMtype='SIonly',params=[0.d0,0.d0])
   Halo = DDCalc_InitHalo()
   CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
-  Detector = PandaX_2016_Init(.true.)
+  Detector = PandaX_2016_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
 
   BGlogL = DDCalc_LogLikelihood(Detector)

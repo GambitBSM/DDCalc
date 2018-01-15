@@ -6,7 +6,6 @@ PROGRAM DDTest
   USE DDTypes
   USE DDCommandLine
   USE DDNumerical
-  USE DDExHelp
   USE DDWIMP
   USE DDDetectors
   USE DDRates
@@ -30,11 +29,10 @@ PROGRAM DDTest
   CALL DDCalc_SetWIMP(WIMP,m=1d0,DMtype='SIonly',params=[0.d0,0.d0])
   Halo = DDCalc_InitHalo()
   CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
-  Detector = CRESST_II_Init(.true.)
+  Detector = CRESST_II_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
 
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
-  WRITE (*,*) 'intervals =', Detector%intervals
   WRITE (*,*) 'StatisticFlag =', Detector%StatisticFlag
   WRITE (*,*) 'exposure =', Detector%exposure
   WRITE (*,*) 'Nevents =', Detector%Nevents

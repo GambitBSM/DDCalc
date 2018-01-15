@@ -58,9 +58,9 @@ CONTAINS
 !   signal_sd   Average expected spin-dependent signal events
 !                  --> In the new DDCalc setup, this is set to zero as a dummy value.
 !   rate        Signal rate [cpd/kg]
-! Optional sub-interval/bin arguments.  Arrays will be allocated to
+! Optional bin arguments.  Arrays will be allocated to
 ! size [1:Nbins]:
-!   Nbins       Number of bins/intervals
+!   Nbins       Number of bins
 !   binsignal   Allocatable array to be filled with average expected
 !               signal in each bin.  Allocated to size [1:Nbins].
 !               The sum of all bins is equal to 'signal'.
@@ -270,10 +270,8 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
 
 
   ! ...................... CALCULATE INTEGRATED RATE ............................
-  ! Number of intervals/bins to do calculations for.
-  ! If intervals=.FALSE. then efficiency index is over [0:0]
-  ! (total only).
-  IF (D%intervals) THEN
+  ! Number of bins to do calculations for.
+  IF (D%StatisticFlag .GT. 0) THEN
     Neff = D%Nbins
   ELSE
     Neff = 0

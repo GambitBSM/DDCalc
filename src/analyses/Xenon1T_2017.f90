@@ -16,11 +16,10 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct to the Xenon1T 2017 analysis.
 ! 
-FUNCTION Xenon1T_2017_Init(intervals) RESULT(D)
+FUNCTION Xenon1T_2017_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.5d0
@@ -70,21 +69,20 @@ FUNCTION Xenon1T_2017_Init(intervals) RESULT(D)
   CALL SetDetector(D,mass=1042.0d0,time=34.2d0,Nevents_tot=0,           &
                    Backgr_tot=0.36d0,Nelem=1,Zelem=(/54/),              &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
-                   intervals=intervals,Emin=EMIN)
+                   Emin=EMIN)
   D%eff_file = '[Xenon1T 2017]'
   
 END FUNCTION  
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_Xenon1T_2017_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_Xenon1T_2017_Init() &
  BIND(C,NAME='C_DDCalc_xenon1t_2017_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = Xenon1T_2017_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = Xenon1T_2017_Init()
   C_Xenon1T_2017_Init = N_Detectors
 END FUNCTION
 

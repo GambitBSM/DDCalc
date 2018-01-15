@@ -19,14 +19,10 @@ CONTAINS
 ! 
 ! The efficiencies used here were generated using TPCMC.
 ! 
-! Required input arguments:
-!     intervals   Indicates if sub-intervals should be included
-! 
-FUNCTION XENON100_2012_Init(intervals) RESULT(D)
+FUNCTION XENON100_2012_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
   INTEGER, PARAMETER :: NBINS = 3
   ! Efficiency curves energy tabulation points
@@ -177,22 +173,20 @@ FUNCTION XENON100_2012_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=34d0,time=224.6d0,Nevents_tot=2,              &
                    Backgr_tot=1.0d0,Nelem=1,Zelem=(/54/),               &
-                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
-                   intervals=intervals)
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF)
   D%eff_file = '[XENON100 2012]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_XENON100_2012_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_XENON100_2012_Init() &
  BIND(C,NAME='C_DDCalc_xenon100_2012_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = XENON100_2012_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = XENON100_2012_Init()
   C_XENON100_2012_Init = N_Detectors
 END FUNCTION
 

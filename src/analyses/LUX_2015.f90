@@ -23,11 +23,10 @@ CONTAINS
 ! We assume that this has negligible impact on the expected background,
 ! so we take 0.64 events, as quoted in http://arxiv.org/pdf/1310.8214v2.pdf .
 !
-FUNCTION LUX_2015_Init(intervals) RESULT(D)
+FUNCTION LUX_2015_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
@@ -80,21 +79,20 @@ FUNCTION LUX_2015_Init(intervals) RESULT(D)
   CALL SetDetector(D,mass=118.0d0,time=85.3d0,Nevents_tot=0,             &
                    Backgr_tot=0.64d0,Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
-                   intervals=intervals,Emin=EMIN)
+                   Emin=EMIN)
   D%eff_file = '[LUX 2015]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_LUX_2015_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_LUX_2015_Init() &
  BIND(C,NAME='C_DDCalc_lux_2015_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = LUX_2015_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = LUX_2015_Init()
   C_LUX_2015_Init = N_Detectors
 END FUNCTION
 

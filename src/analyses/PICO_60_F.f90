@@ -18,11 +18,10 @@ CONTAINS
 !
 ! This analysis includes only fluorine, which is sufficient for SD scattering.
 !
-FUNCTION PICO_60_F_Init(intervals) RESULT(D)
+FUNCTION PICO_60_F_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 5.0d0
@@ -76,21 +75,20 @@ FUNCTION PICO_60_F_Init(intervals) RESULT(D)
   CALL SetDetector(D,mass=2.32d0,time=92.8d0,Nevents_tot=0,              &
                    Backgr_tot=0.0d0,Nelem=1,Zelem=(/9/),                 &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
-                   intervals=intervals,Emin=EMIN)
+                   Emin=EMIN)
   D%eff_file = '[PICO_60 F]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_PICO_60_F_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_PICO_60_F_Init() &
  BIND(C,NAME='C_DDCalc_pico_60_f_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = PICO_60_F_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = PICO_60_F_Init()
   C_PICO_60_F_Init = N_Detectors
 END FUNCTION
 

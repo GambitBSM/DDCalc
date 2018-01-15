@@ -19,14 +19,10 @@ CONTAINS
 ! 
 ! The efficiencies used here were generated using TPCMC.
 ! 
-! Required input arguments:
-!     intervals   Indicates if sub-intervals should be included
-! 
-FUNCTION DARWIN_Xe_Init(intervals) RESULT(D)
+FUNCTION DARWIN_Xe_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
   INTEGER, PARAMETER :: NBINS = 0
   ! Efficiency curves energy tabulation points
@@ -93,22 +89,20 @@ FUNCTION DARWIN_Xe_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,mass=12d3,time=2d0*365d0,Nevents_tot=0,             &
                    Backgr_tot=0.5d0,Nelem=1,Zelem=(/54/),                &
-                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
-                   intervals=intervals)
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF)
   D%eff_file = '[DARWIN Xe 2015]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_DARWIN_Xe_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_DARWIN_Xe_Init() &
  BIND(C,NAME='C_DDCalc_darwin_xe_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = DARWIN_Xe_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = DARWIN_Xe_Init()
   C_DARWIN_Xe_Init = N_Detectors
 END FUNCTION
 

@@ -36,11 +36,11 @@ CONTAINS
 ! 
 ! Required input argument:
 !     file       The file to load efficiencies from.
-!     Nbins      Number of intervals/bins expected.
+!     Nbins      Number of bins expected.
 !     NE         Number of recoil energy tabulation points expected.
 ! Required output arguments:
 !     eff        Array to contain efficiency curves for
-!                the total range and each interval/bin.  Allocated to
+!                the total range and each bin. Allocated to
 !                size [1:NE,0:Nbins].
 !
 SUBROUTINE LoadEfficiencyFile(file,Nbins,NE,eff)
@@ -150,24 +150,21 @@ END SUBROUTINE
 !   NE          Number of tabulated recoil energies E
 !   E           Allocatable real array to be filled with recoil energies
 !               [keV]. Allocated to size [1:NE].
-!   Nbins       Number of subintervals (0 for only total interval)
+!   Nbins       Number of bins
 !   eff         Allocatable dimension=3 array containing efficiencies
 !               as a function of recoil energy. Allocated to size
 !               [1:Niso,1:NE,0:Nbins], where the first index is over isotopes
 !               the second index is over recoil energies and the third
-!               index is over the sub-interval number (0 for the total interval).
+!               index is over the bins.
 !   Wsi,Wsd     Allocatable dimension=3 array containing weighted form
 !               factors for spin-independent (SI) and spin-dependent
 !               (SD) couplings.  Allocated to size [-1:1,1:NE,1:Niso].
-!   intervals   LOGICAL indicating if rates for intervals/bins are
-!               to be calculated (used for max gap).
 ! 
 SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,fiso,Miso,NE,E,                   &
-                       Nbins,eff,Wsi,Wsd,intervals)
+                       Nbins,eff,Wsi,Wsd)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(IN) :: D
-  LOGICAL, INTENT(OUT), OPTIONAL :: intervals
   INTEGER, INTENT(OUT), OPTIONAL :: Nevents(:),Niso,NE,Nbins
   INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Ziso(:),Aiso(:)
   REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background(:)
@@ -231,9 +228,6 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
     Wsd = D%Wsd
   END IF
   
-  ! Calculate rates for intervals/bins?
-  IF (PRESENT(intervals)) intervals = D%intervals
-  
 END SUBROUTINE
 
 
@@ -257,14 +251,14 @@ END SUBROUTINE
 !   E           Array of size [1:NE] containing recoil energies [keV].
 !
 ! 2) Definition of bins
-!   Nbins       Number of sub-intervals/bins in data (0 if total only).
+!   Nbins       Number of bins in data (0 if total only).
 !
 ! 3) Specification of the observed event numbers
 ! EITHER
 !   Nevents_tot Total number of observed events.
 ! OR
 !   Nevents_bin Array of size [1:Nbins] containing the number of
-!               observed events for each interval.
+!               observed events for each bin.
 !
 ! The statistical method to be used in the analysis depends on the information
 ! on the observed events supplied by the user. There are three possibilities
@@ -281,7 +275,7 @@ END SUBROUTINE
 !   Backgr_tot  Total number of expected background events
 ! OR
 !   Backgr_bin  Array of size [1:Nbins] containing the expected background for
-!   		each interval.
+!   		each bin.
 !
 ! Note that information on expected backgrounds will be ignored for Maximum Gap.
 ! For Total Poisson or Binned Poisson, if no background expectation is specified
@@ -321,7 +315,7 @@ END SUBROUTINE
 !   eff_all     Array of size [1:NE,0:Nbins] containing efficiencies
 !               as a function of recoil energy, where the first index
 !               is over recoil energies and the second index is over
-!               the sub-interval number (0 for the total interval).
+!               the bin number (0 for the total interval).
 !               The same efficiency will be used for all target elements
 !               and isotopes.
 ! OR
@@ -352,17 +346,16 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
                        Nevents_tot,Nevents_bin,Backgr_tot,Backgr_bin,   &
                        Niso,Ziso,Aiso,fiso,Nelem,Zelem,stoich,          &
                        NE,E,E_file,eff_file,eff_file_all,eff,eff_all,   &
-                       intervals,Emin)
+                       Emin)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(INOUT) :: D
   CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: eff_file(:)
   CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: eff_file_all,E_file
-  LOGICAL, INTENT(IN), OPTIONAL :: intervals
   INTEGER, INTENT(IN), OPTIONAL :: Nevents_tot,Nevents_bin(:),Niso,Nelem,NE,Nbins
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,Backgr_tot,Backgr_bin(:),Emin
   REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,:,0:),eff_all(:,0:)
-  LOGICAL :: E_change,eff_change,intervals_change
+  LOGICAL :: E_change,eff_change,stat_change
   INTEGER :: KE,Kiso,Neff,ind_elem,ind_iso,ind,Niso_temp,eff_files,file_number
   INTEGER, ALLOCATABLE :: stoich0(:)
   REAL*8, ALLOCATABLE :: eff_new(:,:,:),eff_all_new(:,:)
@@ -371,7 +364,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   ! array resizing and initialization
   E_change   = .FALSE.
   eff_change = .FALSE.
-  intervals_change = .FALSE.
+  stat_change = .FALSE.
 
   ! Check whether any unallowed changes to the already initialized detector are attempted...
   IF (D%InitSuccess) THEN
@@ -421,7 +414,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     D%Nbins = Nbins
   END IF
 
-  ! Read in observed events, which then also defines the StatisticFlag and the intervals flag
+  ! Read in observed events, which then also defines the StatisticFlag
   IF ( PRESENT(Nevents_tot) ) THEN
     IF ( PRESENT(Nevents_bin) ) THEN
       WRITE (*,*) 'Error: both Nevents_tot and Nevents_bin are given as arguments.'
@@ -436,14 +429,12 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
         RETURN      
       END IF
       D%StatisticFlag = 2 ! MaxGap
-      D%intervals = .true.
       D%Nevents(0) = D%Nbins - 1
-      intervals_change = .true.
+      stat_change = .true.
     ELSE
       D%StatisticFlag = 0 ! TotalPoisson
-      D%intervals = .false.
       D%Nevents(0) = Nevents_tot
-      intervals_change = .true.
+      stat_change = .true.
     END IF
     ! info about binned observed events is irrelevant for MaxGap and TotalPoisson, so just set it to zero
     IF (D%Nbins .GT. 0) THEN
@@ -461,10 +452,9 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       RETURN     
     END IF
     D%StatisticFlag = 1 ! BinnedPoisson
-    D%intervals = .true.
     D%Nevents(0) = SUM(Nevents_bin(:))
     D%Nevents(1:) = Nevents_bin(:)
-    intervals_change = .true.
+    stat_change = .true.
   END IF
 
   ! Read in background events
@@ -705,9 +695,9 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     ALLOCATE(D%eta(D%NE,D%Niso))
   END IF
   
-  ! Number of intervals/bins to do calculations for.
+  ! Number of bins to do calculations for.
   ! Used for array sizing below.
-  IF (D%intervals) THEN
+  IF (D%StatisticFlag .GT. 0) THEN
     Neff = D%Nbins
   ELSE
     Neff = 0
@@ -720,19 +710,19 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   END IF
 
   ! Resize rate arrays if necessary
-  IF (E_change .OR. eff_change .OR. intervals_change) THEN
+  IF (E_change .OR. eff_change .OR. stat_change) THEN
     IF (ALLOCATED(D%R)) DEALLOCATE(D%R)
     ALLOCATE(D%R(0:Neff))
   END IF
   
   ! Resize event arrays if necessary
-  IF (eff_change .OR. intervals_change) THEN
+  IF (eff_change .OR. stat_change) THEN
     IF (ALLOCATED(D%MuSignal)) DEALLOCATE(D%MuSignal)
     ALLOCATE(D%MuSignal(0:Neff))
   END IF
   
   ! Set all calculable quantities to zero
-  IF (E_change .OR. eff_change .OR. intervals_change) THEN
+  IF (E_change .OR. eff_change .OR. stat_change) THEN
     D%vmin        = 0d0
     D%eta         = 0d0
     D%dRdEiso     = 0d0
@@ -742,5 +732,5 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
 
   
 END SUBROUTINE
-  
+
 END MODULE

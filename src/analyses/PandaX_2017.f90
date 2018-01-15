@@ -16,11 +16,10 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct to the PandaX 2017 analysis.
 ! 
-FUNCTION PandaX_2017_Init(intervals) RESULT(D)
+FUNCTION PandaX_2017_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
@@ -75,21 +74,20 @@ FUNCTION PandaX_2017_Init(intervals) RESULT(D)
   ! the background that minimizes the log likelihood is 1.8 - 0.5^2 = 1.55.
                    Backgr_tot=1.55d0,Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
-                   intervals=intervals,Emin=EMIN)
+                   Emin=EMIN)
   D%eff_file = '[PandaX 2017]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_PandaX_2017_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_PandaX_2017_Init() &
  BIND(C,NAME='C_DDCalc_pandax_2017_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = PandaX_2017_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = PandaX_2017_Init()
   C_PandaX_2017_Init = N_Detectors
 END FUNCTION
 

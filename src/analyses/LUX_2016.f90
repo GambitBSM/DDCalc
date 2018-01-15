@@ -28,11 +28,10 @@ CONTAINS
 ! are distributed uniformly in S1 and that all other backgrounds fall off exponentially in the same way as the spectrum from
 ! calibration with neutrons. This leads to a prediction of 2.3 background events in the search window.
 ! 
-FUNCTION LUX_2016_Init(intervals) RESULT(D)
+FUNCTION LUX_2016_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 101
   INTEGER, PARAMETER :: NBINS = 0
   REAL*8, PARAMETER :: EMIN = 1.1d0
@@ -84,21 +83,20 @@ FUNCTION LUX_2016_Init(intervals) RESULT(D)
   CALL SetDetector(D,mass=100.9d0,time=332.0d0,Nevents_tot=1,           &
                    Backgr_tot=2.3d0,Nelem=1,Zelem=(/54/),               &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
-                   intervals=intervals,Emin=EMIN)
+                   Emin=EMIN)
   D%eff_file = '[LUX 2016]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_LUX_2016_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_LUX_2016_Init() &
  BIND(C,NAME='C_DDCalc_lux_2016_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = LUX_2016_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = LUX_2016_Init()
   C_LUX_2016_Init = N_Detectors
 END FUNCTION
 

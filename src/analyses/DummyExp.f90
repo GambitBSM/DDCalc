@@ -15,11 +15,10 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct of a dummy experiment
 !
-FUNCTION DummyExp_Init(intervals) RESULT(D)
+FUNCTION DummyExp_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER, PARAMETER :: NE = 151
   INTEGER, PARAMETER :: NBINS = 2 ! 2
   ! Efficiency curves energy tabulation points
@@ -139,39 +138,23 @@ FUNCTION DummyExp_Init(intervals) RESULT(D)
   REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
       = RESHAPE( (/ (/ EFF0(:), EFF1(:), EFF2(:) /) /) ,SHAPE(EFF))
 
-
-
-
-
-
-
-
-
-  ! One call for all settings.
-  ! Most of these _must_ be there to ensure everything get initialized.
-!  CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=1,               &
-!                   Backgr_tot=0.64d0,Nelem=1,Zelem=(/54/),               &
-!                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
-!                   intervals=intervals)
   CALL SetDetector(D,mass=118d0,time=85.3d0,Nevents_tot=11,               &
                    Backgr_tot = 1.3d0, &
                    Nelem=1,Zelem=(/54/),               &
-                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                    &
-                   intervals=intervals)
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF)
   D%eff_file = '[DummyExp]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_DummyExp_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_DummyExp_Init() &
  BIND(C,NAME='C_DDCalc_dummyexp_60_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = DummyExp_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = DummyExp_Init()
   C_DummyExp_Init = N_Detectors
 END FUNCTION
 

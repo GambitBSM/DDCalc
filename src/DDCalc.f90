@@ -97,16 +97,12 @@ MODULE DDCalc
 ! EXPERIMENTAL DETECTOR AND ANALYSIS
 !====================================
 ! Detector/Analysis initialization:
-!     TYPE(DetectorStruct) FUNCTION DDCalc_InitDetector(intervals)
-! Initialise an object carrying the information about the default
-! experimental analysis to consider.  Here intervals is a flag
-! indicating if calculations should be performed for analysis
-! sub-intervals (i.e. intervals between observed events).  This is
-! only necessary for maximum gap calculations and can be set to .FALSE.
-! for likelihood analyses. Returns a detector structure containing the
+!     TYPE(DetectorStruct) FUNCTION DDCalc_InitDetector()
+! Initialise an object carrying the information about the experimental
+! analysis to consider. Returns a detector structure containing the
 ! analysis details.  Non-default analyses can be obtained with
 ! specific functions:
-!     TYPE(DetectorStruct) FUNCTION [Analysis]_Init(intervals)
+!     TYPE(DetectorStruct) FUNCTION [Analysis]_Init()
 ! See DDExperiments.f90 and analyses/[Analysis].f90 for more details.
 ! Note that these functions are only available directly by USE-ing the
 ! DDExperiments module in the calling program, and will not be made
@@ -177,7 +173,6 @@ USE DDConstants
 USE DDTypes
 USE DDCommandLine
 USE DDNumerical
-USE DDExHelp
 USE DDWIMP
 USE DDDetectors
 USE DDRates
@@ -608,6 +603,32 @@ SUBROUTINE C_DDCalc_SetDetectorEmin(DetectorIndex,Emin) &
   CALL DDCalc_SetDetectorEmin(Detectors(DetectorIndex)%p,REAL(Emin,KIND=8))
 END SUBROUTINE
 
+!-----------------------------------------------------------------------
+! Initialise default detector
+! 
+FUNCTION DDCalc_InitDetector() RESULT(Detector)
+
+  IMPLICIT NONE
+  TYPE(DetectorStruct) :: Detector
+  Detector = DDCalc_InitDefaultDetector()
+
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_InitDetector
+!
+INTEGER(KIND=C_INT) FUNCTION C_DDCalc_InitDetector() &
+ BIND(C,NAME='C_DDExperiments_ddcalc_initdetector') 
+  USE ISO_C_BINDING, only: C_INT
+  IMPLICIT NONE
+  N_Detectors = N_Detectors + 1
+  IF (N_Detectors .GT. Max_Detectors) stop 'DDCalc: Max_Detectors exceeded.&
+   Please run FreeDetectors or modify Max_Detectors in DDTypes.f90.'
+  ALLOCATE(Detectors(N_Detectors)%p)
+  Detectors(N_Detectors)%p = DDCalc_InitDetector()
+  C_DDCalc_InitDetector = N_Detectors
+END FUNCTION
+  
 
 !=======================================================================
 ! MAIN ROUTINES
@@ -709,8 +730,7 @@ SUBROUTINE DDCalc_MainLogLikelihood()
   END IF
   
   ! Initializes detector, halo and WIMP structures.
-  ! Will calculate only total rates (not sub-intervals).
-  Detector = InitializeCommandLine(WIMP, Halo, intervals=.FALSE.)
+  Detector = InitializeCommandLine(WIMP, Halo)
   
   ! Print header
   IF (VerbosityLevel .GE. 2) THEN
@@ -754,8 +774,7 @@ SUBROUTINE DDCalc_MainLogLikelihoodInteractive()
   END IF
   
   ! Initializes detector, halo and WIMP structures.
-  ! Will calculate only total rates (not sub-intervals).
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.FALSE.)
+  Detector = InitializeCommandLine(WIMP,Halo)
   
   ! Print header
   IF (VerbosityLevel .GE. 2) THEN
@@ -1045,8 +1064,7 @@ SUBROUTINE DDCalc_MainConstraintsSI()
   END IF
   
   ! Initializes detector, halo and WIMP structures.
-  ! Do not need sub-intervals as we only use the total events.
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.FALSE.)
+  Detector = InitializeCommandLine(WIMP,Halo)
   
   ! Determine WIMP mass tabulation
   mmin    =    0.5d0
@@ -1126,8 +1144,7 @@ SUBROUTINE DDCalc_MainConstraintsSD()
   END IF
   
   ! Initializes detector, halo and WIMP structures.
-  ! Do not need sub-intervals as we only use the total events.
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.FALSE.)
+  Detector = InitializeCommandLine(WIMP,Halo)
   
   ! Determine WIMP mass tabulation
   mmin    =    1d0
@@ -1207,9 +1224,7 @@ SUBROUTINE DDCalc_MainLimitsSI()
   END IF
   
   ! Initializes detector, halo and WIMP structures.
-  ! Will calculate rates for sub-intervals as these are used by
-  ! maximum gap method.
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.TRUE.)
+  Detector = InitializeCommandLine(WIMP,Halo)
   
   ! Determine WIMP mass tabulation
   mmin    =    0.5d0
@@ -1286,9 +1301,7 @@ SUBROUTINE DDCalc_MainLimitsSD()
   END IF
   
   ! Initializes detector, halo and WIMP structures.
-  ! Will calculate rates for sub-intervals as these are used by
-  ! maximum gap method.
-  Detector = InitializeCommandLine(WIMP,Halo,intervals=.TRUE.)
+  Detector = InitializeCommandLine(WIMP,Halo)
   
   ! Determine WIMP mass tabulation
   mmin    =    1d0
@@ -1368,18 +1381,13 @@ END SUBROUTINE
 !               the total rate (default: true).  These are unnecessary
 !               for some calculations.
 ! 
-FUNCTION InitializeCommandLine(WIMP, Halo, intervals) RESULT(Detector)
+FUNCTION InitializeCommandLine(WIMP, Halo) RESULT(Detector)
 
   IMPLICIT NONE
   TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
   TYPE(HaloStruct), INTENT(INOUT) :: Halo  
-  LOGICAL, INTENT(IN), OPTIONAL :: intervals
-  LOGICAL :: intervals0
   TYPE(ArgumentStruct) :: Arguments
   TYPE(DetectorStruct) :: Detector
-  
-  intervals0 = .TRUE.
-  IF (PRESENT(intervals)) intervals0 = intervals
   
   ! Extract parameters and options from command-line.
   Arguments = ReadArguments()
@@ -1395,7 +1403,7 @@ FUNCTION InitializeCommandLine(WIMP, Halo, intervals) RESULT(Detector)
   Halo = DDCalc_InitHaloCommandLine()
 
   ! Initialize detector
-  Detector = DDCalc_ChooseAnalysisCommandLine(intervals=intervals0)
+  Detector = AvailableAnalyses()
     
 END FUNCTION
 

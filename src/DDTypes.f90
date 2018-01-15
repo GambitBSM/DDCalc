@@ -174,20 +174,13 @@ TYPE, PUBLIC :: DetectorStruct
   ! File containing efficiencies
   CHARACTER(LEN=1024) :: eff_file = ''
   
-  ! Number of S1 bins/intervals with efficiencies.
-  ! Will calculate rates for each bin/interval plus total.
+  ! Number of bins with efficiencies.
+  ! Will calculate rates for each bin plus total.
   INTEGER :: Nbins = -1
   
-  ! Array of size [1:Niso,1:NE,0:Nbins] with the third index for the S1
-  ! bin/interval (zero for full range)
-  REAL*8, ALLOCATABLE :: eff(:,:,:)
-  
-  ! Indicates if rates for intervals/bins are to also be calculated
-  ! in addition to the total rate.  Needed for maximum gap analysis,
-  ! but unnecessary for likelihood.  This flag is ignored if the
-  ! efficiencies for intervals/bins are not provided.
-  LOGICAL :: intervals = .FALSE.
-  
+  ! Array of size [1:Niso,1:NE,0:Nbins] with the third index for the
+  ! bin (zero for full range)
+  REAL*8, ALLOCATABLE :: eff(:,:,:)  
   
   ! Form factors -------------------------------
   ! Tabulated spin-independent or spin-dependent form factors combined
@@ -233,7 +226,7 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Integrated rate --------
   ! Efficiency-corrected rates.  Array is of size
-  ! [0:Nbins] with the index being that of the S1 bin/interval
+  ! [0:Nbins] with the index being that of the bin
   ! efficiency curve used in the integral (0 for full range).
   ! [cpd/kg]
   REAL*8, ALLOCATABLE :: R(:)

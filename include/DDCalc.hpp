@@ -86,7 +86,7 @@ namespace DDCalc
 
   // Create a DetectorStruct object internally in DDCalc with default values
   // and return an index for it. 
-  int InitDetector(const bool intervals=true) { return C_DDExperiments_ddcalc_initdetector(intervals); }
+  int InitDetector() { return C_DDExperiments_ddcalc_initdetector(); }
 
 
   //########## Halo setter #############################################

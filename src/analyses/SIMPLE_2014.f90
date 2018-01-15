@@ -18,16 +18,12 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct to the SIMPLE 2014 analysis.
 ! 
-! Required input arguments:
-!     intervals   Indicates if sub-intervals should be included
-! 
-FUNCTION SIMPLE_2014_Init(intervals) RESULT(D)
+FUNCTION SIMPLE_2014_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
   REAL*8, ALLOCATABLE :: EFF_AllIso(:,:,:)
   INTEGER :: Kiso
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER :: K,Kmin,Kmax,Niso,Niso0
   INTEGER, ALLOCATABLE :: Ziso(:),Ziso0(:),Aiso(:),Aiso0(:)
   REAL*8, ALLOCATABLE :: fiso(:),fiso0(:),Miso(:),Miso0(:)
@@ -51,7 +47,6 @@ FUNCTION SIMPLE_2014_Init(intervals) RESULT(D)
   Miso = Miso0(1:Niso)
   
   ! Set efficiencies.
-  ! No event energies, so no intervals for max gap calculations.
   ! Tabulation set at 100 per decade, up to 1000 keV.
   Ethresh = 8d0      ! F & Cl only, C is ~ 100 keV
   Gamma   = 4.2d0    ! 4.2 +/- 0.3
@@ -68,22 +63,20 @@ FUNCTION SIMPLE_2014_Init(intervals) RESULT(D)
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,exposure=18.24d0,Nevents_tot=8,Backgr_tot=12.7d0,      &
                    Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,                 &
-                   NE=NE,E=E,Nbins=0,eff_all=eff,                           &
-                   intervals=.FALSE.)
+                   NE=NE,E=E,Nbins=0,eff_all=eff)
   D%eff_file = '[SIMPLE 2014]'
   
 END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_SIMPLE_2014_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_SIMPLE_2014_Init() &
  BIND(C,NAME='C_DDCalc_simple_2014_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = SIMPLE_2014_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = SIMPLE_2014_Init()
   C_SIMPLE_2014_Init = N_Detectors
 END FUNCTION
 

@@ -19,24 +19,24 @@ extern "C"
 {
   
   // Experiment initialization (factory functions)
-  int C_DDCalc_xenon100_2012_init(const bool&);
-  int C_DDCalc_lux_2013_init(const bool&);
-  int C_DDCalc_lux_2016_init(const bool&);
-  int C_DDCalc_pandax_2016_init(const bool&);
-  int C_DDCalc_pandax_2017_init(const bool&);
-  int C_DDCalc_xenon1t_2017_init(const bool&);
-  int C_DDCalc_lux_2015_init(const bool&);
-  int C_DDCalc_pico_2l_init(const bool&);
-  int C_DDCalc_pico_60_f_init(const bool&);
-  int C_DDCalc_pico_60_i_init(const bool&);
-  int C_DDCalc_pico_60_init(const bool&);
-  int C_DDCalc_pico_60_2017_init(const bool&);
-  int C_DDCalc_supercdms_2014_init(const bool&);
-  int C_DDCalc_simple_2014_init(const bool&);
-  int C_DDCalc_darwin_ar_init(const bool&);
-  int C_DDCalc_darwin_xe_init(const bool&);
-  int C_DDCalc_cresst_ii_init(const bool&);
-  int C_DDCalc_dummyexp_init(const bool&);
+  int C_DDCalc_xenon100_2012_init();
+  int C_DDCalc_lux_2013_init();
+  int C_DDCalc_lux_2016_init();
+  int C_DDCalc_pandax_2016_init();
+  int C_DDCalc_pandax_2017_init();
+  int C_DDCalc_xenon1t_2017_init();
+  int C_DDCalc_lux_2015_init();
+  int C_DDCalc_pico_2l_init();
+  int C_DDCalc_pico_60_f_init();
+  int C_DDCalc_pico_60_i_init();
+  int C_DDCalc_pico_60_init();
+  int C_DDCalc_pico_60_2017_init();
+  int C_DDCalc_supercdms_2014_init();
+  int C_DDCalc_simple_2014_init();
+  int C_DDCalc_darwin_ar_init();
+  int C_DDCalc_darwin_xe_init();
+  int C_DDCalc_cresst_ii_init();
+  int C_DDCalc_dummyexp_init();
 
 }
   
@@ -52,94 +52,94 @@ namespace DDCalc
   // flag is ignored for experimental analysis lacking the event energies
   // necessary for a maximum gap analysis.
 
-  int XENON100_2012_Init(const bool intervals=true)
+  int XENON100_2012_Init()
   {
-    C_DDCalc_xenon100_2012_init(intervals);
+    C_DDCalc_xenon100_2012_init();
   }
   
-  int LUX_2013_Init(const bool intervals=true)
+  int LUX_2013_Init()
   {
-    C_DDCalc_lux_2013_init(intervals);
+    C_DDCalc_lux_2013_init();
   }
   
-  int LUX_2016_Init(const bool intervals=true)
+  int LUX_2016_Init()
   {
-    C_DDCalc_lux_2016_init(intervals);
+    C_DDCalc_lux_2016_init();
   }
   
-  int PandaX_2016_Init(const bool intervals=true)
+  int PandaX_2016_Init()
   {
-    C_DDCalc_pandax_2016_init(intervals);
+    C_DDCalc_pandax_2016_init();
   }
 
-  int PandaX_2017_Init(const bool intervals=true)
+  int PandaX_2017_Init()
   {
-    C_DDCalc_pandax_2017_init(intervals);
+    C_DDCalc_pandax_2017_init();
   }
 
-  int Xenon1T_2017_Init(const bool intervals=true)
+  int Xenon1T_2017_Init()
   {
-    C_DDCalc_xenon1t_2017_init(intervals);
+    C_DDCalc_xenon1t_2017_init();
   }
 
-  int LUX_2015_Init(const bool intervals=true)
+  int LUX_2015_Init()
   {
-    C_DDCalc_lux_2015_init(intervals);
+    C_DDCalc_lux_2015_init();
   }
 
-  int PICO_2L_Init(const bool intervals=true)
+  int PICO_2L_Init()
   {
-    C_DDCalc_pico_2l_init(intervals);
+    C_DDCalc_pico_2l_init();
   }
 
-  int PICO_60_F_Init(const bool intervals=true)
+  int PICO_60_F_Init()
   {
-    C_DDCalc_pico_60_f_init(intervals);
+    C_DDCalc_pico_60_f_init();
   }
 
-  int PICO_60_I_Init(const bool intervals=true)
+  int PICO_60_I_Init()
   {
-    C_DDCalc_pico_60_i_init(intervals);
+    C_DDCalc_pico_60_i_init();
   }
 
-  int PICO_60_Init(const bool intervals=true)
+  int PICO_60_Init()
   {
-    C_DDCalc_pico_60_init(intervals);
+    C_DDCalc_pico_60_init();
   }
 
-  int PICO_60_2017_Init(const bool intervals=true)
+  int PICO_60_2017_Init()
   {
-    C_DDCalc_pico_60_2017_init(intervals);
+    C_DDCalc_pico_60_2017_init();
   }
   
-  int SuperCDMS_2014_Init(const bool intervals=true)
+  int SuperCDMS_2014_Init()
   {
-    C_DDCalc_supercdms_2014_init(intervals);
+    C_DDCalc_supercdms_2014_init();
   }
   
-  int SIMPLE_2014_Init(const bool intervals=true)
+  int SIMPLE_2014_Init()
   {
-    C_DDCalc_simple_2014_init(intervals);
+    C_DDCalc_simple_2014_init();
   }
   
-  int DARWIN_Ar_Init(const bool intervals=true)
+  int DARWIN_Ar_Init()
   {
-    C_DDCalc_darwin_ar_init(intervals);
+    C_DDCalc_darwin_ar_init();
   }
   
-  int DARWIN_Xe_Init(const bool intervals=true)
+  int DARWIN_Xe_Init()
   {
-    C_DDCalc_darwin_xe_init(intervals);
+    C_DDCalc_darwin_xe_init();
   }
 
-  int CRESST_II_Init(const bool intervals=true)
+  int CRESST_II_Init()
   {
-    C_DDCalc_cresst_ii_init(intervals);
+    C_DDCalc_cresst_ii_init();
   }
   
-  int DummyExp_Init(const bool intervals=true)
+  int DummyExp_Init()
   {
-    C_DDCalc_dummyexp_init(intervals);
+    C_DDCalc_dummyexp_init();
   }
     
 }

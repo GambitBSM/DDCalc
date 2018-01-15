@@ -19,14 +19,10 @@ CONTAINS
 !-----------------------------------------------------------------------
 ! Initializes a DetectorStruct to the SuperCDMS 2014 analysis.
 ! 
-! Required input arguments:
-!     intervals   Indicates if sub-intervals should be included
-! 
-FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
+FUNCTION SuperCDMS_2014_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
-  LOGICAL, INTENT(IN) :: intervals
   INTEGER :: K
   INTEGER, PARAMETER :: NE = 1112
   ! Efficiency curves energy tabulation points
@@ -654,14 +650,12 @@ FUNCTION SuperCDMS_2014_Init(intervals) RESULT(D)
     ! These settings are for the analysis with all detectors
     CALL SetDetector(D,mass=4.2d0,time=137.4d0,Nevents_tot=11,          &
                      Backgr_tot=6.1d0,Nelem=1,Zelem=(/32/),             &
-                     NE=NE,E=E,Nbins=Nintervals,eff_all=eff,            &
-                     intervals=intervals)
+                     NE=NE,E=E,Nbins=Nintervals,eff_all=eff)
   ELSE
     ! These settings are for the analysis without t5z3
     CALL SetDetector(D,mass=3.6d0,time=137.4d0,Nevents_tot=8,           &
                      Backgr_tot=6.07d0,Nelem=1,Zelem=(/32/),            &
-                     NE=NE,E=E,Nbins=Nintervals,eff_all=eff,            &
-                     intervals=intervals)
+                     NE=NE,E=E,Nbins=Nintervals,eff_all=eff)
   END IF
   
   D%eff_file = '[SuperCDMS 2014]'
@@ -670,14 +664,13 @@ END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_SuperCDMS_2014_Init(intervals) &
+INTEGER(KIND=C_INT) FUNCTION C_SuperCDMS_2014_Init() &
  BIND(C,NAME='C_DDCalc_supercdms_2014_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
-  LOGICAL(KIND=C_BOOL), INTENT(IN) :: intervals
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = SuperCDMS_2014_Init(LOGICAL(intervals))
+  Detectors(N_Detectors)%p = SuperCDMS_2014_Init()
   C_SuperCDMS_2014_Init = N_Detectors
 END FUNCTION
 
