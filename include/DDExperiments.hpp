@@ -30,6 +30,7 @@ extern "C"
   int C_DDCalc_pico_60_init();
   int C_DDCalc_pico_60_2017_init();
   int C_DDCalc_supercdms_2014_init();
+  int C_DDCalc_cdmslite_init();
   int C_DDCalc_simple_2014_init();
   int C_DDCalc_darwin_ar_init();
   int C_DDCalc_darwin_xe_init();
