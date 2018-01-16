@@ -5,15 +5,12 @@ PROGRAM DDLikelihood
   USE DDConstants
   USE DDCouplings
   USE DDTypes
-  USE DDCommandLine
   USE DDNumerical
   USE DDWIMP
   USE DDDetectors
   USE DDRates
   USE DDStats
   USE DDHalo
-  USE DDOutput
-  USE DDTabulation
   USE DDNuclear
 
   IMPLICIT NONE

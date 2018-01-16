@@ -86,20 +86,11 @@ PROGRAM DDCalc_exampleF
   WIMP = DDCalc_InitWIMP()
 
   ! Explicitly create detector objects for all the experiments to be
-  ! used (set up isotopes, efficiencies, array sizing, etc.)  The   
-  ! argument indicates if extra sub-interval calculations should
-  ! be performed.  Those calculations are required for maximum gap
-  ! analyses, but are unnecessary for calculating total rates and
-  ! likelihoods.  If .FALSE. is given, a no-background-subtraction
-  ! p-value can still be calculated, but a Poisson is used instead
-  ! of the maximum gap.  We show some maximum gap results below, so
-  ! we must use .TRUE. here (the flag is ignored for experiments
-  ! that do not have the event energies necessary for a maximum gap
-  ! analysis).
-  XENON    = XENON100_2012_Init(.TRUE.)
-  LUX      = LUX_2013_Init(.TRUE.)
-  SCDMS    = SuperCDMS_2014_Init(.TRUE.)
-  SIMPLE   = SIMPLE_2014_Init(.TRUE.)
+  ! used (set up isotopes, efficiencies, array sizing, etc.)
+  XENON    = XENON100_2012_Init()
+  LUX      = LUX_2013_Init()
+  SCDMS    = SuperCDMS_2014_Init()
+  SIMPLE   = SIMPLE_2014_Init()
   
   ! Can optionally specify a minimum recoil energy to be included in
   ! the rate calculations [keV].  Note the efficiency curves already
@@ -167,7 +158,7 @@ PROGRAM DDCalc_exampleF
     
     ! Header
     WRITE(*,'(A20,5(2X,A11))') '',' XENON 2012',' LUX 2013  ',          &
-        'SuCDMS 2014','SIMPLE 2014',' (special) '
+        'SuCDMS 2014','SIMPLE 2014'
     !WRITE(*,'(A20,7(1X,A12))') '','-----------','-----------',          &
     !    '-----------','-----------','-----------','-----------',        &
     !    '-----------'
@@ -193,43 +184,27 @@ PROGRAM DDCalc_exampleF
         DDCalc_Signal(SIMPLE)
     
     ! The log-likelihoods for the current WIMP; note these are _not_
-    ! multiplied by -2.  The likelihood is calculated using a Poisson
-    ! given the observed number of events and expected signal+background.
+    ! multiplied by -2.
     WRITE(*,'(A20,5(2X,1PG11.4))')  'Log-likelihood                  ', &
         DDCalc_LogLikelihood(XENON), &
         DDCalc_LogLikelihood(LUX), &
         DDCalc_LogLikelihood(SCDMS), &
         DDCalc_LogLikelihood(SIMPLE)
-    
-    ! The logarithm of the p-value, calculated without background
-    ! subtraction, using either the maximum gap statistic or a Poisson
-    ! statistic, depending on how the detector was initialized.  Note
-    ! that this is actually a conservative upper _bound_ on the p-value
-    ! in the event of an unknown background and is useful for excluding
-    ! WIMP parameters.  However, since it is not a true p-value, it
-    ! should not be interpreted as being related to any particular
-    ! likelihood.
-    WRITE(*,'(A20,5(2X,1PG11.4))')  'Max gap log(p-value)            ', &
-        DDCalc_LogPValue(XENON), &
-        DDCalc_LogPValue(LUX), &
-        DDCalc_LogPValue(SCDMS), &
-        DDCalc_LogPValue(SIMPLE)
-    
+        
     ! The factor x by which the current WIMP cross- sections must be
     ! multiplied (sigma -> x*sigma, applied to all four WIMP-nucleon
     ! cross-sections) to achieve the given p-value (specified by its
-    ! logarithm).  Useful for finding the no-background-subtraction
-    ! exclusion limits.  For example, if setWIMP_msigma(100d0,10d0,10d0,
+    ! logarithm). For example, if setWIMP_msigma(100d0,10d0,10d0,
     ! 0d0,0d0) is called, then x*(10. pb) would be the SI cross-section
     ! at a WIMP mass of 100 GeV at which the experiment is excluded at
     ! the 90% CL (p=1-CL).
     lnp = LOG(0.1d0)
-    WRITE(*,'(A20,5(2X,1PG11.4))')  'Max gap x for 90% CL            ', &
+    WRITE(*,'(A20,5(2X,1PG11.4))')  'Rescaling for 90% CL            ', &
         DDCalc_ScaleToPValue(XENON), &
         DDCalc_ScaleToPValue(LUX), &
         DDCalc_ScaleToPValue(SCDMS), &
         DDCalc_ScaleToPValue(SIMPLE)
-    WRITE(*,'(A60)')  '  * Factor x such that sigma->x*sigma gives desired p-value'
+    WRITE(*,'(A99)')  ' * This is the factor by which the cross section must be rescaled to give the desired p-value'
     
     !WRITE(*,*)
     

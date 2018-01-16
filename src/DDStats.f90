@@ -161,18 +161,19 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   ! Starting point
   x1   = 1d0 / mu
   lnp1 = (LogLikelihood(D,x1)-LogLikelihood(D,0.d0))
+
   ! Bracket
-  IF (lnp1 .GT. lnp) THEN
+  IF (lnp1 .GT. lnp0) THEN
     x2   = 2d0*x1
     lnp2 = (LogLikelihood(D,x2)-LogLikelihood(D,0.d0))
-    DO WHILE (lnp2 .GE. lnp)
+    DO WHILE (lnp2 .GE. lnp0)
       x1   = x2
       lnp1 = lnp2
       x2   = 2d0*x2
       lnp2 = (LogLikelihood(D,x2)-LogLikelihood(D,0.d0))
     END DO
   ELSE
-    DO WHILE (lnp1 .LE. lnp)
+    DO WHILE (lnp1 .LE. lnp0)
       x2   = x1
       lnp2 = lnp1
       x1   = 0.5d0*x1
@@ -184,7 +185,7 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   DO WHILE ((ABS(lnp2-lnp1) .GT. 1d-5) .AND. (ABS(LOG(x2/x1)) .GT. 1d-5))
     xm   = SQRT(x1*x2)
     lnpm = (LogLikelihood(D,xm)-LogLikelihood(D,0.d0))
-    IF (lnpm .GE. lnp) THEN
+    IF (lnpm .GE. lnp0) THEN
       x1   = xm
       lnp1 = lnpm
     ELSE

@@ -149,7 +149,7 @@ END FUNCTION
 
 ! C++ interface wrapper
 INTEGER(KIND=C_INT) FUNCTION C_DummyExp_Init() &
- BIND(C,NAME='C_DDCalc_dummyexp_60_init') 
+ BIND(C,NAME='C_DDCalc_dummyexp_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
   N_Detectors = N_Detectors + 1

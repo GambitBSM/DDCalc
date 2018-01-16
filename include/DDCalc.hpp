@@ -26,7 +26,7 @@ extern "C"
   // Default initialisation (factory functions)
   int C_DDWIMP_ddcalc_initwimp();
   int C_DDHalo_ddcalc_inithalo();
-  int C_DDExperiments_ddcalc_initdetector(const bool&);
+  int C_DDExperiments_ddcalc_initdetector();
 
   // Halo setter
   void C_DDCalc_ddcalc_setshm(const int&, const double&, const double&, const double&,

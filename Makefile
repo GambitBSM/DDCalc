@@ -157,17 +157,17 @@ endif
 #################### FILES / TARGETS #######################
 
 # Main programs
-fprograms := DDCalc_run DDTest DDLikelihood
+fprograms := DDTest DDLikelihood
 
 # Example/test programs
 ftestprograms := DDCalc_exampleF
 ctestprograms := DDCalc_exampleC
 
 # Fortran sources
-fsrc := DDConstants.f90 DDTypes.f90 DDCommandLine.f90 DDNuclear.f90 \
+fsrc := DDConstants.f90 DDTypes.f90 DDNuclear.f90 \
         DDUtils.f90 DDNumerical.f90 DDStats.f90 DDCouplings.f90 \
-        DDWIMP.f90 DDInput.f90 DDHalo.f90 DDRates.f90 DDOutput.f90 \
-        DDDetectors.f90 DDTabulation.f90 DDExperiments.f90 \
+        DDWIMP.f90 DDInput.f90 DDHalo.f90 DDRates.f90 \
+        DDDetectors.f90 DDExperiments.f90 \
         DDCalc.f90
 analyses := DARWIN_Ar.f90 DARWIN_Xe.f90 LUX_2013.f90 SIMPLE_2014.f90 \
             SuperCDMS_2014.f90 XENON100_2012.f90 LUX_2016.f90 \
@@ -223,22 +223,17 @@ $(ctestprograms): $(cincludes)
 $(BUILD)/DDCalc.o: $(BUILD)/DDExperiments.o \
  $(BUILD)/DDConstants.o \
  $(BUILD)/DDTypes.o \
- $(BUILD)/DDCommandLine.o \
  $(BUILD)/DDNumerical.o \
  $(BUILD)/DDWIMP.o \
  $(BUILD)/DDDetectors.o \
  $(BUILD)/DDRates.o \
  $(BUILD)/DDStats.o \
- $(BUILD)/DDHalo.o \
- $(BUILD)/DDOutput.o \
- $(BUILD)/DDTabulation.o
+ $(BUILD)/DDHalo.o
 $(BUILD)/DDCouplings.o: $(BUILD)/DDConstants.o
 $(BUILD)/DDDetectors.o: $(BUILD)/DDTypes.o \
- $(BUILD)/DDCommandLine.o \
  $(BUILD)/DDNuclear.o \
  $(BUILD)/DDUtils.o \
- $(BUILD)/DDInput.o \
- $(BUILD)/DDOutput.o
+ $(BUILD)/DDInput.o
 $(BUILD)/DDExperiments.o: $(BUILD)/XENON100_2012.o \
  $(BUILD)/LUX_2013.o \
  $(BUILD)/SIMPLE_2014.o \
@@ -261,29 +256,17 @@ $(BUILD)/DDHalo.o: $(BUILD)/DDConstants.o \
  $(BUILD)/DDTypes.o \
  $(BUILD)/DDUtils.o \
  $(BUILD)/DDNumerical.o \
- $(BUILD)/DDCommandLine.o \
  $(BUILD)/DDInput.o
 $(BUILD)/DDInput.o: $(BUILD)/DDUtils.o
 $(BUILD)/DDNuclear.o: $(BUILD)/DDConstants.o
 $(BUILD)/DDNumerical.o: $(BUILD)/DDUtils.o
-$(BUILD)/DDOutput.o: $(BUILD)/DDUtils.o \
- $(BUILD)/DDConstants.o \
- $(BUILD)/DDTypes.o \
- $(BUILD)/DDInput.o \
- $(BUILD)/DDStats.o \
- $(BUILD)/DDRates.o \
- $(BUILD)/DDCouplings.o \
- $(BUILD)/DDCommandLine.o
 $(BUILD)/DDRates.o: $(BUILD)/DDTypes.o \
  $(BUILD)/DDHalo.o
 $(BUILD)/DDStats.o: $(BUILD)/DDTypes.o \
  $(BUILD)/DDNumerical.o
-$(BUILD)/DDTabulation.o: $(BUILD)/DDTypes.o \
- $(BUILD)/DDCommandLine.o
 $(BUILD)/DDUtils.o: $(BUILD)/DDTypes.o
 $(BUILD)/DDWIMP.o: $(BUILD)/DDTypes.o \
  $(BUILD)/DDUtils.o \
- $(BUILD)/DDCommandLine.o \
  $(BUILD)/DDCouplings.o
 
 #################### RULES #################################

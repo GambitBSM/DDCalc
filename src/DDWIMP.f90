@@ -8,7 +8,6 @@ MODULE DDWIMP
 
 USE DDTypes
 USE DDUtils
-USE DDCommandLine
 USE DDCouplings
 
 IMPLICIT NONE
@@ -16,7 +15,7 @@ PRIVATE
 
 ! WIMP mass & couplings routines
 PUBLIC :: DDCalc_GetWIMP,DDCalc_SetWIMP,     &
-          DDCalc_InitWIMP,DDCalc_InitWIMPCommandLine, &
+          DDCalc_InitWIMP,                   &
           ParseWIMPInput, C_DDCalc_InitWIMP
 INTERFACE DDCalc_GetWIMP
   MODULE PROCEDURE GetWIMP
@@ -26,9 +25,6 @@ INTERFACE DDCalc_SetWIMP
 END INTERFACE
 INTERFACE DDCalc_InitWIMP
   MODULE PROCEDURE InitWIMP
-END INTERFACE
-INTERFACE DDCalc_InitWIMPCommandLine
-  MODULE PROCEDURE InitWIMPCommandLine
 END INTERFACE
 
 CONTAINS
@@ -145,84 +141,6 @@ INTEGER(KIND=C_INT) FUNCTION C_DDCalc_InitWIMP() &
   C_DDCalc_InitWIMP = N_WIMPs
 END FUNCTION
 
-
-!-----------------------------------------------------------------------
-! Initializes WIMP from command-line parameters.
-! 
-! Possible options:
-!   --m=<value>          ! WIMP mass [GeV]
-!   --GpSI=<value>       ! Spin-independent WIMP-proton coupling [GeV^-2].
-!   --GnSI=<value>       ! Spin-independent WIMP-neutron coupling [GeV^-2].
-!   --GpSD=<value>       ! Spin-dependent WIMP-proton coupling [GeV^-2].
-!   --GnSD=<value>       ! Spin-dependent WIMP-neutron coupling [GeV^-2].
-!   --fp=<value>         ! Spin-independent WIMP-proton coupling [GeV^-2].
-!                        ! Related by GpSI = 2 fp.
-!   --fn=<value>         ! Spin-independent WIMP-neutron coupling [GeV^-2].
-!                        ! Related by GnSI = 2 fn.
-!   --ap=<value>         ! Spin-dependent WIMP-proton coupling [unitless].
-!                        ! Related by GpSD = 2\sqrt{2} G_F ap.
-!   --an=<value>         ! Spin-dependent WIMP-neutron coupling [unitless].
-!                        ! Related by GnSD = 2\sqrt{2} G_F an.
-! Cross-section options may be given as negative values to indicate the
-! corresponding coupling should be negative:
-!   --sigmapSI=<value>   ! Spin-independent WIMP-proton cross-section [pb].
-!   --sigmanSI=<value>   ! Spin-independent WIMP-neutron cross-section [pb].
-!   --sigmapSD=<value>   ! Spin-dependent WIMP-proton cross-section [pb].
-!   --sigmanSD=<value>   ! Spin-dependent WIMP-neutron cross-section [pb].
-!   --sigmaSI=<value>    ! Sets both sigmapSI and sigmanSI to the given value [pb].
-!   --sigmaSD=<value>    ! Sets both sigmapSD and sigmanSD to the given value [pb].
-! 
-FUNCTION InitWIMPCommandLine(Arguments) RESULT(WIMP)
-
-  IMPLICIT NONE
-  TYPE(ArgumentStruct), INTENT(IN) :: Arguments
-  TYPE(WIMPStruct) :: WIMP
-  LOGICAL :: status
-  REAL*8 :: x, m, fp, fn, ap, an
-  
-  ! Defauls values
-  m = 100d0
-  fp = 1d-9
-  fn = 1d-9
-  ap = 0d0
-  an = 0d0
-
-  IF (GetLongArgReal('m',x)) m = x
-
-  IF (Arguments%Nparameters .GE. 1) THEN
-    x = Arguments%values(1)
-    IF (x .GT. 0d0) m = x
-  END IF
-  
-  IF (GetLongArgReal('GpSI',x)) fp = GtoF(x)
-  IF (GetLongArgReal('GnSI',x)) fn = GtoF(x)
-  IF (GetLongArgReal('GpSD',x)) an = GtoA(x)
-  IF (GetLongArgReal('GnSD',x)) ap = GtoA(x)
-  IF (GetLongArgReal('fp',x))   fp = x
-  IF (GetLongArgReal('fn',x))   fn = x
-  IF (GetLongArgReal('ap',x))   ap = x
-  IF (GetLongArgReal('an',x))   an = x
-  IF (GetLongArgReal('sigmapSI',x)) fp = SigmapSItoFp(m,x)
-  IF (GetLongArgReal('sigmanSI',x)) fn = SigmanSItoFn(m,x)
-  IF (GetLongArgReal('sigmapSD',x)) ap = SigmapSDtoAp(m,x)
-  IF (GetLongArgReal('sigmanSD',x)) an = SigmanSDtoAn(m,x)
-  IF (GetLongArgReal('sigmaSI',x)) THEN
-    fp = SigmapSItoFp(m,x)
-    fn = SigmanSItoFn(m,x)
-  END IF
-  IF (GetLongArgReal('sigmaSD',x)) THEN
-    ap = SigmapSDtoAp(m,x)
-    an = SigmanSDtoAn(m,x)
-  END IF
-
-  CALL SetWIMP(WIMP, m=m, DMtype='SISD', params=[fp,fn,ap,an])
-  
-  ! Process command-line arguments (if more than just mass)
-  IF (Arguments%Nparameters .GE. 1) THEN
-    status = ParseWIMPParameters(Arguments%Nparameters,Arguments%values,WIMP)
-  END IF
-  
-END FUNCTION
 
 
 !-----------------------------------------------------------------------

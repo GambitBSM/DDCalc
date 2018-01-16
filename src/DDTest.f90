@@ -4,15 +4,12 @@ PROGRAM DDTest
   USE DDExperiments
   USE DDConstants
   USE DDTypes
-  USE DDCommandLine
   USE DDNumerical
   USE DDWIMP
   USE DDDetectors
   USE DDRates
   USE DDStats
   USE DDHalo
-  USE DDOutput
-  USE DDTabulation
   USE DDNuclear
 
   IMPLICIT NONE

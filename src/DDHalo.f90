@@ -11,7 +11,6 @@ USE DDConstants
 USE DDTypes
 USE DDUtils
 USE DDNumerical
-USE DDCommandLine
 USE DDInput
 
 IMPLICIT NONE
@@ -30,7 +29,7 @@ INTERFACE MeanInverseSpeed
 END INTERFACE
 
 PUBLIC :: DDCalc_GetHalo,DDCalc_SetHalo, &
-          DDCalc_InitHalo,DDCalc_InitHaloCommandLine, &
+          DDCalc_InitHalo,               &
           EToVmin, MeanInverseSpeed, C_DDCalc_InitHalo
 INTERFACE DDCalc_GetHalo
   MODULE PROCEDURE GetHalo
@@ -40,9 +39,6 @@ INTERFACE DDCalc_SetHalo
 END INTERFACE
 INTERFACE DDCalc_InitHalo
   MODULE PROCEDURE InitHalo
-END INTERFACE
-INTERFACE DDCalc_InitHaloCommandLine
-  MODULE PROCEDURE InitHaloCommandLine
 END INTERFACE
 
 ! Parameters describing the dark matter halo.  Only the Standard Halo
@@ -331,106 +327,6 @@ INTEGER(KIND=C_INT) FUNCTION C_DDCalc_InitHalo() &
   Halos(N_Halos)%p = InitHalo()
   C_DDCalc_InitHalo = N_Halos
 END FUNCTION
-
-
-!-----------------------------------------------------------------------
-! Initializes halo from command-line parameters.
-! 
-! Possible options regarding galactic motions:
-!   --vrot=<value>       ! Local galactic disk rotation speed [km/s].
-!   --vlsr=<x>,<y>,<z>   ! Local standard of rest velocity vector (array of size 3)
-!                        ! [km/s], defined relative to galactic rest frame.
-!   --vpec=<x>,<y>,<z>   ! Sun's peculiar velocity vector (array of size 3) [km/s],
-!                        ! defined relative to local standard of rest.
-!   --vsun=<x>,<y>,<z>   ! Sun's velocity vector (array of size 3) [km/s], defined
-!                        ! relative to galactic rest frame.
-! Possible options regarding dark matter density:
-!   --rho=<value>        ! Local dark matter density [GeV/cm^3]
-! Possible options regarding SHM distribution:
-!   --vbulk=<x>,<y>,<z>  ! Bulk velocity of dark matter (array of size 3) [km/s],
-!                        ! defined relative to galactic rest frame.
-!   --vobs=<value>       ! Observer/detector's speed (i.e. Sun's speed) [km/s],
-!                        ! defined relative to MB rest frame.
-!   --v0=<value>         ! Most probable speed [km/s] in the galactic rest frame.
-!   --vesc=<value>       ! Escape speed of the dark matter population [km/s] in
-!                        ! its rest frame.
-! Possible options for provided a tabulated eta(vmin) instead of using the above
-! SHM distribution.
-!   --eta-file=<file>    ! File from which tabulated mean inverse speed eta(vmin)
-!                        ! should be read.  First column is vmin [km/s] and second
-!                        ! column is eta [s/km].  Default behavior is to do explicit
-!                        ! calculations for SHM.
-!   --eta-file=<file>,<K>! Same as above, but take the Kth column for eta.
-! 
-FUNCTION InitHaloCommandLine() RESULT(Halo)
-
-  IMPLICIT NONE
-  TYPE(HaloStruct) :: Halo
-  CHARACTER(LEN=1024) :: eta_file
-  INTEGER :: I,K,Nval,ios
-  REAL*8 :: vrot,vobs,rho,v0,vesc
-  REAL*8, ALLOCATABLE :: vlsr(:),vpec(:),vsun(:),vbulk(:)
-  ! Older compiler compatibility
-  INTEGER, PARAMETER :: NCHAR = 1024
-  CHARACTER(LEN=NCHAR), DIMENSION(:), ALLOCATABLE :: aval
-  ! ...but this would be better better (needs gfortran 4.6+)
-  !CHARACTER(LEN=:), DIMENSION(:), ALLOCATABLE :: aval
-  
-  Halo = InitHalo()
-  
-  IF (GetLongArgReal('vrot',vrot)) CALL SetDiskRotationSpeed(vrot,Halo)
-  IF (GetLongArgReals('vlsr',vlsr,I)) THEN
-    IF (I .EQ. 3) THEN
-      CALL SetLocalStandardOfRest(vlsr,Halo)
-    ELSE
-      WRITE(0,*) 'ERROR: Invalid --vlsr=<vx>,<vy>,<vz> parameter.'
-      STOP
-    END IF
-  END IF
-  IF (GetLongArgReals('vpec',vpec,I)) THEN
-    IF (I .EQ. 3) THEN
-      CALL SetSunPeculiarVelocity(vpec,Halo)
-    ELSE
-      WRITE(0,*) 'ERROR: Invalid --vpec=<vx>,<vy>,<vz> parameter.'
-      STOP
-    END IF
-  END IF
-  IF (GetLongArgReals('vsun',vsun,I)) THEN
-    IF (I .EQ. 3) THEN
-      CALL SetSunVelocity(vsun,Halo)
-    ELSE
-      WRITE(0,*) 'ERROR: Invalid --vsun=<vx>,<vy>,<vz> parameter.'
-      STOP
-    END IF
-  END IF
-  
-  IF (GetLongArgReal('rho',rho))   CALL SetLocalDensity(rho,Halo)
-  
-  IF (GetLongArgReals('vbulk',vbulk,I)) THEN
-    IF (I .EQ. 3) THEN
-      CALL SetBulkVelocity(vbulk,Halo)
-    ELSE
-      WRITE(0,*) 'ERROR: Invalid --vbulk=<vx>,<vy>,<vz> parameter.'
-      STOP
-    END IF
-  END IF
-  IF (GetLongArgReal('vobs',vobs)) CALL SetObserverSpeed(vobs,Halo)
-  IF (GetLongArgReal('v0',v0))     CALL SetMostProbableSpeed(v0,Halo)
-  IF (GetLongArgReal('vesc',vesc)) CALL SetEscapeSpeed(vesc,Halo)
-  
-  !IF (GetLongArgString('eta-file',eta_file)) CALL SetHalo(Halo,eta_file=eta_file)
-  IF (GetLongArgStrings('eta-file',NCHAR,aval,Nval)) THEN
-    IF (Nval .GE. 2) THEN
-      READ(aval(2),*,IOSTAT=ios) K
-      IF (ios .NE. 0) K = 2
-    ELSE
-      K = 2
-    END IF
-    CALL SetHalo(Halo,eta_file=aval(1),eta_file_K=K)
-  END IF
-  
-END FUNCTION
-
 
 ! ----------------------------------------------------------------------
 ! Get/set local galactic disk rotation speed [km/s].

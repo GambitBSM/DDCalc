@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   // the resulting object.
   int WIMP;
   int Halo;
-  int MyDetector, XENON, LUX, SCDMS, SIMPLE;  
+  int XENON, LUX, SCDMS, SIMPLE;  
 
   // Parse command line options
   // Notably, determining how WIMP parameters will be specified.
@@ -109,11 +109,6 @@ int main(int argc, char* argv[])
      later -- but here's how you would make a default version if needed: */
   WIMP = DDCalc::InitWIMP();
 
-  /* As we are responsible adults, we also choose our own detectors below.
-    Here is what you'd do if you wanted to just rely on the default
-    (currently LUX 2013): */
-  MyDetector = DDCalc::InitDetector(true);
-
   /* Explicitly create detector objects for all the experiments to be
      used (set up isotopes, efficiencies, array sizing, etc.)  The   
      argument indicates if extra sub-interval calculations should
@@ -125,10 +120,10 @@ int main(int argc, char* argv[])
      we must use true here (the flag is ignored for experiments
      that do not have the event energies necessary for a maximum gap
      analysis). */
-  XENON    = DDCalc::XENON100_2012_Init(true);
-  LUX      = DDCalc::LUX_2013_Init(true);
-  SCDMS    = DDCalc::SuperCDMS_2014_Init(true);
-  SIMPLE   = DDCalc::SIMPLE_2014_Init(true);
+  XENON    = DDCalc::XENON100_2012_Init();
+  LUX      = DDCalc::LUX_2013_Init();
+  SCDMS    = DDCalc::SuperCDMS_2014_Init();
+  SIMPLE   = DDCalc::SIMPLE_2014_Init();
 
   /* Can optionally specify a minimum recoil energy to be included in
      the rate calculations [keV].  Note the efficiency curves already
@@ -201,84 +196,58 @@ int main(int argc, char* argv[])
     DDCalc::CalcRates(LUX,WIMP,Halo);
     DDCalc::CalcRates(SCDMS,WIMP,Halo);
     DDCalc::CalcRates(SIMPLE,WIMP,Halo);
-    DDCalc::CalcRates(MyDetector,WIMP,Halo);
     
     /* Header */
-    printf("%-20s  %11s  %11s  %11s  %11s  %11s\n","",
-           " XENON 2012"," LUX 2013  ","SuCDMS 2014","SIMPLE 2014",
-           " (special) ");
+    printf("%-20s  %11s  %11s  %11s  %11s\n","",
+           " XENON 2012"," LUX 2013  ","SuCDMS 2014","SIMPLE 2014");
     //printf("%-20s  %11s  %11s  %11s  %11s  %11s\n","",
     //       "-----------","-----------","-----------","-----------",
     //       "-----------","-----------");
     
     /* Event quantities. */
-    printf("%-20s  % 6i       % 6i       % 6i       % 6i       % 6i     \n",
+    printf("%-20s  % 6i       % 6i       % 6i       % 6i       \n",
            "Observed events     ",
         DDCalc::Events(XENON),
         DDCalc::Events(LUX),
         DDCalc::Events(SCDMS),
-        DDCalc::Events(SIMPLE),
-        DDCalc::Events(MyDetector));
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
+        DDCalc::Events(SIMPLE));
+    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  \n",
            "Expected background ",
         DDCalc::Background(XENON),
         DDCalc::Background(LUX),
         DDCalc::Background(SCDMS),
-        DDCalc::Background(SIMPLE),
-        DDCalc::Background(MyDetector));
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
+        DDCalc::Background(SIMPLE));
+    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  \n",
            "Expected signal     ",
         DDCalc::Signal(XENON),
         DDCalc::Signal(LUX),
         DDCalc::Signal(SCDMS),
-        DDCalc::Signal(SIMPLE),
-        DDCalc::Signal(MyDetector));
+        DDCalc::Signal(SIMPLE));
     
     /* The log-likelihoods for the current WIMP; note these are _not_
-       multiplied by -2.  The likelihood is calculated using a Poisson
-       given the observed x.length() of events and expected signal +
-       background. */
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
+       multiplied by -2. */
+    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  \n",
            "Log-likelihood      ",
         DDCalc::LogLikelihood(XENON),
         DDCalc::LogLikelihood(LUX),
         DDCalc::LogLikelihood(SCDMS),
-        DDCalc::LogLikelihood(SIMPLE),
-        DDCalc::LogLikelihood(MyDetector));
-    
-    /* The logarithm of the p-value, calculated without background
-       subtraction, using either the maximum gap statistic or a Poisson
-       statistic, depending on how the detector was initialized.  Note
-       that this is actually a conservative upper _bound_ on the p-value
-       in the event of an unknown background and is useful for excluding
-       WIMP parameters.  However, since it is not a true p-value, it
-       should not be interpreted as being related to any particular
-       likelihood. */
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
-           "Max gap log(p-value)",
-        DDCalc::LogPValue(XENON),
-        DDCalc::LogPValue(LUX),
-        DDCalc::LogPValue(SCDMS),
-        DDCalc::LogPValue(SIMPLE),
-        DDCalc::LogPValue(MyDetector));
-    
+        DDCalc::LogLikelihood(SIMPLE));
+        
     /* Returns a factor x by which the current WIMP cross-sections must
        be multiplied (sigma -> x*sigma, applied to all four WIMP-nucleon
        cross-sections) to achieve the given p-value (specified by its
-       logarithm).  Useful for finding the no-background-subtraction
-       exclusion limits.  For example, if setWIMP_msigma(100.0,10.0,
+       logarithm). For example, if setWIMP_msigma(100.0,10.0,
        10.0,0.0,0.0) is called, then x*(10. pb) would be the SI
        cross-section at a WIMP mass of 100 GeV at which the experiment
        is excluded at the 90% CL (p=1-CL). */
     double lnp = log(0.1);  // default value for optional argument
-    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g\n",
-           "Max gap x for 90% CL",
+    printf("%-20s  %- #11.5g  %- #11.5g  %- #11.5g  %- #11.5g  \n",
+           "Rescaling for 90% CL",
         DDCalc::ScaleToPValue(XENON),
         DDCalc::ScaleToPValue(LUX),
         DDCalc::ScaleToPValue(SCDMS),
-        DDCalc::ScaleToPValue(SIMPLE),
-        DDCalc::ScaleToPValue(MyDetector));
-    std::cout << "         * Factor x such that sigma->x*sigma gives desired p-value" << std::endl;
+        DDCalc::ScaleToPValue(SIMPLE));
+    std::cout << " * This is the factor by which the cross section must be rescaled to give the desired p-value" << std::endl;
 
   }  // END INPUT LOOP <<<<<<<<<<<<<<<<<<<<<<<<<
 
