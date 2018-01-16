@@ -39,6 +39,7 @@ TYPE, PUBLIC :: WIMPStruct
   !                interactions
   ! 'HiggsPortal': Fermionic WIMP with scalar and pseudoscalar
   !                couplings to the Higgs boson
+  ! 'NREffectiveTheory': Effective WIMP defined via the non-relativistic DM-nucleon operators
   CHARACTER(LEN=24) :: DMtype = ''
   ! List of WIMP parameters. 
   ! The length and meaning of this list depends on the WIMP type:
@@ -52,6 +53,12 @@ TYPE, PUBLIC :: WIMPStruct
   ! 'HiggsPortal': (fsp, fsn, app, apn)
   ! fsp: scalar DM-proton coupling, fsn: scalar DM-neutron coupling
   ! app: pseudoscalar DM-proton coupling, apn: pseudoscalar DM-neutron coupling
+  ! 'NREffectiveTheory': 
+  ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1)
+  ! The coefficients of each operator has to be given in units GeV^(-2).
+  ! _0 and _1 correspond to isoscalar and isovector coefficients. 
+  ! Notice that O2 and O16 do not exist.
+  ! Also, for O1 and O4, there also q^2 suppressed operators O1q2 and O4q2.
   REAL*8, ALLOCATABLE  :: params(:)
   ! Number of parameters
   INTEGER :: Nparams = 1

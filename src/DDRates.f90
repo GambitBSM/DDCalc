@@ -11,6 +11,7 @@ USE DDConstants
 USE DDTypes
 USE DDHalo
 USE DDCouplings
+USE DDNREffectiveTheory
 
 IMPLICIT NONE
 PRIVATE
@@ -189,6 +190,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   TYPE(HaloStruct), INTENT(IN) :: Halo
   INTEGER :: Kiso, KE, Keff, Neff
+  REAL*8 :: S1S2(8)
 
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot calculate rates for a detector that has not been correctly initialized.'
@@ -261,6 +263,25 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
              D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
              D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) * &
              (2*D%Miso(Kiso)*D%E(KE)*1d-6)/(4d0 * WIMP%m**2)
+       END DO
+     END DO
+
+  ELSE IF (WIMP%DMtype .EQ. 'NREffectiveTheory') THEN
+
+   ! WIMP%params has to be a 37-element list, interpreted as coefficients in units GeV^(-2) of the non-relativistic operators
+   ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1)
+   ! See DDTypes for more information.
+     
+     IF (WIMP%params(1).LE.0) THEN
+        WRITE (*,*) 'Error in using WIMP type NREffectiveTheory: the dark matter spin is not set correctly.'
+        STOP
+     END IF 
+
+     DO KE = 1,D%NE
+       DO Kiso = 1,D%Niso 
+         S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, 1, KE, Kiso)
+         WRITE (*,*) S1S2
+         D%dRdEiso(KE,Kiso) = 0.0
        END DO
      END DO
 

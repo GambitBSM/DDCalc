@@ -168,7 +168,7 @@ fsrc := DDConstants.f90 DDTypes.f90 DDNuclear.f90 \
         DDUtils.f90 DDNumerical.f90 DDStats.f90 DDCouplings.f90 \
         DDWIMP.f90 DDInput.f90 DDHalo.f90 DDRates.f90 \
         DDDetectors.f90 DDExperiments.f90 \
-        DDCalc.f90
+        DDCalc.f90 DDNREffectiveTheory.f90
 analyses := DARWIN_Ar.f90 DARWIN_Xe.f90 LUX_2013.f90 SIMPLE_2014.f90 \
             SuperCDMS_2014.f90 XENON100_2012.f90 LUX_2016.f90 \
             PandaX_2016.f90 LUX_2015.f90 PICO_2L.f90 \
@@ -258,8 +258,13 @@ $(BUILD)/DDHalo.o: $(BUILD)/DDConstants.o \
 $(BUILD)/DDInput.o: $(BUILD)/DDUtils.o
 $(BUILD)/DDNuclear.o: $(BUILD)/DDConstants.o
 $(BUILD)/DDNumerical.o: $(BUILD)/DDUtils.o
+$(BUILD)/DDNREffectiveTheory.o: $(BUILD)/DDConstants.o \
+ $(BUILD)/DDHalo.o \
+ $(BUILD)/DDCouplings.o \
+ $(BUILD)/DDTypes.o
 $(BUILD)/DDRates.o: $(BUILD)/DDTypes.o \
- $(BUILD)/DDHalo.o
+ $(BUILD)/DDHalo.o \
+ $(BUILD)/DDNREffectiveTheory.o
 $(BUILD)/DDStats.o: $(BUILD)/DDTypes.o \
  $(BUILD)/DDNumerical.o
 $(BUILD)/DDUtils.o: $(BUILD)/DDTypes.o

@@ -98,6 +98,11 @@ SUBROUTINE SetWIMP(WIMP, m, DMtype, params)
       WIMP%Nparams = 4
       updated = .TRUE.
     END IF
+    IF ( DMtype .EQ. 'NREffectiveTheory' ) THEN
+      WIMP%DMtype  = DMtype
+      WIMP%Nparams = 37
+      updated = .TRUE.
+    END IF
     IF ( updated ) THEN
       ALLOCATE(WIMP%params(WIMP%Nparams))
       WIMP%params = params(1:WIMP%Nparams)
