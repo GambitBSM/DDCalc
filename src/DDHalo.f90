@@ -739,7 +739,7 @@ END FUNCTION
 !   N1,N2       Size of vmin and eta arrays, i.e. [1:N1,1:N2]
 !   vmin        The minimum speed in the h integral [km/s].
 ! 
-PURE FUNCTION MeanSpeed(N1,N2,vmin,Halo) RESULT(h)
+FUNCTION MeanSpeed(N1,N2,vmin,Halo) RESULT(h)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(IN) :: Halo
   REAL*8 :: h(N1,N2)

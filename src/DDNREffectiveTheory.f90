@@ -16,7 +16,7 @@ IMPLICIT NONE
 PRIVATE
 
 
-PUBLIC :: NRET_SFunctions, NRET_CreateCoeffList, NRET_SetDMSpin, NRET_SetNRCoefficient
+PUBLIC :: NRET_SFunctions, NRET_CreateCoeffList, NRET_SetDMSpin, NRET_SetNRCoefficient, NRET_UpdateNRCoefficients
 
 INTERFACE NRET_SFunctions
   MODULE PROCEDURE NRET_SFunctions_fct
@@ -34,6 +34,9 @@ INTERFACE NRET_SetNRCoefficient
   MODULE PROCEDURE NRET_SetNRCoefficient_fct
 END INTERFACE
 
+INTERFACE NRET_UpdateNRCoefficients
+  MODULE PROCEDURE NRET_UpdateNRCoefficients_fct
+END INTERFACE
 
 CONTAINS
 
@@ -42,7 +45,7 @@ CONTAINS
 FUNCTION NRET_CreateCoeffList_fct() &
      RESULT (par)
   IMPLICIT NONE
-  REAL*8 :: par(37)
+  REAL*8 :: par(45)
   par(:) = 0.0d0
   par(1) = -1.0d0
 END FUNCTION
@@ -51,7 +54,7 @@ END FUNCTION
 ! this function sets the spin of the DM particle
 SUBROUTINE NRET_SetDMSpin_fct(par, DMSpin)
   IMPLICIT NONE
-  REAL*8, INTENT(INOUT) :: par(37)
+  REAL*8, INTENT(INOUT) :: par(45)
   REAL*8, INTENT(IN) :: DMSpin
   par(1) = DMSpin
 END SUBROUTINE
@@ -60,7 +63,7 @@ END SUBROUTINE
 ! this function sets a single coefficient to a non-zero value (in units GeV^(-2))
 SUBROUTINE NRET_SetNRCoefficient_fct(par, OpString, tau, value)
   IMPLICIT NONE
-  REAL*8, INTENT(INOUT) :: par(37)
+  REAL*8, INTENT(INOUT) :: par(45)
   CHARACTER(LEN=*), INTENT(IN) :: OpString
   REAL*8, INTENT(IN) :: value
   INTEGER, INTENT(IN) :: tau
@@ -114,6 +117,8 @@ SUBROUTINE NRET_SetNRCoefficient_fct(par, OpString, tau, value)
 
   par(i+tau) = value
 
+  CALL NRET_UpdateNRCoefficients(par)
+
 END SUBROUTINE
 
 ! Auxiliary function providing the response functions S1 and S2 for the non-relativistic effective theory.
@@ -128,7 +133,7 @@ FUNCTION NRET_SFunctions_fct(D, m, p, alpha, KE, Kiso)   &
   REAL*8 :: S1S2(8)
   TYPE(DetectorStruct), INTENT(IN) :: D
   REAL*8, INTENT(IN) :: m
-  REAL*8, INTENT(IN) :: p(37)
+  REAL*8, INTENT(IN) :: p(45)
   INTEGER, INTENT(IN) :: alpha, KE, Kiso
   REAL*8 :: a, b, mp, muT, ttt
 
@@ -238,5 +243,27 @@ FUNCTION NRET_SFunctions_fct(D, m, p, alpha, KE, Kiso)   &
 END FUNCTION
 
 
+SUBROUTINE NRET_UpdateNRCoefficients_fct(par)
+  IMPLICIT NONE
+  REAL*8, INTENT(INOUT) :: par(45)
+  INTEGER :: alpha, i
+  INTEGER :: ptoalphaMatrix(288) =                                                                                     &
+          (/1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,&
+            0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,&
+            1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,&
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,&
+            0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1,&
+            0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1,&
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,&
+            0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0/)
+
+  DO alpha = 1,8
+    par(37 + alpha) = 0
+    DO i = 1,36
+      par(37 + alpha) = par(37 + alpha) + ptoalphaMatrix(i+(alpha-1)*36) * par(i+1)**2
+    END DO
+  END DO
+
+END SUBROUTINE
 
 END MODULE

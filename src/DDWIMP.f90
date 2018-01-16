@@ -100,7 +100,7 @@ SUBROUTINE SetWIMP(WIMP, m, DMtype, params)
     END IF
     IF ( DMtype .EQ. 'NREffectiveTheory' ) THEN
       WIMP%DMtype  = DMtype
-      WIMP%Nparams = 37
+      WIMP%Nparams = 45
       updated = .TRUE.
     END IF
     IF ( updated ) THEN

@@ -289,8 +289,8 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
 
   ELSE IF (WIMP%DMtype .EQ. 'NREffectiveTheory') THEN
 
-   ! WIMP%params has to be a 37-element list, interpreted as coefficients in units GeV^(-2) of the non-relativistic operators
-   ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1)
+   ! WIMP%params has to be a 45-element list, interpreted as coefficients in units GeV^(-2) of the non-relativistic operators
+   ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1, alpha_1, ..., alpha_8)
    ! See DDTypes for more information.
      
      IF (WIMP%params(1).LE.0) THEN
