@@ -245,8 +245,11 @@ END SUBROUTINE
 ! The following steps are required to define a new detector
 !
 ! 1) Definition of the recoil energy grid used for calculating dR/dE
+! EITHER
 !   NE          Number of tabulated recoil energies E
 !   E           Array of size [1:NE] containing recoil energies [keV].
+! OR
+!   E_file      File from which grid of recoil enregies shoud be read.
 !
 ! 2) Definition of bins
 !   Nbins       Number of bins in data (0 if total only).

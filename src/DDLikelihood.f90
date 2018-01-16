@@ -14,30 +14,37 @@ PROGRAM DDLikelihood
   USE DDNuclear
 
   IMPLICIT NONE
-  TYPE(DetectorStruct) :: Detector
+  TYPE(DetectorStruct) :: Detector1, Detector2, Detector3
   TYPE(WIMPStruct) :: WIMP
   TYPE(HaloStruct) :: Halo
-  REAL*8 :: BGlogL,mDM,sigmaSI,mDMmin,mDMmax,sigmaSImin,sigmaSImax,fp,fn,lnp
+  REAL*8 :: BGlogL1,BGlogL2,BGlogL3,mDM,sigmaSI,mDMmin,mDMmax,sigmaSImin,sigmaSImax,fp,fn,lnp
   INTEGER :: mDMsteps, sigmaSIsteps, mDMi, sigmaSIi
 
-  mDMmin = 1.d0
-  mDMmax = 1.d4
-  sigmaSImin = 1.d-11
-  sigmaSImax = 1.d-4
+  mDMmin = 7.d-1
+  mDMmax = 1.3d1
+  sigmaSImin = 1.d-6
+  sigmaSImax = 1.d2
 
-  mDMsteps = 40
-  sigmaSIsteps = 70
+  mDMsteps = 80
+  sigmaSIsteps = 80
 
   WIMP = DDCalc_InitWIMP()
   CALL DDCalc_SetWIMP(WIMP,m=1d0,DMtype='SIonly',params=[0.d0,0.d0])
   Halo = DDCalc_InitHalo()
   CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
-  Detector = PandaX_2016_Init()
-  CALL DDCalc_CalcRates(Detector, WIMP, Halo)
+  Detector1 = CRESST_II_Init()
+  Detector2 = CDMSlite_Init()
+  Detector3 = LUX_2016_Init()
+  CALL DDCalc_CalcRates(Detector1, WIMP, Halo)
+  CALL DDCalc_CalcRates(Detector2, WIMP, Halo)
+  CALL DDCalc_CalcRates(Detector3, WIMP, Halo)
 
-  BGlogL = DDCalc_LogLikelihood(Detector)
-  WRITE (*,*) 'Background log likelihood =',BGlogL
-  WRITE (*,*) 'mDM[GeV] sigmaSI(cm2) logL(signal) -2DeltalogL log(pvalue)'
+  BGlogL1 = DDCalc_LogLikelihood(Detector1)
+  BGlogL2 = DDCalc_LogLikelihood(Detector2)
+  BGlogL3 = DDCalc_LogLikelihood(Detector3)
+
+!  WRITE (*,*) 'Background log likelihood =',BGlogL
+!  WRITE (*,*) 'mDM[GeV] sigmaSI(cm2) logL(signal) -2DeltalogL log(pvalue)'
 
   DO mDMi = 0,mDMsteps
     mDM = mDMmin * (mDMmax/mDMmin)**(REAL(mDMi)/mDMsteps)
@@ -46,8 +53,11 @@ PROGRAM DDLikelihood
       fp = SigmapSItoFp(mDM,sigmaSI)
       fn = SigmanSItoFn(mDM,sigmaSI)
       CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SIonly',params=[fp,fn])
-      CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-      WRITE (*,*) mDM,sigmaSI,DDCalc_LogLikelihood(Detector),-2*(DDCalc_LogLikelihood(Detector)-BGlogL)
+      CALL DDCalc_CalcRates(Detector1, WIMP, Halo)
+      CALL DDCalc_CalcRates(Detector2, WIMP, Halo)
+      CALL DDCalc_CalcRates(Detector3, WIMP, Halo)
+      WRITE (*,*) mDM,sigmaSI,-2*(DDCalc_LogLikelihood(Detector1)+DDCalc_LogLikelihood(Detector2) &
+                                  +DDCalc_LogLikelihood(Detector3)-BGlogL1-BGlogL2-BGlogL3)
     END DO
   END DO
 
