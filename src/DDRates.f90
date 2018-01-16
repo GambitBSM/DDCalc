@@ -210,19 +210,17 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   INTEGER :: Kiso, KE, Keff, Neff, alpha
   REAL*8 :: S1S2(8)
   REAL*8 :: WTilde_array(4)
-  REAL*8 :: gvmin_value, hvmin_value
-  REAL*8, PARAMETER :: TO_CPD_KG_KEV = 1.695e14 !   s / (cm^3 km GeV^4)  -->  cpd/kg/keV
 
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot calculate rates for a detector that has not been correctly initialized.'
     STOP      
   END IF
 
-  ! Update mean inverse speed, set dRdEiso to zero
+  ! Update mean inverse speed and mean speed, set dRdEiso to zero
   D%vmin = EToVmin(D%NE,D%E,WIMP%m,D%Niso,D%Miso)
-  D%eta  = MeanInverseSpeed(D%NE,D%Niso,D%vmin,Halo)
+  D%g_vmin  = MeanInverseSpeed(D%NE,D%Niso,D%vmin,Halo)
+  D%h_vmin  = MeanSpeed(D%NE,D%Niso,D%vmin,Halo)
   D%dRdEiso = 0.0d0
-
 
 
   ! ...................... CALCULATE DIFFERENTIAL RATES ............................
@@ -234,7 +232,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
-             dRdE_SI(WIMP%m, Halo%rho, D%eta(KE,Kiso), &
+             dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
              D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
              D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso))
        END DO
@@ -246,7 +244,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
-             dRdE_SD(WIMP%m, Halo%rho, D%eta(KE,Kiso), &
+             dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
              D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
              D%Wsd(+1,KE,Kiso), D%Wsd(0,KE,Kiso), D%Wsd(-1,KE,Kiso))
        END DO
@@ -259,10 +257,10 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
-           dRdE_SI(WIMP%m, Halo%rho, D%eta(KE,Kiso), &
+           dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
              D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
              D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) + &
-           dRdE_SD(WIMP%m, Halo%rho, D%eta(KE,Kiso), &
+           dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
              D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
              D%Wsd(+1,KE,Kiso), D%Wsd(0,KE,Kiso), D%Wsd(-1,KE,Kiso))
        END DO
@@ -277,10 +275,10 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
-            dRdE_SI(WIMP%m, Halo%rho, D%eta(KE,Kiso), & ! scalar-scalar term
+            dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), & ! scalar-scalar term
              D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
              D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) + &
-            dRdE_SI(WIMP%m, Halo%rho, D%eta(KE,Kiso), & ! psuedoscalar-scalar term
+            dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), & ! psuedoscalar-scalar term
              D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
              D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) * &
              (2*D%Miso(Kiso)*D%E(KE)*1d-6)/(4d0 * WIMP%m**2)
@@ -303,17 +301,14 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso 
          D%dRdEiso(KE,Kiso) = 0.0
-
-         gvmin_value = 1.0 ! TODO: replace dummy assignments
-         hvmin_value = 1.0 ! TODO: replace dummy assignments
          DO alpha = 1,8
             S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, alpha, KE, Kiso)
             WTilde_array = WTilde_Dummy(D, alpha, KE, Kiso)
-            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + dot_product(S1S2(:4), WTilde_array) * gvmin_value
-            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + dot_product(S1S2(5:), WTilde_array) * hvmin_value
+            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.6961e14 * dot_product(S1S2(:4), WTilde_array) * D%g_vmin(KE,Kiso)
+            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.8871e3 * dot_product(S1S2(5:), WTilde_array) * D%h_vmin(KE,Kiso)
          END DO
 
-         D%dRdEiso(KE,Kiso) = TO_CPD_KG_KEV*D%fiso(Kiso)*Halo%rho*D%dRdEiso(KE,Kiso)/(2*PI*WIMP%m)
+         D%dRdEiso(KE,Kiso) = D%fiso(Kiso)*Halo%rho*D%dRdEiso(KE,Kiso)/(2*PI*WIMP%m)
          
        END DO
      END DO

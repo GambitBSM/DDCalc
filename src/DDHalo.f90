@@ -18,7 +18,8 @@ PRIVATE
 
 PUBLIC :: DDCalc_GetHalo,DDCalc_SetHalo, &
           DDCalc_InitHalo,               &
-          EToVmin, MeanInverseSpeed, C_DDCalc_InitHalo
+          EToVmin, MeanInverseSpeed, C_DDCalc_InitHalo, &
+          MeanSpeed
 INTERFACE DDCalc_GetHalo
   MODULE PROCEDURE GetHalo
 END INTERFACE

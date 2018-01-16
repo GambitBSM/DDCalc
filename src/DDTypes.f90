@@ -223,8 +223,11 @@ TYPE, PUBLIC :: DetectorStruct
   ! WIMP mass changes.
   REAL*8, ALLOCATABLE :: vmin(:,:)
   
-  ! Tabulated mean inverse speed (eta) [s/km] at the above vmin.
-  REAL*8, ALLOCATABLE :: eta(:,:)
+  ! Tabulated mean inverse speed (g_vmin) [s/km] at the above vmin.
+  REAL*8, ALLOCATABLE :: g_vmin(:,:)
+
+  ! Tabulated mean speed (h_vmin) [km/s] at the above vmin.
+  REAL*8, ALLOCATABLE :: h_vmin(:,:)
 
   ! structure for the differential rates,
   ! separately for each isotope of the experiment.

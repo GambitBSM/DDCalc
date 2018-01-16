@@ -774,8 +774,10 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   IF (E_change) THEN
     IF (ALLOCATED(D%vmin)) DEALLOCATE(D%vmin)
     ALLOCATE(D%vmin(D%NE,D%Niso))
-    IF (ALLOCATED(D%eta))  DEALLOCATE(D%eta)
-    ALLOCATE(D%eta(D%NE,D%Niso))
+    IF (ALLOCATED(D%g_vmin))  DEALLOCATE(D%g_vmin)
+    ALLOCATE(D%g_vmin(D%NE,D%Niso))
+    IF (ALLOCATED(D%h_vmin))  DEALLOCATE(D%h_vmin)
+    ALLOCATE(D%h_vmin(D%NE,D%Niso))
   END IF
   
   ! Number of bins to do calculations for.
@@ -807,7 +809,8 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   ! Set all calculable quantities to zero
   IF (E_change .OR. eff_change .OR. stat_change) THEN
     D%vmin        = 0d0
-    D%eta         = 0d0
+    D%g_vmin      = 0d0
+    D%h_vmin      = 0d0
     D%dRdEiso     = 0d0
     D%R           = 0d0
     D%MuSignal    = 0d0
