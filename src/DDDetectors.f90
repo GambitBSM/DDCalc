@@ -114,6 +114,88 @@ SUBROUTINE LoadEnergyFile(file,NE,E)
   
 END SUBROUTINE
 
+! ----------------------------------------------------------------------
+! Retabulates the given efficiency data at the given array of energies.
+! The efficiency is taken to be zero beyond the tabulation range of
+! the provided efficiency data.
+! 
+! Input arguments:
+!     NEeff      Number of recoil energy tabulation points for raw
+!                efficiency data.
+!     Eeff       Array of size [1:NEeff] containing tabulation energies
+!                for raw efficiency data [keV].
+!     Nbins      Number bins in raw efficiency data (0 if total only).
+!     eff        Array of size [1:NEeff,0:Nbins] containing raw
+!                efficiency data.  The second index is over the
+!                interval/bin number (0 for total range).
+!     NE         Number of recoil energies in desired tabulation.
+!     E          Array of size [1:NE] containing desired tabulation
+!                energies [keV].
+! Output argument:
+!     eff0       Allocatable array to contain efficiency curves for
+!                the total range and each bin at the energies
+!                in E.  Allocated to size [1:NE,0:Nbins].
+! 
+SUBROUTINE RetabulateEfficiency(NEeff,Eeff,Nbins,eff,NE,E,eff0)
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: NEeff,Nbins,NE
+  REAL*8, INTENT(IN) :: Eeff(1:NEeff),eff(1:NEeff,0:Nbins),E(1:NE)
+  REAL*8, ALLOCATABLE, INTENT(OUT) :: eff0(:,:)
+  INTEGER :: Keff,K0,K0start
+  REAL*8 :: f
+  
+  ALLOCATE(eff0(1:NE,0:Nbins))
+  
+  ! Special cases
+  IF (E(NE) .LT. Eeff(1)) THEN
+    eff0 = 0d0
+    RETURN
+  ELSE IF (E(1) .GT. Eeff(NEeff)) THEN
+    eff0 = 0d0
+    RETURN
+  END IF
+  
+  ! Energies below tabulation range
+  K0 = 1
+  DO WHILE (E(K0) .LT. Eeff(1))
+    eff0(K0,:) = 0d0
+    K0 = K0 + 1
+  END DO
+  
+  ! Cycle over remaining energies
+  Keff    = -1
+  K0start = K0
+  DO K0 = K0start,NE
+    Keff = BSearch(NEeff,Eeff,E(K0),Keff)
+    ! Below tabulation range: set to zero (already accounted for)
+    !IF (Keff .LE. 0) THEN
+    !  eff0(K0,:) = 0d0
+    ! Within tabulation range: linear interpolation
+    IF (Keff .LT. NEeff) THEN
+      ! Determine fractional distance between tabulation points
+      IF (Eeff(Keff) .EQ. Eeff(Keff+1)) THEN
+        f = 0.5d0
+      ELSE
+        f = (E(K0)-Eeff(Keff)) / (Eeff(Keff+1)-Eeff(Keff))
+      END IF
+      eff0(K0,:) = (1d0-f)*eff(Keff,0:Nbins) + f*eff(Keff+1,0:Nbins)
+    ! Above tabulation range: set to zero
+    ELSE
+      IF (E(K0) .EQ. Eeff(NEeff)) THEN
+        eff0(K0,:) = eff(NEeff,0:Nbins)
+      ELSE
+        eff0(K0,:) = 0d0
+      END IF
+      ! Can skip remaining points
+      IF (K0 .LT. NE) THEN
+        eff0(K0+1:NE,:) = 0d0
+      END IF
+      EXIT
+    END IF
+  END DO
+  
+END SUBROUTINE
+
 
 !=======================================================================
 ! DETECTOR SETUP ROUTINES
