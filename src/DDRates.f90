@@ -172,6 +172,24 @@ FUNCTION dRdE_SD(m, rho, eta, fiso, ap, an, Wsd1, Wsd0, WsdM1)   &
 END FUNCTION
 
 
+
+
+
+
+! This function returns the nuclear response functions [WTilde_00, WTilde_01, WTilde_10, WTilde_11].
+! TODO: Replace the dummy assignments with the actual nuclear response functions!
+FUNCTION WTilde_Dummy(D, alpha, KE, Kiso) &
+    RESULT (WTilde_array)
+  IMPLICIT NONE
+
+  REAL*8 :: WTilde_array(4)
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  INTEGER, INTENT(IN) :: alpha, KE, Kiso
+
+  WTilde_array = (/ 1.0d0, 0.1d0, 0.1d0, 0.5d0 /)
+
+END FUNCTION
+
 !
 ! End of auxiliary functions 
 ! -----------------------------------------------------------------------------
@@ -189,8 +207,11 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   TYPE(DetectorStruct), INTENT(INOUT) :: D
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   TYPE(HaloStruct), INTENT(IN) :: Halo
-  INTEGER :: Kiso, KE, Keff, Neff
+  INTEGER :: Kiso, KE, Keff, Neff, alpha
   REAL*8 :: S1S2(8)
+  REAL*8 :: WTilde_array(4)
+  REAL*8 :: gvmin_value, hvmin_value
+  REAL*8, PARAMETER :: TO_CPD_KG_KEV = 1.695e14 !   s / (cm^3 km GeV^4)  -->  cpd/kg/keV
 
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot calculate rates for a detector that has not been correctly initialized.'
@@ -277,16 +298,29 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
         STOP
      END IF 
 
+
+
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso 
-         S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, 1, KE, Kiso)
-         WRITE (*,*) S1S2
          D%dRdEiso(KE,Kiso) = 0.0
+
+         gvmin_value = 1.0 ! TODO: replace dummy assignments
+         hvmin_value = 1.0 ! TODO: replace dummy assignments
+         DO alpha = 1,8
+            S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, alpha, KE, Kiso)
+            WTilde_array = WTilde_Dummy(D, alpha, KE, Kiso)
+            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + dot_product(S1S2(:4), WTilde_array) * gvmin_value
+            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + dot_product(S1S2(5:), WTilde_array) * hvmin_value
+         END DO
+
+         D%dRdEiso(KE,Kiso) = TO_CPD_KG_KEV*D%fiso(Kiso)*Halo%rho*D%dRdEiso(KE,Kiso)/(2*PI*WIMP%m)
+         
        END DO
      END DO
 
   ELSE
-     WRITE (*,*) '... this should produce some error ...'
+     WRITE (*,*) 'Error in CalcRates: invalid WIMP%DMType'
+     STOP
   END IF
 
 
