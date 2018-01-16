@@ -53,6 +53,9 @@ The experimental results implemented in DDCalc at this time are:
   * SuperCDMS 2014: 577 kg-days (Ge)  
     R. Agnese et al., PRL 112, 241302 (2014) [arxiv:1402.7137]
 
+  * CDMSlite: 70.1 kg-days (Ge)  
+    R. Agnese et al., PRL 116, 071301 (2016) [arxiv:1509.02448]
+
   * SIMPLE 2014: 18.24 kg-days (C2ClF5)  
     M. Felizardo et al., PRD 89, 072013 (2014) [arXiv:1404.4309]
 
