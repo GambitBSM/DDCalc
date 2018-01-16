@@ -16,18 +16,6 @@ USE DDInput
 IMPLICIT NONE
 PRIVATE
 
-! Convert E to vmin given the scalar or vector arguments.
-! Access all versions under function name 'EToVmin'.
-INTERFACE EToVmin
-  MODULE PROCEDURE EToVmin0,EToVmin1,EToVmin2
-END INTERFACE
-
-! Calculate mean inverse speed from vmin given the scalar or vector
-! arguments. Access all versions under function name 'MeanInverseSpeed'.
-INTERFACE MeanInverseSpeed
-  MODULE PROCEDURE MeanInverseSpeed0,MeanInverseSpeed1,MeanInverseSpeed2
-END INTERFACE
-
 PUBLIC :: DDCalc_GetHalo,DDCalc_SetHalo, &
           DDCalc_InitHalo,               &
           EToVmin, MeanInverseSpeed, C_DDCalc_InitHalo
@@ -570,56 +558,6 @@ SUBROUTINE SetEscapeSpeed(vesc,Halo)
   Halo%vesc = MAX(vesc,0d0)
 END SUBROUTINE
 
-
-! ----------------------------------------------------------------------
-! INTERFACE NAME: EToVmin
-! Calculate the minimum velocity for producing a recoil of energy E,
-! given by vmin = sqrt{M E/(2\mu^2)} [km/s].
-! 
-! This is the scalar version (single mass and energy).
-! 
-! Input arguments:
-!   E           Recoil energy [keV]
-!   m           WIMP mass [GeV]
-!   Miso        Isotope mass [GeV]
-! 
-ELEMENTAL FUNCTION EToVmin0(E,m,Miso) RESULT(vmin)
-  IMPLICIT NONE
-  REAL*8 :: vmin
-  REAL*8, INTENT(IN) :: E,m,Miso
-  REAL*8 :: mu
-  REAL*8, PARAMETER :: c = 1d-3*SPEED_OF_LIGHT  ! Speed of light in km/s
-  mu = Miso*m / (Miso + m)
-  vmin = c * SQRT(1d-6*Miso*E/(2*mu**2))
-END FUNCTION
-
-
-! ----------------------------------------------------------------------
-! INTERFACE NAME: EToVmin
-! Calculate the minimum velocity for producing a recoil of energy E,
-! given by vmin = sqrt{M E/(2\mu^2)} [km/s].  Returns as array of
-! size [1:N].
-! 
-! This is the 1D array version (single mass and array of energies).
-! 
-! Input arguments:
-!   N           Number of recoil energies
-!   E           Array of recoil energies [keV]
-!   m           WIMP mass [GeV]
-!   Miso        Isotope mass [GeV]
-! 
-PURE FUNCTION EToVmin1(N,E,m,Miso) RESULT(vmin)
-  IMPLICIT NONE
-  REAL*8 :: vmin(N)
-  INTEGER, INTENT(IN) :: N
-  REAL*8, INTENT(IN) :: E(N),m,Miso
-  REAL*8 :: mu
-  REAL*8, PARAMETER :: c = 1d-3*SPEED_OF_LIGHT  ! Speed of light in km/s
-  mu = Miso*m / (Miso + m)
-  vmin = c * SQRT(1d-6*Miso*E/(2*mu**2))
-END FUNCTION
-
-
 ! ----------------------------------------------------------------------
 ! INTERFACE NAME: EToVmin
 ! Calculate the minimum velocity for producing a recoil of energy E,
@@ -635,7 +573,7 @@ END FUNCTION
 !   Niso        Number of isotopes
 !   Miso        Array of isotope masses [GeV]
 ! 
-PURE FUNCTION EToVmin2(N,E,m,Niso,Miso) RESULT(vmin)
+PURE FUNCTION EToVmin(N,E,m,Niso,Miso) RESULT(vmin)
   IMPLICIT NONE
   REAL*8 :: vmin(N,Niso)
   INTEGER, INTENT(IN) :: N,Niso
@@ -652,191 +590,6 @@ END FUNCTION
 
 !-----------------------------------------------------------------------
 ! INTERFACE NAME: MeanInverseSpeed
-! Calculates the mean inverse speed (eta) [s/km] for the given vmin,
-! with eta define as:
-!     eta(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
-! 
-! This is the scalar version (single vmin).
-! 
-! Input arguments:
-!   vmin        The minimum speed in the eta integral [km/s]
-! 
-ELEMENTAL FUNCTION MeanInverseSpeed0(vmin,Halo) RESULT(eta)
-  IMPLICIT NONE
-  TYPE(HaloStruct), INTENT(IN) :: Halo
-  REAL*8 :: eta
-  REAL*8, INTENT(IN) :: vmin
-  REAL*8 :: v0,vobs,vesc,x,y,z,Nesc
-  
-  ! If have tabulation, use it
-  IF (Halo%tabulated) THEN
-    eta = MeanInverseSpeedT(vmin,Halo)
-    RETURN
-  END IF
-  
-  ! Easier to use variable names
-  v0   = Halo%v0
-  vobs = Halo%vobs
-  vesc = Halo%vesc
-  
-  ! Special case: no dispersion
-  ! Distribution is delta function
-  IF (v0 .EQ. 0) THEN
-    IF (vobs .EQ. 0d0) THEN
-      eta = 0d0
-    ELSE
-      IF (vmin .LE. vobs) THEN
-        eta = 1d0 / vobs
-      ELSE
-        eta = 0d0
-      END IF
-    END IF
-    RETURN
-  END IF
-  
-  x    = vmin / v0
-  y    = vobs / v0
-  z    = vesc / v0
-  Nesc = ERF(z) - 2*INVSQRTPI*z*EXP(-z**2)
-  
-  ! Special case: no relative motion by observer
-  !   eta = 2/(sqrt(pi) Nesc v0) [e^{-x^2} - e^{-z^2}]
-  ! Note: EXP2(a,b) = e^b - e^a
-  IF (y .EQ. 0d0) THEN
-    IF (x .LE. z) THEN
-      eta = 2*INVSQRTPI/(Nesc*v0) * EXP2(-z**2,-x**2)
-    ELSE
-      eta = 0d0
-    END IF
-    RETURN
-  END IF
-  
-  ! Special case: no finite cutoff (vesc is effectively infinite)
-  IF (z .GT. 25d0) THEN
-    eta = ERF2(x-y,x+y) / (2*vobs)
-    RETURN
-  END IF
-  
-  ! General case.
-  ! See e.g. Savage, Freese & Gondolo, PRD 74, 043531 (2006)
-  ! [astrop-ph/0607121]; use arxiv version as PRD version has type-
-  ! setting issues in the formula.
-  ! Note: ERF2(a,b) = ERF(b) - ERF(a)
-  IF (x .LE. ABS(y-z)) THEN
-    IF (y .LT. z) THEN
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,x+y) - 4*INVSQRTPI*y*EXP(-z**2))
-    ELSE
-      eta = 1d0 / vobs
-    END IF
-  ELSE IF (x .LE. y+z) THEN
-    eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
-  ELSE
-    eta = 0d0
-  END IF
-  
-END FUNCTION
-
-
-!-----------------------------------------------------------------------
-! INTERFACE NAME: MeanInverseSpeed
-! Calculates the mean inverse speed (eta) [s/km] for the given 1D
-! array of vmin, with eta define as:
-!     eta(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
-! Returns as array of size [1:N].
-! 
-! This is the 1D array version (1D array of vmin).
-! 
-! Input arguments:
-!   N           Number of vmin
-!   vmin        The minimum speed in the eta integral [km/s].
-!               Array of size [1:N].
-! 
-PURE FUNCTION MeanInverseSpeed1(N,vmin,Halo) RESULT(eta)
-  IMPLICIT NONE
-  TYPE(HaloStruct), INTENT(IN) :: Halo
-  REAL*8 :: eta(N)
-  INTEGER, INTENT(IN) :: N
-  REAL*8, INTENT(IN) :: vmin(N)
-  REAL*8 :: v0,vobs,vesc,x(N),y,z,Nesc
-  
-  ! If have tabulation, use it
-  IF (Halo%tabulated) THEN
-    eta = MeanInverseSpeedT(vmin,Halo)
-    RETURN
-  END IF
-  
-  ! Easier to use variable names
-  v0   = Halo%v0
-  vobs = Halo%vobs
-  vesc = Halo%vesc
-  
-  ! Special case: no dispersion
-  ! Distribution is delta function
-  IF (v0 .EQ. 0) THEN
-    IF (vobs .EQ. 0d0) THEN
-      eta = 0d0
-    ELSE
-      WHERE (vmin .LE. vobs)
-        eta = 1d0 / vobs
-      ELSE WHERE
-        eta = 0d0
-      END WHERE
-    END IF
-    RETURN
-  END IF
-  
-  x    = vmin / v0
-  y    = vobs / v0
-  z    = vesc / v0
-  Nesc = ERF(z) - 2*INVSQRTPI*z*EXP(-z**2)
-  
-  ! Special case: no relative motion by observer
-  !   eta = 2/(sqrt(pi) Nesc v0) [e^{-x^2} - e^{-z^2}]
-  ! Note: EXP2(a,b) = e^b - e^a
-  IF (y .EQ. 0d0) THEN
-    WHERE (x .LE. z)
-      eta = 2*INVSQRTPI/(Nesc*v0) * EXP2(-z**2,-x**2)
-    ELSE WHERE
-      eta = 0d0
-    END WHERE
-    RETURN
-  END IF
-  
-  ! Special case: no finite cutoff (vesc is effectively infinite)
-  IF (z .GT. 25d0) THEN
-    eta = ERF2(x-y,x+y) / (2*vobs)
-    RETURN
-  END IF
-  
-  ! General case.
-  ! See e.g. Savage, Freese & Gondolo, PRD 74, 043531 (2006)
-  ! [astrop-ph/0607121]; use arxiv version as PRD version has type-
-  ! setting issues in the formula.
-  ! Note: ERF2(a,b) = ERF(b) - ERF(a)
-  ! Separate y < z & y > z cases to make easier use of WHERE statements.
-  IF (y .LT. z) THEN
-    WHERE (x .LT. z-y)
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,x+y) - 4*INVSQRTPI*y*EXP(-z**2))
-    ELSE WHERE (x .LT. z+y)
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
-    ELSE WHERE
-      eta = 0d0
-    END WHERE
-  ELSE
-    WHERE (x .LT. y-z)
-      eta = 1d0 / vobs
-    ELSE WHERE (x .LT. y+z)
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
-    ELSE WHERE
-      eta = 0d0
-    END WHERE
-  END IF
-  
-END FUNCTION
-
-
-!-----------------------------------------------------------------------
-! INTERFACE NAME: MeanInverseSpeed
 ! Calculates the mean inverse speed (eta) [s/km] for the given 2D
 ! array of vmin, with eta define as:
 !     eta(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
@@ -847,9 +600,8 @@ END FUNCTION
 ! Input arguments:
 !   N1,N2       Size of vmin and eta arrays, i.e. [1:N1,1:N2]
 !   vmin        The minimum speed in the eta integral [km/s].
-!               Array of size [1:N].
 ! 
-PURE FUNCTION MeanInverseSpeed2(N1,N2,vmin,Halo) RESULT(eta)
+PURE FUNCTION MeanInverseSpeed(N1,N2,vmin,Halo) RESULT(eta)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(IN) :: Halo
   REAL*8 :: eta(N1,N2)
@@ -971,6 +723,66 @@ ELEMENTAL FUNCTION MeanInverseSpeedT(vmin,Halo) RESULT(eta)
     f = (vmin-Halo%vmin(K)) / (Halo%vmin(K+1)-Halo%vmin(K))
     eta = (1-f)*Halo%eta(K) + f*Halo%eta(K+1)
   END IF
+  
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! INTERFACE NAME: MeanSpeed
+! Calculates the mean speed (h) [km/s] for the given 2D
+! array of vmin, with h defined as:
+!     h(vmin) = \int_{|v|>vmin} d^3v |v| f(v)
+! Returns as array of size [1:N1,1:N2].
+! 
+! This is the 2D array version (2D array of vmin).
+! 
+! Input arguments:
+!   N1,N2       Size of vmin and eta arrays, i.e. [1:N1,1:N2]
+!   vmin        The minimum speed in the h integral [km/s].
+! 
+PURE FUNCTION MeanSpeed(N1,N2,vmin,Halo) RESULT(h)
+  IMPLICIT NONE
+  TYPE(HaloStruct), INTENT(IN) :: Halo
+  REAL*8 :: h(N1,N2)
+  INTEGER, INTENT(IN) :: N1,N2
+  REAL*8, INTENT(IN) :: vmin(N1,N2)
+  REAL*8 :: v0,vobs,vesc,x(N1,N2),y,z,Nesc
+  
+  ! Easier to use variable names
+  v0   = Halo%v0
+  vobs = Halo%vobs
+  vesc = Halo%vesc
+
+  IF ((v0 .EQ. 0) .OR. (vobs .EQ. 0) .OR. (vesc .EQ. 0)) THEN
+    WRITE(*,*) 'ERROR: One of more halo parameters are zero. Cannot calculate mean velocity.'
+    STOP   
+  END IF
+
+  x    = vmin / v0
+  y    = vobs / v0
+  z    = vesc / v0
+  Nesc = ERF(z) - 2*INVSQRTPI*z*EXP(-z**2)
+
+  IF (z .GT. 25d0) THEN
+    WRITE(*,*) 'ERROR: Escape velocity too large. Cannot calculate mean velocity.'
+    STOP
+  END IF
+
+  IF (z .LT. y) THEN
+    WRITE(*,*) 'ERROR: Escape velocity too small. Cannot calculate mean velocity.'
+    STOP
+  END IF
+
+  WHERE (x .LT. z-y)
+    h = 1.0/Nesc * v0 * (((x-y)/(2*y*SQRTPI) + INVSQRTPI) * exp(-(x-y)**2) & 
+        - ((x+y)/(2*y*SQRTPI) - INVSQRTPI) * exp(-(x+y)**2) + (1 + 2 * y**2) / (4*y) * (erf((x+y)) - erf((x-y))) &
+        - INVSQRTPI * ( 2 + ( (x+z-(x-y))**3 - (x+z-(x+y))**3 )/(3*y) ) * exp(-z**2) )
+  ELSE WHERE (x .LT. z+y)
+    h = 1.0/Nesc * v0 * (((x-y)/(2*y*SQRTPI) + INVSQRTPI) * exp(-(x-y)**2) &
+        - (z/(2*y*SQRTPI) - INVSQRTPI) * exp(-z**2) + (1 + 2 * y**2) / (4*y) * (erf(z) - erf((x-y))) &
+        - INVSQRTPI * ( 2 + ( (x+z-(x-y))**3 - (x+z-z)**3 )/(3*y) ) * exp(-z**2) )
+  ELSE WHERE
+    h = 0d0
+  END WHERE
   
 END FUNCTION
 
