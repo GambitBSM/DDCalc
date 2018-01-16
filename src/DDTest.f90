@@ -24,9 +24,10 @@ PROGRAM DDTest
 
   params_tmp = NRET_CreateCoeffList()
   CALL NRET_SetDMSpin(params_tmp, 0.5d0)
-  CALL NRET_SetNRCoefficient(params_tmp, 'Op1', 0, -4.0d0) 
-  CALL NRET_SetNRCoefficient(params_tmp, 'Op4_q2', 1, 7.0d0) 
-  WRITE (*,*) 'params_test =', params_tmp
+  CALL NRET_SetNRCoefficient(params_tmp, 'Op18', 0, 3.0d0) 
+  CALL NRET_SetNRCoefficient(params_tmp, 'Op18', 1, -2.0d0) 
+  !WRITE (*,*) 'params_test =', params_tmp(38:)
+
 
   WIMP = DDCalc_InitWIMP()
   CALL DDCalc_SetWIMP(WIMP,m=10.0d0,DMtype='NREffectiveTheory',params=params_tmp)
@@ -34,6 +35,8 @@ PROGRAM DDTest
   CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
   Detector = CRESST_II_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
+
+
 
   WRITE (*,*) 'InitSuccess =', Detector%InitSuccess
   WRITE (*,*) 'StatisticFlag =', Detector%StatisticFlag

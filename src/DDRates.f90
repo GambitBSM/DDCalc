@@ -296,20 +296,18 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
         STOP
      END IF 
 
-
-
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso 
          D%dRdEiso(KE,Kiso) = 0.0
          DO alpha = 1,8
-            S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, alpha, KE, Kiso)
-            WTilde_array = WTilde_Dummy(D, alpha, KE, Kiso)
-            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.6961e14 * dot_product(S1S2(:4), WTilde_array) * D%g_vmin(KE,Kiso)
-            D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.8871e3 * dot_product(S1S2(5:), WTilde_array) * D%h_vmin(KE,Kiso)
+            IF (abs(WIMP%params(37 + alpha))>0) THEN ! only calculate and add those terms in alpha for which the corresponding param entry is non-zero
+              S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, alpha, KE, Kiso)
+              WTilde_array = WTilde_Dummy(D, alpha, KE, Kiso)
+              D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.6961e14 * dot_product(S1S2(:4), WTilde_array) * D%g_vmin(KE,Kiso)
+              D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.8871e3 * dot_product(S1S2(5:), WTilde_array) * D%h_vmin(KE,Kiso)
+            END IF
          END DO
-
          D%dRdEiso(KE,Kiso) = D%fiso(Kiso)*Halo%rho*D%dRdEiso(KE,Kiso)/(2*PI*WIMP%m)
-         
        END DO
      END DO
 
