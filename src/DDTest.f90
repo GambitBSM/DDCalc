@@ -18,7 +18,7 @@ PROGRAM DDTest
   TYPE(WIMPStruct) :: WIMP
   TYPE(HaloStruct) :: Halo
   REAL*8 :: BGlogL
-  REAL*8 :: params_tmp(37)
+  REAL*8 :: params_tmp(45)
 
   WRITE (*,*) 'This is DDTest.' 
 
