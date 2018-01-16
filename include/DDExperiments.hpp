@@ -27,8 +27,6 @@ extern "C"
   int C_DDCalc_xenon1t_2017_init();
   int C_DDCalc_lux_2015_init();
   int C_DDCalc_pico_2l_init();
-  int C_DDCalc_pico_60_f_init();
-  int C_DDCalc_pico_60_i_init();
   int C_DDCalc_pico_60_init();
   int C_DDCalc_pico_60_2017_init();
   int C_DDCalc_supercdms_2014_init();
@@ -90,16 +88,6 @@ namespace DDCalc
   int PICO_2L_Init()
   {
     C_DDCalc_pico_2l_init();
-  }
-
-  int PICO_60_F_Init()
-  {
-    C_DDCalc_pico_60_f_init();
-  }
-
-  int PICO_60_I_Init()
-  {
-    C_DDCalc_pico_60_i_init();
   }
 
   int PICO_60_Init()
