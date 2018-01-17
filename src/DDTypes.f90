@@ -107,8 +107,8 @@ TYPE, PUBLIC :: HaloStruct
   CHARACTER(LEN=1024) :: g_file = ''
   INTEGER :: Nvmin = -1
   REAL*8, ALLOCATABLE :: vmin(:)
-  REAL*8, ALLOCATABLE :: g(:)
-  REAL*8, ALLOCATABLE :: h(:)
+  REAL*8, ALLOCATABLE :: g_vmin(:)
+  REAL*8, ALLOCATABLE :: h_vmin(:)
 END TYPE
 
 

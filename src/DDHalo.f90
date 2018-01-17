@@ -172,7 +172,7 @@ SUBROUTINE GetHalo(Halo,vrot,vlsr,vpec,vsun,rho,vbulk,vobs,v0,vesc,    &
     ALLOCATE(g_vmin(Halo%Nvmin))
     g_vmin = Halo%g_vmin
   END IF
-  IF (PRESENT(h)) THEN
+  IF (PRESENT(h_vmin)) THEN
     ALLOCATE(h_vmin(Halo%Nvmin))
     h_vmin = Halo%h_vmin
   END IF
