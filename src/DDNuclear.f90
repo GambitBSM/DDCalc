@@ -497,11 +497,10 @@ END SUBROUTINE
 
 
 
-SUBROUTINE CalcWTilde(Z,A,NE,qArray,WT)
+SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z,A,NE
-  !REAL*8, INTENT(IN) :: J
-  REAL*8 :: J
+  REAL*8, INTENT(IN) :: J
   REAL*8, INTENT(IN) :: qArray(NE)
   REAL*8, INTENT(INOUT) :: WT(1:8,1:4,NE)
 
@@ -513,7 +512,6 @@ SUBROUTINE CalcWTilde(Z,A,NE,qArray,WT)
 
   CALL LoadWbarFile(Z,A,wbar,success)
 
-  J = 0.0d0
 
   !TODO: implement success Abfrage !!!!
 

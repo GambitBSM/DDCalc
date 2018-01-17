@@ -257,7 +257,8 @@ $(BUILD)/DDHalo.o: $(BUILD)/DDConstants.o \
  $(BUILD)/DDNumerical.o \
  $(BUILD)/DDInput.o
 $(BUILD)/DDInput.o: $(BUILD)/DDUtils.o
-$(BUILD)/DDNuclear.o: $(BUILD)/DDConstants.o
+$(BUILD)/DDNuclear.o: $(BUILD)/DDConstants.o \
+ $(BUILD)/DDInput.o
 $(BUILD)/DDNumerical.o: $(BUILD)/DDUtils.o
 $(BUILD)/DDNREffectiveTheory.o: $(BUILD)/DDConstants.o \
  $(BUILD)/DDHalo.o \

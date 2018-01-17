@@ -240,7 +240,7 @@ END SUBROUTINE
 !		Allocated to size [1:8,1:4,1:NE,1:Niso] (see DDTypes).
 ! 
 SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
-                       Niso,Ziso,Aiso,fiso,Miso,NE,E,                   &
+                       Niso,Ziso,Aiso,Jiso,fiso,Miso,NE,E,                   &
                        Nbins,eff,WTilde)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(IN) :: D
@@ -434,7 +434,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   INTEGER, INTENT(IN), OPTIONAL :: Nevents_tot,Nevents_bin(:),Niso,Nelem,NE,Nbins
   INTEGER, INTENT(IN), OPTIONAL :: Ziso(:),Aiso(:),Zelem(:),stoich(:)
   REAL*8, INTENT(IN), OPTIONAL :: mass,time,exposure,Backgr_tot,Backgr_bin(:),Emin
-  REAL*8, INTENT(IN), OPTIONAL :: fiso(:),E(:),eff(:,:,0:),eff_all(:,0:)
+  REAL*8, INTENT(IN), OPTIONAL :: Jiso(:),fiso(:),E(:),eff(:,:,0:),eff_all(:,0:)
   LOGICAL :: E_change,eff_change,stat_change
   INTEGER :: KE,Kiso,Neff,ind_elem,ind_iso,ind,Niso_temp,eff_files,file_number
   INTEGER, ALLOCATABLE :: stoich0(:)
@@ -759,7 +759,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   IF (ALLOCATED(D%WTilde)) DEALLOCATE(D%WTilde)
   ALLOCATE(D%WTilde(1:8,1:4,D%NE,D%Niso))
   DO Kiso = 1,D%Niso
-    CALL CalcWTilde(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
+    CALL CalcWTilde(D%Ziso(Kiso),D%Aiso(Kiso),D%Jiso(Kiso),D%NE,                   &
                  EToQ(D%E,D%Miso(Kiso)),D%WTilde(:,:,:,Kiso))
   END DO
   
