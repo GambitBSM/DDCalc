@@ -26,7 +26,7 @@ FUNCTION SIMPLE_2014_Init() RESULT(D)
   INTEGER :: Kiso
   INTEGER :: K,Kmin,Kmax,Niso,Niso0
   INTEGER, ALLOCATABLE :: Ziso(:),Ziso0(:),Aiso(:),Aiso0(:)
-  REAL*8, ALLOCATABLE :: fiso(:),fiso0(:),Miso(:),Miso0(:)
+  REAL*8, ALLOCATABLE :: Jiso(:),Jiso0(:),fiso(:),fiso0(:),Miso(:),Miso0(:)
   
   ! Will build array of efficiencies below
   INTEGER :: NE
@@ -38,11 +38,12 @@ FUNCTION SIMPLE_2014_Init() RESULT(D)
   ! fractions correct.  C is placed last in the stoichiometry to
   ! allow easier extraction of F & Cl parts.
   CALL CompoundIsotopeList(3,(/17,9,6/),(/1,5,2/),                      &
-                           Niso0,Ziso0,Aiso0,fiso0,Miso0)
+                           Niso0,Ziso0,Aiso0,Jiso0,fiso0,Miso0)
   Niso = COUNT(Ziso0 .NE. 6)
-  ALLOCATE(Ziso(Niso),Aiso(Niso),fiso(Niso),Miso(Niso))
+  ALLOCATE(Ziso(Niso),Aiso(Niso),Jiso(Niso),fiso(Niso),Miso(Niso))
   Ziso = Ziso0(1:Niso)
   Aiso = Aiso0(1:Niso)
+  Jiso = Jiso0(1:Niso)
   fiso = fiso0(1:Niso)
   Miso = Miso0(1:Niso)
   
@@ -62,7 +63,7 @@ FUNCTION SIMPLE_2014_Init() RESULT(D)
   ! One call for all settings.
   ! Most of these _must_ be there to ensure everything get initialized.
   CALL SetDetector(D,exposure=18.24d0,Nevents_tot=8,Backgr_tot=12.7d0,      &
-                   Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,                 &
+                   Niso=Niso,Ziso=Ziso,Aiso=Aiso,fiso=fiso,Jiso=Jiso,       &
                    NE=NE,E=E,Nbins=0,eff_all=eff)
   D%eff_file = '[SIMPLE 2014]'
   
