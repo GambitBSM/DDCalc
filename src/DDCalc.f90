@@ -159,6 +159,7 @@ USE DDRates
 USE DDStats
 USE DDHalo
 USE DDCouplings
+USE DDNREffectiveTheory
 
 IMPLICIT NONE
 PRIVATE
@@ -474,7 +475,16 @@ SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
   REAL*8, INTENT(IN) :: m,fsp,fsn,app,apn
   TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
   CHARACTER(LEN=24) :: DMtype = 'NREffectiveTheory'
-  CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=[fsp,fsn,app,apn])
+  REAL*8 :: params_HiggsPortal(45)
+
+  ! Set operator coefficients for the HiggsPortal model scenario
+  params_HiggsPortal = NRET_CreateCoeffList()
+  CALL NRET_SetDMSpin(params_HiggsPortal, 0.5d0)
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 0, 0.0d0) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 1, 0.0d0) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 0, 0.0d0) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 1, 0.0d0) 
+  CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params_HiggsPortal)
 END SUBROUTINE
 
 SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
@@ -489,7 +499,7 @@ SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
 
   CALL DDCalc_GetWIMP(WIMP,m=m,DMtype=DMtype,params=params)
 
-  IF ( DMtype .EQ. 'HiggsPortal' ) THEN
+  IF ( DMtype .EQ. 'NREffectiveTheory' ) THEN
     fsp = params(1)
     fsn = params(2)
     app = params(3)

@@ -228,7 +228,8 @@ $(BUILD)/DDCalc.o: $(BUILD)/DDExperiments.o \
  $(BUILD)/DDDetectors.o \
  $(BUILD)/DDRates.o \
  $(BUILD)/DDStats.o \
- $(BUILD)/DDHalo.o
+ $(BUILD)/DDHalo.o \
+ $(BUILD)/DDNREffectiveTheory.o
 $(BUILD)/DDCouplings.o: $(BUILD)/DDConstants.o
 $(BUILD)/DDDetectors.o: $(BUILD)/DDTypes.o \
  $(BUILD)/DDNuclear.o \
