@@ -32,7 +32,8 @@ PROGRAM DDTest
   WIMP = DDCalc_InitWIMP()
   CALL DDCalc_SetWIMP(WIMP,m=10.0d0,DMtype='NREffectiveTheory',params=params_tmp)
   Halo = DDCalc_InitHalo()
-  CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
+  ! CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
+  CALL DDCalc_SetHalo(Halo,rho=0.3d0,g_file='data/gtab.dat',h_column=3,Nvmin=601)
   Detector = CRESST_II_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
 
