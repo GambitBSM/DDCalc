@@ -121,28 +121,32 @@ END SUBROUTINE
 
 
 ! standard SI scattering
-FUNCTION dRdE_SI(m, rho, eta, fiso, fp, fn, Wsi1, Wsi0, WsiM1)   &
+FUNCTION dRdE_SI(m, rho, eta, fiso, fp, fn, WTilde1_00, WTilde1_01, WTilde1_11)   &
     RESULT (rate)
   IMPLICIT NONE
 
   REAL*8 :: rate
   REAL*8, INTENT(IN) :: m, rho, eta, fiso, fp, fn
-  REAL*8, INTENT(IN) :: Wsi1, Wsi0, WsiM1
+  REAL*8, INTENT(IN) :: WTilde1_00, WTilde1_01, WTilde1_11
   REAL*8, PARAMETER :: TO_CPD_KG_KEV = 1.695e14 !   s / (cm^3 km GeV^4)  -->  cpd/kg/keV
 
     ! In the DDCalc/DarkBit convention, fp and fn are the coefficients
     ! of the DM DM N N term in the Lagrangian, assuming a Majorana DM
     ! particle. In particular, one has sigma_p = 4 mu^2 fp^2 / pi.  
-  ! dRdE = fiso*rho*eta(vmin)/(2*mDM) * 
-  !   ( 4 fp^2 Wsi(+1) + 4 fp fn Wsi(0) + 4 fn^2 Wsi(-1) )
-  ! The weighted structure functions Wsi are related to the usual Helm form factor F(E) via
-  !   Wsi(+1,E) = (1/pi) Z^2 F^2(E)        ! SI proton
-  !   Wsi( 0,E) = (1/pi) 2*Z*(A-Z) F^2(E)  ! SI crossterm
-  !   Wsi(-1,E) = (1/pi) (A-Z)^2 F^2(E)    ! SI neutron
-  rate = TO_CPD_KG_KEV * fiso * rho * eta/(2*m) * (    & 
-                4*fp**2 * Wsi1     &
-              + 4*fp*fn * Wsi0     &
-              + 4*fn**2 * WsiM1)
+  ! dRdE = fiso*rho*eta(vmin)/(2*pi*mDM) * 
+  !   ( 4 fp^2 WTilde1_pp + 4 fp fn WTilde1_pn + 4 fn^2 WTilde1_nn )
+  ! The weighted structure functions WTilde1_XX are related to the usual Helm form factor F(E) via
+  !   WTilde1_pp = WTilde1_00 + WTilde1_11 + 2*WTilde1_01 
+  !   WTilde1_pn = 2*(WTilde1_00 - WTilde1_11) 
+  !   WTilde1_nn = WTilde1_00 + WTilde1_11 - 2*WTilde1_01 
+  !
+  !   WTilde1_00 = 1/4 * A^2 F^2(E)        ! SI proton
+  !   WTilde1_01 = 1/4 * (2Z-A)^2 F^2(E)  ! SI crossterm
+  !   WTilde1_11 = 1/4 * A(2Z-A) F^2(E)    ! SI neutron
+  rate = TO_CPD_KG_KEV * fiso * rho * eta/(2*PI*m) * (    & 
+                4*fp**2 * (WTilde1_00 + WTilde1_11 + 2*WTilde1_01)     &
+              + 4*fp*fn * 2*(WTilde1_00 - WTilde1_11)     &
+              + 4*fn**2 * (WTilde1_00 + WTilde1_11 - 2*WTilde1_01))
   
 END FUNCTION
 
@@ -228,13 +232,16 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
     ! fp = WIMP%params(1), fn = WIMP%params(2)
     ! In the DDCalc/DarkBit convention, fp and fn are the coefficients
     ! of the DM DM N N term in the Lagrangian, assuming a Majorana DM
-    ! particle. In particular, one has sigma_p = 4 mu^2 fp^2 / pi.  
+    ! particle. In particular, one has sigma_p = 4 mu^2 fp^2 / pi.
+    ! Notice: WTilde1_00 corresponds to D%WTilde(1,1,KE,Kiso) 
+    ! Notice: WTilde1_01 corresponds to D%WTilde(1,2,KE,Kiso) 
+    ! Notice: WTilde1_11 corresponds to D%WTilde(1,4,KE,Kiso) 
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
-         !D%dRdEiso(KE,Kiso) = &
-         !    dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
-         !    D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
-         !    D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso))
+         D%dRdEiso(KE,Kiso) = &
+             dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+             D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+             D%WTilde(1,1,KE,Kiso), D%WTilde(1,2,KE,Kiso), D%WTilde(1,4,KE,Kiso))
        END DO
      END DO
 
