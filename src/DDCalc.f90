@@ -473,7 +473,7 @@ SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
   IMPLICIT NONE
   REAL*8, INTENT(IN) :: m,fsp,fsn,app,apn
   TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
-  CHARACTER(LEN=24) :: DMtype = 'HiggsPortal'
+  CHARACTER(LEN=24) :: DMtype = 'NREffectiveTheory'
   CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=[fsp,fsn,app,apn])
 END SUBROUTINE
 

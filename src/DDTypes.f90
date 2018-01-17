@@ -37,8 +37,6 @@ TYPE, PUBLIC :: WIMPStruct
   ! 'SDonly':      WIMP with only spin-dependent interactions
   ! 'SISD':        WIMP with spin-independent and spin-dependent 
   !                interactions
-  ! 'HiggsPortal': Fermionic WIMP with scalar and pseudoscalar
-  !                couplings to the Higgs boson
   ! 'NREffectiveTheory': Effective WIMP defined via the non-relativistic DM-nucleon operators
   CHARACTER(LEN=24) :: DMtype = ''
   ! List of WIMP parameters. 
@@ -50,9 +48,6 @@ TYPE, PUBLIC :: WIMPStruct
   ! 'SISD':        (fp, fn, ap, an)
   ! fp: SI DM-proton coupling, fn: SI DM-neutron coupling
   ! ap: SD DM-proton coupling, an: SD DM-neutron coupling
-  ! 'HiggsPortal': (fsp, fsn, app, apn)
-  ! fsp: scalar DM-proton coupling, fsn: scalar DM-neutron coupling
-  ! app: pseudoscalar DM-proton coupling, apn: pseudoscalar DM-neutron coupling
   ! 'NREffectiveTheory': 
   ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1, alpha_1, ..., alpha_8)
   ! The coefficients of each operator has to be given in units GeV^(-2).

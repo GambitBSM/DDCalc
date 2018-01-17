@@ -93,11 +93,6 @@ SUBROUTINE SetWIMP(WIMP, m, DMtype, params)
       WIMP%Nparams = 4
       updated = .TRUE.
     END IF
-    IF ( DMtype .EQ. 'HiggsPortal' ) THEN
-      WIMP%DMtype  = DMtype
-      WIMP%Nparams = 4
-      updated = .TRUE.
-    END IF
     IF ( DMtype .EQ. 'NREffectiveTheory' ) THEN
       WIMP%DMtype  = DMtype
       WIMP%Nparams = 45

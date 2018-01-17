@@ -152,26 +152,27 @@ END FUNCTION
 
 
 ! standard SD scattering
-FUNCTION dRdE_SD(m, rho, eta, fiso, ap, an, Wsd1, Wsd0, WsdM1)   &
+FUNCTION dRdE_SD(m, rho, eta, fiso, ap, an, WTilde56_00, WTilde56_01, WTilde56_11)   &
     RESULT (rate)
   IMPLICIT NONE
 
   REAL*8 :: rate
   REAL*8, INTENT(IN) :: m, rho, eta, fiso, ap, an
-  REAL*8, INTENT(IN) :: Wsd1, Wsd0, WsdM1
+  REAL*8, INTENT(IN) :: WTilde56_00, WTilde56_01, WTilde56_11
   REAL*8, PARAMETER :: TO_CPD_KG_KEV = 1.695e14 !   s / (cm^3 km GeV^4)  -->  cpd/kg/keV
 
-   ! This follows the Jungman/Kamionkowski convention of defining ap and an.
-  ! dRdE = 4*fiso*rho*eta(vmin)*Gfermi**2 / mDM * 
-  !   ( ap^2*WSd(+1) + ap*an*WSd(0) * an^2*Wsd(-1) )
-  ! The weighted structure functions Wsd are related to the Spp,Spn,Snn structure functions via
-  !   Wsd(+1,E) = 4/(2J+1) Spp(E)          ! SD proton
-  !   Wsd( 0,E) = 4/(2J+1) Spn(E)          ! SD crossterm
-  !   Wsd(-1,E) = 4/(2J+1) Snn(E)          ! SD neutron
-  rate = TO_CPD_KG_KEV * 4.0d0 * fiso * rho * eta *   &
-                FERMI_COUPLING_CONSTANT**2/m * (     &
-                ap**2 * Wsd1 + ap*an * Wsd0 +        &
-                an**2 * WsdM1 )
+   ! This follows the Jungman/Kamionkowski convention of defining ap and an, assuming a Majorana DM particle.
+   ! dRdE = fiso*rho*eta(vmin)/(2*pi*mDM) * 8 GFermi^2 * (
+   !          ap^2 (WTilde56_00 + WTilde56_11 + 2*WTilde56_01) +  
+   !          ap*an (2*WTilde56_00 - 2*WTilde56_11) + 
+   !          an^2 (WTilde56_00 + WTilde56_11 - 2*WTilde56_01) 
+   !       )
+   ! Here, WTilde56_XY = WTilde5_XY + WTilde6_XY
+  rate = TO_CPD_KG_KEV * fiso * rho * eta/(2*PI*m) *   &
+                8 * FERMI_COUPLING_CONSTANT**2 * (     &
+                ap**2 * (WTilde56_00 + WTilde56_11 + 2*WTilde56_01) + &
+                ap*an * (2*WTilde56_00 - 2*WTilde56_11) + &
+                an**2 * (WTilde56_00 + WTilde56_11 - 2*WTilde56_01))
 
 END FUNCTION
 
@@ -233,10 +234,12 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! This follows the Jungman/Kamionkowski convention of defining ap and an.
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
-         !D%dRdEiso(KE,Kiso) = &
-         !    dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
-         !    D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
-         !    D%Wsd(+1,KE,Kiso), D%Wsd(0,KE,Kiso), D%Wsd(-1,KE,Kiso))
+         D%dRdEiso(KE,Kiso) = &
+             dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+             D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+              D%WTilde(5,1,KE,Kiso)+D%WTilde(6,1,KE,Kiso), &
+              D%WTilde(5,2,KE,Kiso)+D%WTilde(6,2,KE,Kiso), &
+              D%WTilde(5,4,KE,Kiso)+D%WTilde(6,4,KE,Kiso))
        END DO
      END DO
 
@@ -246,32 +249,15 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! fp = WIMP%params(1), fn = WIMP%params(2), ap = WIMP%params(3), an = WIMP%params(4)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
-         !D%dRdEiso(KE,Kiso) = &
-         !  dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
-         !    D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
-         !    D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) + &
-         !  dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
-         !    D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
-         !    D%Wsd(+1,KE,Kiso), D%Wsd(0,KE,Kiso), D%Wsd(-1,KE,Kiso))
-       END DO
-     END DO
-
-  ELSE IF (WIMP%DMtype .EQ. 'HiggsPortal') THEN
-   ! fsN * (DM DM N N) + apN * (i DM G5 GM N N), assuming a Majorana DM particle
-   ! The expression for the rate originating from apN is the same as the standard SI interaction,
-   !   aside from an additional factor q^2/(4*mDM^2).
-   ! fsp = WIMP%params(1), fsn =  WIMP%params(2), app = WIMP%params(3), apn = WIMP%params(4)
-
-     DO KE = 1,D%NE
-       DO Kiso = 1,D%Niso
-         !D%dRdEiso(KE,Kiso) = &
-         !   dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), & ! scalar-scalar term
-         !    D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
-         !    D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) + &
-         !   dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), & ! psuedoscalar-scalar term
-         !    D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
-         !    D%Wsi(+1,KE,Kiso), D%Wsi(0,KE,Kiso), D%Wsi(-1,KE,Kiso)) * &
-         !    (2*D%Miso(Kiso)*D%E(KE)*1d-6)/(4d0 * WIMP%m**2)
+         D%dRdEiso(KE,Kiso) = &
+             dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+               D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+               D%WTilde(1,1,KE,Kiso), D%WTilde(1,2,KE,Kiso), D%WTilde(1,4,KE,Kiso)) + & 
+             dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+               D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+               D%WTilde(5,1,KE,Kiso)+D%WTilde(6,1,KE,Kiso), &
+               D%WTilde(5,2,KE,Kiso)+D%WTilde(6,2,KE,Kiso), &
+               D%WTilde(5,4,KE,Kiso)+D%WTilde(6,4,KE,Kiso))
        END DO
      END DO
 
