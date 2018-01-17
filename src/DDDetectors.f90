@@ -645,7 +645,6 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   END IF
 
   ! Set efficiencies
-  ! ...from file (note that right now only one efficiency can be provided for all isotopes)
   IF (PRESENT(eff_file_all)) THEN
     IF (eff_file_all .NE. '') THEN
       ALLOCATE(eff_all_new(D%NE,0:D%Nbins))

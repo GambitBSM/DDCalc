@@ -442,6 +442,54 @@ ELEMENTAL FUNCTION EToQ(E,Miso) RESULT(q)
   q = SQRT(2*Miso*(1d-6*E))
 END FUNCTION
 
+SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: Z,A
+  REAL*8, INTENT(INOUT) :: Wbar(8,4,11)
+  LOGICAL, INTENT(INOUT) :: success
+  INTEGER :: Nrow,Ncol
+  REAL*8, ALLOCATABLE :: data(:,:)
+  LOGICAL :: status
+
+  character(len=1024) :: filename
+  character(len=1024) :: format_string
+  
+  INTEGER :: Zlength, Alength
+  IF (Z < 10) THEN
+    Zlength = 1
+  ELSE
+    Zlength = 2
+  END IF
+
+  IF (A < 10) THEN
+    Alength = 1
+  ELSE IF (A < 100) THEN
+    Alength = 2
+  ELSE
+    Alength = 3
+  END IF
+
+  WRITE (format_string,"(A6,I1,A5,I1,A4)") "(A10,I",Zlength,",A1,I",Alength,",A4)"
+  WRITE (*,*) TRIM(format_string)
+
+  WRITE (filename,format_string) "data/Wbar/",Z,"_",A,".dat"
+  WRITE (*,*) TRIM(filename)
+
+  ! Load table from file
+  CALL LoadTable(file=TRIM(filename),Nrow=Nrow,Ncol=Ncol,data=data,status=status)
+  IF (.NOT. status) THEN
+    success = .FALSE.
+    Wbar(:,:,:) = 0
+  ELSE IF ((Ncol .NE. 1) .OR. (Nrow .NE. 352)) THEN
+    WRITE(0,*) 'ERROR: Number of entries in file ' // TRIM(filename) // ' does not agree with expectation.'
+    STOP
+  ELSE
+    success = .TRUE.
+    Wbar = reshape(data,shape(Wbar),order = (/3,2,1/))
+  END IF
+
+END SUBROUTINE
+
 
 
 
