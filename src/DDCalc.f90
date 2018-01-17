@@ -480,10 +480,10 @@ SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
   ! Set operator coefficients for the HiggsPortal model scenario
   params_HiggsPortal = NRET_CreateCoeffList()
   CALL NRET_SetDMSpin(params_HiggsPortal, 0.5d0)
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 0, 0.0d0) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 1, 0.0d0) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 0, 0.0d0) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 1, 0.0d0) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 0, 2d0*(fsp+fsn)) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 1, 2d0*(fsp-fsn)) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 0, 2d0*(app+apn)*PROTON_MASS/m) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 1, 2d0*(app-apn)*PROTON_MASS/m) 
   CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params_HiggsPortal)
 END SUBROUTINE
 
@@ -500,10 +500,10 @@ SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
   CALL DDCalc_GetWIMP(WIMP,m=m,DMtype=DMtype,params=params)
 
   IF ( DMtype .EQ. 'NREffectiveTheory' ) THEN
-    fsp = params(1)
-    fsn = params(2)
-    app = params(3)
-    apn = params(4)
+    fsp = 0.25*(params(2) + params(3))
+    fsn = 0.25*(params(2) - params(3))
+    app = 0.25*(params(24) + params(25)) * m/PROTON_MASS
+    apn = 0.25*(params(24) - params(25)) * m/PROTON_MASS
     found = .TRUE.
   END IF
 

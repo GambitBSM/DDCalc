@@ -181,6 +181,8 @@ testing of the DDCalc package:
   * Felix Kahlhoefer, DESY  
     LUX 2015/16, PICO, Panda X, Xenon1T
 
+  * Sebastian Wild, DESY  
+
   * Lauren Hsu, FermiLab  
     SuperCDMS.
 
