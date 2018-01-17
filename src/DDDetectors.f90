@@ -236,20 +236,19 @@ END SUBROUTINE
 !               [1:Niso,1:NE,0:Nbins], where the first index is over isotopes
 !               the second index is over recoil energies and the third
 !               index is over the bins.
-!   Wsi,Wsd     Allocatable dimension=3 array containing weighted form
-!               factors for spin-independent (SI) and spin-dependent
-!               (SD) couplings.  Allocated to size [-1:1,1:NE,1:Niso].
+!   WTilde      Allocatable dimension=4 array containing form factors.
+!		Allocated to size [1:8,1:4,1:NE,1:Niso] (see DDTypes).
 ! 
 SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,fiso,Miso,NE,E,                   &
-                       Nbins,eff,Wsi,Wsd)
+                       Nbins,eff,WTilde)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(IN) :: D
   INTEGER, INTENT(OUT), OPTIONAL :: Nevents(:),Niso,NE,Nbins
   INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Ziso(:),Aiso(:)
   REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background(:)
   REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: fiso(:),Miso(:),E(:),   &
-          eff(:,:,:),Wsi(:,:,:),Wsd(:,:,:)
+          eff(:,:,:),WTilde(:,:,:,:)
   
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot get information from a detector that has not been correctly initialized.'
@@ -298,14 +297,10 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
     eff = D%eff
   END IF
   
-  ! Weighted form factors
-  IF (PRESENT(Wsi)) THEN
-    ALLOCATE(Wsi(-1:1,D%NE,0:D%Niso))
-    Wsi = D%Wsi
-  END IF
-  IF (PRESENT(Wsd)) THEN
-    ALLOCATE(Wsd(-1:1,D%NE,0:D%Niso))
-    Wsd = D%Wsd
+  ! Form factors
+  IF (PRESENT(WTilde)) THEN
+    ALLOCATE(WTilde(1:8,1:4,D%NE,D%Niso))
+    WTilde = D%WTilde
   END IF
   
 END SUBROUTINE
@@ -754,20 +749,12 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
     E_change = .TRUE.
   END IF
   
-  ! Calculate weighted form factors (SI)
-  IF (ALLOCATED(D%Wsi)) DEALLOCATE(D%Wsi)
-  ALLOCATE(D%Wsi(-1:1,D%NE,D%Niso))
+  ! Calculate weighted form factors
+  IF (ALLOCATED(D%WTilde)) DEALLOCATE(D%WTilde)
+  ALLOCATE(D%WTilde(1:8,1:4,D%NE,D%Niso))
   DO Kiso = 1,D%Niso
-    CALL CalcWSI(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
-                 EToQ(D%E,D%Miso(Kiso)),D%Wsi(:,:,Kiso))
-  END DO
-
-  ! Calculate weighted form factors (SD)
-  IF (ALLOCATED(D%Wsd)) DEALLOCATE(D%Wsd)
-  ALLOCATE(D%Wsd(-1:1,D%NE,D%Niso))
-  DO Kiso = 1,D%Niso
-    CALL CalcWSD(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
-                 EToQ(D%E,D%Miso(Kiso)),D%Wsd(:,:,Kiso))
+    CALL CalcWTilde(D%Ziso(Kiso),D%Aiso(Kiso),D%NE,                   &
+                 EToQ(D%E,D%Miso(Kiso)),D%WTilde(:,:,:,Kiso))
   END DO
   
   ! Resize halo velocity arrays if necessary

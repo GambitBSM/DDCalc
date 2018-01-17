@@ -193,28 +193,15 @@ TYPE, PUBLIC :: DetectorStruct
   REAL*8, ALLOCATABLE :: eff(:,:,:)  
   
   ! Form factors -------------------------------
-  ! Tabulated spin-independent or spin-dependent form factors combined
-  ! with prefactors.  Arrays of size [-1:1,1:NE,1:Niso].  Defined as
-  ! [unitless]:
-  !   Wsi(+1,:,:) = (1/pi) Z^2 F^2(q)        ! SI proton
-  !   Wsi( 0,:,:) = (1/pi) 2*Z*(A-Z) F^2(q)  ! SI crossterm
-  !   Wsi(-1,:,:) = (1/pi) (A-Z)^2 F^2(q)    ! SI neutron
-  !   Wsd(+1,:,:) = 4/(2J+1) Spp(q)          ! SD proton
-  !   Wsd( 0,:,:) = 4/(2J+1) Spn(q)          ! SD crossterm
-  !   Wsd(-1,:,:) = 4/(2J+1) Snn(q)          ! SD neutron
-  ! The above definitions give for the conventional SI and SD
-  ! cross-sections:
-  !   \sigma(q) = \mu^2 (hbar c)^2 [W(1)*Gp^2 + W(0)*Gp*Gn + W(-1)*Gn^2]
-  ! where Gp and Gn are the effective proton and neutron couplings
-  ! in units of [GeV^-2] and \mu is the reduced mass.  In terms of
-  ! more commonly used notation:
-  !   SI (scalar):        G = 2f
-  !   SD (axial-vector):  G = 2\sqrt{2} G_F a
-  ! where G, f, and a have 'p' and 'n' subscripts.  While form factors
-  ! are often a function of the momentum transfer, we tabulate them
-  ! here as a function of recoil energy E = q^2/2M.
+  ! Tabulated form factors combined with prefactors.
+  ! Arrays of size [1:8,1:4,1:NE,1:Niso].  
+  ! The first index denotes the type of nuclear response function
+  ! The second index denotes the isospin combination in the order
+  ! (00, 01, 10, 11).
+  ! The third index corresponds to the energies stored in E(:)
+  ! The fourth index corresponds to the isotopes stored in Aiso(:) etc.
   ! NOTE: Need only be calculated once.
-  REAL*8, ALLOCATABLE :: Wsi(:,:,:),Wsd(:,:,:)
+  REAL*8, ALLOCATABLE :: WTilde(:,:,:,:)
   
   ! Halo ---------------------------------------
   ! The minimum velocity for producing a recoil of energy E, given

@@ -165,58 +165,6 @@ source file provides an example of how to call/use DDCalc routines
 from C++.
 
 
-Off the beaten track: momentum-dependent cross-sections
--------------------------------------------------------
-
-A variety of operators exist to describe WIMP-fermion scattering, and many
-lead to a non-trivial velocity- or momentum-dependence of the scattering
-cross-section. This requires direct search limits to be re-evaluated from
-first principles, since integrals over velocity or momentum must now take
-account of the changed functional form. Since DDCalc derives dark matter
-constraints from scratch rather than using digitised limits from experimental
-results derived using simple operators, it is in principle capable of
-supporting non-trivial velocity and momentum dependence. Although the
-current release does not support this behaviour by default, we here provide
-some instructions for the interested for adapting the code, using an example
-of a spin-independent cross-section with an extra q^2/m_DM factor which would
-arise, to take one example, from a pseudoscalar WIMP-nucleon interaction
-with a fermionic WIMP (see Beniwal et al, PRD 2016, arXiv:1512.06458).
-
-The extra factor can be included by making the following modifications to
-the DDcalc source code:
-
-1. Create an array of size [1:NE,1:Niso] in the DetectorStruct definition
-in DDTypes.f90 that can hold momentum transfer values in units of GeV:
-
-  ! Array of size [1:NE,1:Niso] containing the momenta transfer
-  ! corresponding to the tabulated energies and target isotopes [GeV].
-  REAL*8, ALLOCATABLE :: q(:,:)
-
-2. Initialise the momentum array in the SetDetector subroutine of
-DDDetectors.f90, by adding the following lines immediately before the
-definition of the weighted form factors:
-
-  IF ((iso_change .OR. E_change) .AND. (DP%Niso .GE. 0) .AND. (DP%NE .GE. 0)) THEN
-    IF (ALLOCATED(DP%q)) DEALLOCATE(DP%q)
-    ALLOCATE(DP%q(DP%NE,DP%Niso))
-    DO Kiso = 1,DP%Niso
-      DP%q(:,Kiso) = EToQ(DP%E,DP%Miso(Kiso))
-    END DO
-  END IF
-
-3. In the weighted form factor definitions that follow the previous modification,
-use DP\%q(:,Kiso) in place of EToQ when calling the CalcWSI and CalcWSD routines.
-
-4. Finally, modify the cross-section for the scattering process to include the
-extra q^2/m_DM factor. The relevant code lives in the CalcRates subroutine of
-DDRates.f90. To modify the spin independent cross-section, add an extra factor:
-
-  * (DP%q(:,Kiso) / (2 * WIMP%m))**2
-
-to the definitions of DP\%dRdEsi0(+1,:), DP\%dRdEsi0( 0,:) and DP\%dRdEsi0(-1,:).
-
-
-
 Contact
 -------
 
