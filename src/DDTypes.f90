@@ -104,10 +104,11 @@ TYPE, PUBLIC :: HaloStruct
   ! Instead of being calculated for SHM above, mean inverse speed
   ! can be given explicitly as a tabulation.
   LOGICAL :: tabulated = .FALSE.
-  CHARACTER(LEN=1024) :: eta_file = ''
+  CHARACTER(LEN=1024) :: g_file = ''
   INTEGER :: Nvmin = -1
   REAL*8, ALLOCATABLE :: vmin(:)
-  REAL*8, ALLOCATABLE :: eta(:)
+  REAL*8, ALLOCATABLE :: g_vmin(:)
+  REAL*8, ALLOCATABLE :: h_vmin(:)
 END TYPE
 
 
