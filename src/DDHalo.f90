@@ -3,8 +3,8 @@ MODULE DDHalo
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ! DDHalo
 !    Routines for initializing and modifying the dark matter halo
-!    distribution, as well as performing the mean inverse speed (eta)
-!    calculation needed for recoil rates.
+!    distribution, as well as performing the mean inverse speed (g)
+!    and mean speed (h) calculation needed for recoil rates.
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 USE DDConstants
@@ -130,23 +130,24 @@ CONTAINS
 !   vesc        Galactic/population escape speed [km/s] in the MB rest
 !               frame (_galactic_ escape speed only if MB has no bulk
 !               motion relative to galactic rest frame).
-! Optional output arguments regarding tabulated eta(vmin):
-!   tabulated   Indicates if a tabulated eta(vmin) is being used
-!   eta_file    The file tabulated eta were taken from
+! Optional output arguments regarding tabulated g(vmin) and h(vmin):
+!   tabulated   Indicates if a tabulated g(vmin) is being used
+!   g_file      The file tabulated g and h were taken from
 !   Nvmin       Number of tabulation points
 !   vmin        Allocatable array of vmin [km/s]
-!   eta         Allocatable array of mean inverse speeds at vmin [s/km]
+!   g_vmin      Allocatable array of mean inverse speeds at vmin [s/km]
+!   h_vmin      Allocatable array of mean speeds at vmin [km/s]
 ! 
 SUBROUTINE GetHalo(Halo,vrot,vlsr,vpec,vsun,rho,vbulk,vobs,v0,vesc,    &
-                   tabulated,eta_file,Nvmin,vmin,eta)
+                   tabulated,g_file,h_file,Nvmin,vmin,g_vmin,h_vmin)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(IN) :: Halo
-  CHARACTER(LEN=*), INTENT(OUT), OPTIONAL :: eta_file
+  CHARACTER(LEN=*), INTENT(OUT), OPTIONAL :: g_file, h_file
   LOGICAL, INTENT(OUT), OPTIONAL :: tabulated
   INTEGER, INTENT(OUT), OPTIONAL :: Nvmin
   REAL*8, INTENT(OUT), OPTIONAL :: vrot,vlsr(3),vpec(3),vsun(3),       &
                                    rho,vbulk(3),vobs,v0,vesc
-  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: vmin(:),eta(:)
+  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: vmin(:),g_vmin(:),h_vmin(:)
   
   IF (PRESENT(vrot))  vrot  = Halo%vrot
   IF (PRESENT(vlsr))  vlsr  = Halo%vlsr
@@ -161,15 +162,19 @@ SUBROUTINE GetHalo(Halo,vrot,vlsr,vpec,vsun,rho,vbulk,vobs,v0,vesc,    &
   IF (PRESENT(vesc))  vesc  = Halo%vesc
   
   IF (PRESENT(tabulated)) tabulated = Halo%tabulated
-  IF (PRESENT(eta_file)) eta_file = Halo%eta_file
+  IF (PRESENT(g_file)) g_file = Halo%g_file
   IF (PRESENT(Nvmin)) Nvmin = Halo%Nvmin
   IF (PRESENT(vmin)) THEN
     ALLOCATE(vmin(Halo%Nvmin))
     vmin = Halo%vmin
   END IF
-  IF (PRESENT(eta)) THEN
-    ALLOCATE(eta(Halo%Nvmin))
-    eta = Halo%eta
+  IF (PRESENT(g_vmin)) THEN
+    ALLOCATE(g_vmin(Halo%Nvmin))
+    g_vmin = Halo%g_vmin
+  END IF
+  IF (PRESENT(h)) THEN
+    ALLOCATE(h_vmin(Halo%Nvmin))
+    h_vmin = Halo%h_vmin
   END IF
 END SUBROUTINE
 
@@ -197,37 +202,37 @@ END SUBROUTINE
 !   vesc        Galactic/population escape speed [km/s] in the MB rest
 !               frame (_galactic_ escape speed only if MB has no bulk
 !               motion relative to galactic rest frame).
-! Optional tabulated eta(vmin) arguments.  Can be loaded from a given
-! file or explicitly provided.  If provided, Nvmin, vmin, and eta must
-! all be given to take effect.  When a tabulation is not provided, the
+! Optional tabulated g(vmin) and h(vmin) arguments.  Can be loaded from a 
+! given file or explicitly provided.  If provided, Nvmin, vmin and g must
+! all be given to take effect. When a tabulation is not provided, the
 ! mean inverse speed will be calculated explicitly (not tabulated!)
-! using the SHM as described by the above parameters.
-!   tabulated   Indicates if a tabulated eta(vmin) is to be used.  Implied
+! using the SHM as described by the above parameters. If h (or h_column) is
+! not provided, the corresponding entries will be set to zero.
+!   tabulated   Indicates if a tabulated g(vmin) is to be used.  Implied
 !               by the use of other tabulation arguments, but can be set
 !               false to return to the SHM calculation after a tabulation
 !               has been loaded.
-!   eta_file    File from which tabulated eta(vmin) should be read;
-!               default is to perform explicit calculations for the SHM
-!               describe The file tabulated eta were taken from
-!   eta_filename Sets the stored file name _without_ loading any data
-!               from the file.
-!   eta_file_K  The column number in the file to take eta from (default
-!               is second)
+!   g_file      File from which tabulated g(vmin) should be read
+!   g_column    The column in the file to take g from (default is 2)
+!   h_column    The column in the file to take h from. If not specified,
+!               h will be set to zero.
 !   Nvmin       Number of tabulation points
 !   vmin        Array of size [1:Nvmin] containing tabulation vmin [km/s]
-!   eta         Array of size [1:Nvmin] containing tabulated mean inverse
+!   g_vmin      Array of size [1:Nvmin] containing tabulated mean inverse
 !               speeds at vmin [s/km]
+!   h_vmin      Array of size [1:Nvmin] containing tabulated mean
+!               speeds at vmin [km/s]
 ! 
 SUBROUTINE SetHalo(Halo,vrot,vlsr,vpec,vsun,vobs,rho,vbulk,v0,vesc, &
-            tabulated,eta_file,eta_filename,eta_file_K,Nvmin,vmin,eta)
+            tabulated,g_file,g_column,h_column,Nvmin,vmin,g_vmin,h_vmin)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(INOUT) :: Halo
-  CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: eta_file,eta_filename
+  CHARACTER(LEN=*), INTENT(IN), OPTIONAL :: g_file
   LOGICAL, INTENT(IN), OPTIONAL :: tabulated
-  INTEGER, INTENT(IN), OPTIONAL :: eta_file_K,Nvmin
+  INTEGER, INTENT(IN), OPTIONAL :: g_column,h_column,Nvmin
   REAL*8, INTENT(IN), OPTIONAL :: vrot,vlsr(3),vpec(3),vsun(3),         &
                                   rho,vbulk(3),vobs,v0,vesc
-  REAL*8, INTENT(IN), OPTIONAL :: vmin(:),eta(:)
+  REAL*8, INTENT(IN), OPTIONAL :: vmin(:),g_vmin(:),h_vmin(:)
   INTEGER :: K
   
   IF (PRESENT(vrot))  CALL SetDiskRotationSpeed(vrot,Halo)
@@ -245,30 +250,41 @@ SUBROUTINE SetHalo(Halo,vrot,vlsr,vpec,vsun,vobs,rho,vbulk,v0,vesc, &
   IF (PRESENT(tabulated)) THEN
     IF (Halo%Nvmin .GT. 0) Halo%tabulated = tabulated
   END IF
-  IF (PRESENT(Nvmin) .AND. PRESENT(vmin) .AND. PRESENT(eta)) THEN
+  IF (PRESENT(Nvmin) .AND. PRESENT(vmin) .AND. PRESENT(g_vmin)) THEN
     IF (Nvmin .GT. 0) THEN
       IF (ALLOCATED(Halo%vmin)) DEALLOCATE(Halo%vmin)
-      IF (ALLOCATED(Halo%eta))  DEALLOCATE(Halo%eta)
+      IF (ALLOCATED(Halo%g_vmin))  DEALLOCATE(Halo%g_vmin)
+      IF (ALLOCATED(Halo%h_vmin))  DEALLOCATE(Halo%h_vmin)
       Halo%Nvmin = Nvmin
       Halo%vmin  = vmin
-      Halo%eta   = eta
+      Halo%g_vmin = g_vmin
+      IF (PRESENT(h_vmin)) THEN
+        Halo%h_vmin = h_vmin
+      ELSE
+        ALLOCATE(Halo%h_vmin(Nvmin))
+        Halo%h_vmin(:) = 0
+      END IF
       Halo%tabulated = .TRUE.
-      Halo%eta_file  = ''
+      Halo%g_file  = ''
     END IF
   END IF
-  IF (PRESENT(eta_file)) THEN
-    IF (PRESENT(eta_file_K)) THEN
-      K = eta_file_K
+  IF (PRESENT(g_file)) THEN
+    IF (PRESENT(g_column)) THEN
+      K = g_column
     ELSE
       K = 2
     END IF
-    CALL LoadArrays(file=eta_file,N=Halo%Nvmin,N1=1,C1=Halo%vmin,       &
-                    N2=K,C2=Halo%eta)
+    CALL LoadArrays(file=g_file,N=Halo%Nvmin,N1=1,C1=Halo%vmin,       &
+                    N2=K,C2=Halo%g_vmin)
+    IF (PRESENT(h_column)) THEN
+      CALL LoadArrays(file=g_file,N=K,N1=h_column,C1=Halo%h_vmin)
+    ELSE
+        ALLOCATE(Halo%h_vmin(Halo%Nvmin))
+        Halo%h_vmin(:) = 0      
+    END IF
     Halo%tabulated = .TRUE.
-    Halo%eta_file  = eta_file
+    Halo%g_file  = g_file
   END IF
-  
-  IF (PRESENT(eta_filename)) Halo%eta_file = eta_filename
   
 END SUBROUTINE
 
@@ -295,10 +311,11 @@ FUNCTION InitHalo() RESULT(Halo)
   Halo%vesc  = 550d0
   
   Halo%tabulated = .FALSE.
-  Halo%eta_file  = ''
+  Halo%g_file  = ''
   Halo%Nvmin = 0
   IF (ALLOCATED(Halo%vmin)) DEALLOCATE(Halo%vmin)
-  IF (ALLOCATED(Halo%eta))  DEALLOCATE(Halo%eta)
+  IF (ALLOCATED(Halo%g_vmin))  DEALLOCATE(Halo%g_vmin)
+  IF (ALLOCATED(Halo%h_vmin))  DEALLOCATE(Halo%h_vmin)
   
 END FUNCTION
 
@@ -591,28 +608,28 @@ END FUNCTION
 
 !-----------------------------------------------------------------------
 ! INTERFACE NAME: MeanInverseSpeed
-! Calculates the mean inverse speed (eta) [s/km] for the given 2D
-! array of vmin, with eta define as:
-!     eta(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
+! Calculates the mean inverse speed (g) [s/km] for the given 2D
+! array of vmin, with g defined as:
+!     g(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
 ! Returns as array of size [1:N1,1:N2].
 ! 
 ! This is the 2D array version (2D array of vmin).
 ! 
 ! Input arguments:
-!   N1,N2       Size of vmin and eta arrays, i.e. [1:N1,1:N2]
-!   vmin        The minimum speed in the eta integral [km/s].
+!   N1,N2       Size of vmin and g arrays, i.e. [1:N1,1:N2]
+!   vmin        The minimum speed in the g integral [km/s].
 ! 
-PURE FUNCTION MeanInverseSpeed(N1,N2,vmin,Halo) RESULT(eta)
+PURE FUNCTION MeanInverseSpeed(N1,N2,vmin,Halo) RESULT(g_vmin)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(IN) :: Halo
-  REAL*8 :: eta(N1,N2)
+  REAL*8 :: g_vmin(N1,N2)
   INTEGER, INTENT(IN) :: N1,N2
   REAL*8, INTENT(IN) :: vmin(N1,N2)
   REAL*8 :: v0,vobs,vesc,x(N1,N2),y,z,Nesc
   
   ! If have tabulation, use it
   IF (Halo%tabulated) THEN
-    eta = MeanInverseSpeedT(vmin,Halo)
+    g_vmin = MeanInverseSpeedT(vmin,Halo)
     RETURN
   END IF
   
@@ -625,12 +642,12 @@ PURE FUNCTION MeanInverseSpeed(N1,N2,vmin,Halo) RESULT(eta)
   ! Distribution is delta function
   IF (v0 .EQ. 0) THEN
     IF (vobs .EQ. 0d0) THEN
-      eta = 0d0
+      g_vmin = 0d0
     ELSE
       WHERE (vmin .LE. vobs)
-        eta = 1d0 / vobs
+        g_vmin = 1d0 / vobs
       ELSE WHERE
-        eta = 0d0
+        g_vmin = 0d0
       END WHERE
     END IF
     RETURN
@@ -642,20 +659,20 @@ PURE FUNCTION MeanInverseSpeed(N1,N2,vmin,Halo) RESULT(eta)
   Nesc = ERF(z) - 2*INVSQRTPI*z*EXP(-z**2)
   
   ! Special case: no relative motion by observer
-  !   eta = 2/(sqrt(pi) Nesc v0) [e^{-x^2} - e^{-z^2}]
+  !   g_vmin = 2/(sqrt(pi) Nesc v0) [e^{-x^2} - e^{-z^2}]
   ! Note: EXP2(a,b) = e^b - e^a
   IF (y .EQ. 0d0) THEN
     WHERE (x .LE. z)
-      eta = 2*INVSQRTPI/(Nesc*v0) * EXP2(-z**2,-x**2)
+      g_vmin = 2*INVSQRTPI/(Nesc*v0) * EXP2(-z**2,-x**2)
     ELSE WHERE
-      eta = 0d0
+      g_vmin = 0d0
     END WHERE
     RETURN
   END IF
   
   ! Special case: no finite cutoff (vesc is effectively infinite)
   IF (z .GT. 25d0) THEN
-    eta = ERF2(x-y,x+y) / (2*vobs)
+    g_vmin = ERF2(x-y,x+y) / (2*vobs)
     RETURN
   END IF
   
@@ -667,19 +684,19 @@ PURE FUNCTION MeanInverseSpeed(N1,N2,vmin,Halo) RESULT(eta)
   ! Separate y < z & y > z cases to make easier use of WHERE statements.
   IF (y .LT. z) THEN
     WHERE (x .LT. z-y)
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,x+y) - 4*INVSQRTPI*y*EXP(-z**2))
+      g_vmin = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,x+y) - 4*INVSQRTPI*y*EXP(-z**2))
     ELSE WHERE (x .LT. z+y)
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
+      g_vmin = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
     ELSE WHERE
-      eta = 0d0
+      g_vmin = 0d0
     END WHERE
   ELSE
     WHERE (x .LT. y-z)
-      eta = 1d0 / vobs
+      g_vmin = 1d0 / vobs
     ELSE WHERE (x .LT. y+z)
-      eta = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
+      g_vmin = 1d0 / (2*Nesc*vobs) * (ERF2(x-y,z) - 2*INVSQRTPI*(z+y-x)*EXP(-z**2))
     ELSE WHERE
-      eta = 0d0
+      g_vmin = 0d0
     END WHERE
   END IF
   
@@ -687,42 +704,42 @@ END FUNCTION
 
 
 !-----------------------------------------------------------------------
-! Calculates the mean inverse speed (eta) [s/km] for the given vmin,
-! with eta define as:
-!     eta(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
+! Calculates the mean inverse speed (g) [s/km] for the given vmin,
+! with g_vmin define as:
+!     g(vmin) = \int_{|v|>vmin} d^3v 1/|v| f(v)
 ! using the stored tabulation rather than the explicit calculation.
 ! 
 ! Input arguments:
-!   vmin        The minimum speed in the eta integral [km/s]
+!   vmin        The minimum speed in the g integral [km/s]
 ! 
-ELEMENTAL FUNCTION MeanInverseSpeedT(vmin,Halo) RESULT(eta)
+ELEMENTAL FUNCTION MeanInverseSpeedT(vmin,Halo) RESULT(g_vmin)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(IN) :: Halo
-  REAL*8 :: eta
+  REAL*8 :: g_vmin
   REAL*8, INTENT(IN) :: vmin
   INTEGER :: K
   REAL*8 :: f
   
   IF (.NOT. Halo%tabulated .OR. (Halo%Nvmin .LE. 0)) THEN
-    eta = 0d0
+    g_vmin = 0d0
     RETURN
   END IF
   
   K = BSearch(Halo%Nvmin,Halo%vmin,vmin)
   
   IF (K .LE. 0) THEN
-    eta = Halo%eta(1)
+    g_vmin = Halo%g_vmin(1)
   ELSE IF (K .GE. Halo%Nvmin) THEN
     IF (vmin .EQ. Halo%vmin(Halo%Nvmin)) THEN
-      eta = Halo%eta(Halo%Nvmin)
+      g_vmin = Halo%g_vmin(Halo%Nvmin)
     ELSE
-      eta = 0d0
+      g_vmin = 0d0
     END IF
   ELSE IF (Halo%vmin(K) .EQ. Halo%vmin(K+1)) THEN
-    eta = Halo%eta(K)
+    g_vmin = Halo%g_vmin(K)
   ELSE
     f = (vmin-Halo%vmin(K)) / (Halo%vmin(K+1)-Halo%vmin(K))
-    eta = (1-f)*Halo%eta(K) + f*Halo%eta(K+1)
+    g_vmin = (1-f)*Halo%g_vmin(K) + f*Halo%g_vmin(K+1)
   END IF
   
 END FUNCTION
@@ -737,17 +754,23 @@ END FUNCTION
 ! This is the 2D array version (2D array of vmin).
 ! 
 ! Input arguments:
-!   N1,N2       Size of vmin and eta arrays, i.e. [1:N1,1:N2]
+!   N1,N2       Size of vmin and h arrays, i.e. [1:N1,1:N2]
 !   vmin        The minimum speed in the h integral [km/s].
 ! 
-FUNCTION MeanSpeed(N1,N2,vmin,Halo) RESULT(h)
+FUNCTION MeanSpeed(N1,N2,vmin,Halo) RESULT(h_vmin)
   IMPLICIT NONE
   TYPE(HaloStruct), INTENT(IN) :: Halo
-  REAL*8 :: h(N1,N2)
+  REAL*8 :: h_vmin(N1,N2)
   INTEGER, INTENT(IN) :: N1,N2
   REAL*8, INTENT(IN) :: vmin(N1,N2)
   REAL*8 :: v0,vobs,vesc,x(N1,N2),y,z,Nesc
   
+  ! If have tabulation, use it
+  IF (Halo%tabulated) THEN
+    h_vmin = MeanSpeedT(vmin,Halo)
+    RETURN
+  END IF
+
   ! Easier to use variable names
   v0   = Halo%v0
   vobs = Halo%vobs
@@ -774,18 +797,60 @@ FUNCTION MeanSpeed(N1,N2,vmin,Halo) RESULT(h)
   END IF
 
   WHERE (x .LT. z-y)
-    h = 1.0/Nesc * v0 * (((x-y)/(2*y*SQRTPI) + INVSQRTPI) * exp(-(x-y)**2) & 
+    h_vmin = 1.0/Nesc * v0 * (((x-y)/(2*y*SQRTPI) + INVSQRTPI) * exp(-(x-y)**2) & 
         - ((x+y)/(2*y*SQRTPI) - INVSQRTPI) * exp(-(x+y)**2) + (1 + 2 * y**2) / (4*y) * (erf((x+y)) - erf((x-y))) &
         - INVSQRTPI * ( 2 + ( (x+z-(x-y))**3 - (x+z-(x+y))**3 )/(3*y) ) * exp(-z**2) )
   ELSE WHERE (x .LT. z+y)
-    h = 1.0/Nesc * v0 * (((x-y)/(2*y*SQRTPI) + INVSQRTPI) * exp(-(x-y)**2) &
+    h_vmin = 1.0/Nesc * v0 * (((x-y)/(2*y*SQRTPI) + INVSQRTPI) * exp(-(x-y)**2) &
         - (z/(2*y*SQRTPI) - INVSQRTPI) * exp(-z**2) + (1 + 2 * y**2) / (4*y) * (erf(z) - erf((x-y))) &
         - INVSQRTPI * ( 2 + ( (x+z-(x-y))**3 - (x+z-z)**3 )/(3*y) ) * exp(-z**2) )
   ELSE WHERE
-    h = 0d0
+    h_vmin = 0d0
   END WHERE
   
 END FUNCTION
+
+!-----------------------------------------------------------------------
+! Calculates the mean speed (h) [km/s] for the given vmin,
+! with h defined as:
+!     h(vmin) = \int_{|v|>vmin} d^3v |v| f(v)
+! using the stored tabulation rather than the explicit calculation.
+! 
+! Input arguments:
+!   vmin        The minimum speed in the h integral [km/s]
+! 
+ELEMENTAL FUNCTION MeanSpeedT(vmin,Halo) RESULT(h_vmin)
+  IMPLICIT NONE
+  TYPE(HaloStruct), INTENT(IN) :: Halo
+  REAL*8 :: h_vmin
+  REAL*8, INTENT(IN) :: vmin
+  INTEGER :: K
+  REAL*8 :: f
+  
+  IF (.NOT. Halo%tabulated .OR. (Halo%Nvmin .LE. 0)) THEN
+    h_vmin = 0d0
+    RETURN
+  END IF
+  
+  K = BSearch(Halo%Nvmin,Halo%vmin,vmin)
+  
+  IF (K .LE. 0) THEN
+    h_vmin = Halo%h_vmin(1)
+  ELSE IF (K .GE. Halo%Nvmin) THEN
+    IF (vmin .EQ. Halo%vmin(Halo%Nvmin)) THEN
+      h_vmin = Halo%h_vmin(Halo%Nvmin)
+    ELSE
+      h_vmin = 0d0
+    END IF
+  ELSE IF (Halo%vmin(K) .EQ. Halo%vmin(K+1)) THEN
+    h_vmin = Halo%h_vmin(K)
+  ELSE
+    f = (vmin-Halo%vmin(K)) / (Halo%vmin(K+1)-Halo%vmin(K))
+    h_vmin = (1-f)*Halo%h_vmin(K) + f*Halo%h_vmin(K+1)
+  END IF
+  
+END FUNCTION
+
 
 
 END MODULE
