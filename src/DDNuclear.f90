@@ -14,7 +14,7 @@ USE DDInput
 IMPLICIT NONE
 PRIVATE
 
-PUBLIC :: IsotopeMass, EtoQ, ElementIsotopeList, GetNiso, CompoundIsotopeList, CalcWSI, CalcWTilde
+PUBLIC :: IsotopeMass, EtoQ, ElementIsotopeList, GetNiso, CompoundIsotopeList, CalcF2, CalcWTilde
 
 CONTAINS
 
@@ -392,22 +392,19 @@ END FUNCTION
 !     W          Array of size [-1,1,1:N] to be filled with weighted
 !                form factor values [unitless].
 ! 
-PURE SUBROUTINE CalcWSI(Z,A,N,q,W)
+PURE SUBROUTINE CalcF2(A,N,q,F2)
+
   IMPLICIT NONE
-  INTEGER, INTENT(IN) :: Z,A,N
+  INTEGER, INTENT(IN) :: A,N
   REAL*8, INTENT(IN) :: q(1:N)
-  REAL*8, INTENT(OUT) :: W(-1:1,1:N)
+  REAL*8, INTENT(OUT) :: F2(1:N)
   INTEGER :: K
-  REAL*8 :: c,rn,qrn,qs,F2,weights(-1:1)
+  REAL*8 :: c,rn,qrn,qs
   REAL*8, PARAMETER :: Arn = 0.52d0
   REAL*8, PARAMETER :: S   = 0.9d0
   REAL*8, PARAMETER :: C1  = 1.23d0
   REAL*8, PARAMETER :: C2  = -0.60d0
-  
-  weights(+1) = Z**2      / PI
-  weights( 0) = 2*Z*(A-Z) / PI
-  weights(-1) = (A-Z)**2  / PI
-  
+    
   c  = C1*A**(1d0/3d0) + C2
   rn = SQRT(c**2 + (7d0/3d0)*PI**2*Arn**2 - 5*S**2)
   
@@ -417,11 +414,11 @@ PURE SUBROUTINE CalcWSI(Z,A,N,q,W)
     qs  = q(K)*S / HBARC
     ! avoid numerical issues for small q by using a Taylor expansion
     IF (qrn .LE. 0.01d0) THEN
-      F2 = (1 - qrn**2*((1d0/5d0) - qrn**2*(3d0/175d0))) * EXP(-qs**2)
+      F2(K) = (1 - qrn**2*((1d0/5d0) - qrn**2*(3d0/175d0))) * EXP(-qs**2)
     ELSE
-      F2 = 9 * (SIN(qrn) - qrn*COS(qrn))**2 / qrn**6 * EXP(-qs**2)
+      F2(K) = 9 * (SIN(qrn) - qrn*COS(qrn))**2 / qrn**6 * EXP(-qs**2)
     END IF
-    W(:,K) = F2 * weights
+    
   END DO
   
 END SUBROUTINE
@@ -474,10 +471,8 @@ SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
   END IF
 
   WRITE (format_string,"(A6,I1,A5,I1,A4)") "(A10,I",Zlength,",A1,I",Alength,",A4)"
-  WRITE (*,*) TRIM(format_string)
 
   WRITE (filename,format_string) "data/Wbar/",Z,"_",A,".dat"
-  WRITE (*,*) TRIM(filename)
 
   ! Load table from file
   CALL LoadTable(file=TRIM(filename),Nrow=Nrow,Ncol=Ncol,data=data,status=status)
@@ -506,31 +501,33 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
 
   REAL*8 :: yArray(NE)
   REAL*8 :: wbar(1:8,1:4,1:11)
+  REAL*8 :: F2(1:NE)
   LOGICAL :: success
   INTEGER :: alpha, t_tp, k
  
-
   CALL LoadWbarFile(Z,A,wbar,success)
 
-
-  !TODO: implement success Abfrage !!!!
-
-  yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray**2/4.0 
+  IF (success) THEN
+    yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray**2/4.0 
 	! Parameter y following 1308.6288
 
-   DO alpha = 1,8
+     DO alpha = 1,8
        DO t_tp = 1,4
           WT(alpha,t_tp,:) = 0.0d0
           DO k = 1,11
              WT(alpha,t_tp,:) = WT(alpha,t_tp,:) + wbar(alpha,t_tp,k)*(yArray**(k-1))
           END DO
+          WT(alpha,t_tp,:) = WT(alpha,t_tp,:)*4*PI/(2*J+1) * exp(-2*yArray)
        END DO
-   END DO
-   WT(alpha,t_tp,:) = WT(alpha,t_tp,:)*4*PI/(2*J+1) * exp(-2*yArray)
-
-
-
-
+     END DO
+   ELSE ! Use Helm form factor for SI interaction and set the rest to zero
+     WT(:,:,:) = 0
+     CALL CalcF2(A,NE,qArray,F2)
+     WT(1,1,:) = 1.d0/4.d0 * A**2 * F2(:)
+     WT(1,2,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
+     WT(1,3,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
+     WT(1,4,:) = 1.d0/4.d0 * (2*Z-A)**2 * F2(:)
+   END IF
 
 END SUBROUTINE
 

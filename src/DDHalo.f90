@@ -234,6 +234,7 @@ SUBROUTINE SetHalo(Halo,vrot,vlsr,vpec,vsun,vobs,rho,vbulk,v0,vesc, &
                                   rho,vbulk(3),vobs,v0,vesc
   REAL*8, INTENT(IN), OPTIONAL :: vmin(:),g_vmin(:),h_vmin(:)
   INTEGER :: K
+  LOGICAL :: success
   
   IF (PRESENT(vrot))  CALL SetDiskRotationSpeed(vrot,Halo)
   IF (PRESENT(vlsr))  CALL SetLocalStandardOfRest(vlsr,Halo)
@@ -275,13 +276,25 @@ SUBROUTINE SetHalo(Halo,vrot,vlsr,vpec,vsun,vobs,rho,vbulk,v0,vesc, &
       K = 2
     END IF
     CALL LoadArrays(file=g_file,N=Halo%Nvmin,N1=1,C1=Halo%vmin,       &
-                    N2=K,C2=Halo%g_vmin)
+                    N2=K,C2=Halo%g_vmin,status=success)
+    IF (.NOT. success) THEN
+      WRITE (*,*) 'Loading of tabulated g(v_min) failed.'
+      STOP
+    END IF
+
     IF (PRESENT(h_column)) THEN
       CALL LoadArrays(file=g_file,N=K,N1=h_column,C1=Halo%h_vmin)
+
+      IF (.NOT. success) THEN
+        WRITE (*,*) 'Loading of tabulated h(v_min) failed.'
+        STOP
+      END IF
+
     ELSE
         ALLOCATE(Halo%h_vmin(Halo%Nvmin))
         Halo%h_vmin(:) = 0      
     END IF
+
     Halo%tabulated = .TRUE.
     Halo%g_file  = g_file
   END IF
