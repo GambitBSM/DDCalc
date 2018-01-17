@@ -178,22 +178,6 @@ END FUNCTION
 
 
 
-
-
-! This function returns the nuclear response functions [WTilde_00, WTilde_01, WTilde_10, WTilde_11].
-! TODO: Replace the dummy assignments with the actual nuclear response functions!
-FUNCTION WTilde_Dummy(D, alpha, KE, Kiso) &
-    RESULT (WTilde_array)
-  IMPLICIT NONE
-
-  REAL*8 :: WTilde_array(4)
-  TYPE(DetectorStruct), INTENT(IN) :: D
-  INTEGER, INTENT(IN) :: alpha, KE, Kiso
-
-  WTilde_array = (/ 1.0d0, 0.1d0, 0.1d0, 0.5d0 /)
-
-END FUNCTION
-
 !
 ! End of auxiliary functions 
 ! -----------------------------------------------------------------------------
@@ -213,7 +197,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   TYPE(HaloStruct), INTENT(IN) :: Halo
   INTEGER :: Kiso, KE, Keff, Neff, alpha
   REAL*8 :: S1S2(8)
-  REAL*8 :: WTilde_array(4)
 
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot calculate rates for a detector that has not been correctly initialized.'
@@ -309,9 +292,10 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
          DO alpha = 1,8
             IF (abs(WIMP%params(37 + alpha))>0) THEN ! only calculate and add those terms in alpha for which the corresponding param entry is non-zero
               S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, alpha, KE, Kiso)
-              WTilde_array = WTilde_Dummy(D, alpha, KE, Kiso)
-              D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.6961e14 * dot_product(S1S2(:4), WTilde_array) * D%g_vmin(KE,Kiso)
-              D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + 1.8871e3 * dot_product(S1S2(5:), WTilde_array) * D%h_vmin(KE,Kiso)
+              D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + &
+                  1.6961e14 * dot_product(S1S2(:4), D%WTilde(alpha,:,KE,Kiso)) * D%g_vmin(KE,Kiso)
+              D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + &
+                  1.8871e3 * dot_product(S1S2(5:), D%WTilde(alpha,:,KE,Kiso)) * D%h_vmin(KE,Kiso)
             END IF
          END DO
          D%dRdEiso(KE,Kiso) = D%fiso(Kiso)*Halo%rho*D%dRdEiso(KE,Kiso)/(2*PI*WIMP%m)
