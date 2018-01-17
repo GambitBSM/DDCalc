@@ -167,6 +167,7 @@ TYPE, PUBLIC :: DetectorStruct
   INTEGER, ALLOCATABLE :: Aiso(:)
   REAL*8, ALLOCATABLE  :: fiso(:)
   REAL*8, ALLOCATABLE  :: Miso(:)  ! Calculated internally
+  REAL*8, ALLOCATABLE  :: Jiso(:)  ! Calculated internally
   
   ! Tabulation ---------------------------------
   ! Number of tabulation points (energies).

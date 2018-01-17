@@ -247,7 +247,7 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   INTEGER, INTENT(OUT), OPTIONAL :: Nevents(:),Niso,NE,Nbins
   INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Ziso(:),Aiso(:)
   REAL*8, INTENT(OUT), OPTIONAL :: mass,time,exposure,background(:)
-  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: fiso(:),Miso(:),E(:),   &
+  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: Jiso(:),fiso(:),Miso(:),E(:),   &
           eff(:,:,:),WTilde(:,:,:,:)
   
   IF ( .NOT. D%InitSuccess ) THEN
@@ -273,6 +273,10 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   IF (PRESENT(Aiso)) THEN
     ALLOCATE(Aiso(D%Niso))
     Aiso = D%Aiso
+  END IF
+  IF (PRESENT(Jiso)) THEN
+    ALLOCATE(Jiso(D%Niso))
+    Jiso = D%Jiso
   END IF
   IF (PRESENT(fiso)) THEN
     ALLOCATE(fiso(D%Niso))
@@ -364,12 +368,10 @@ END SUBROUTINE
 ! 5) Target elements
 ! EITHER
 !   Niso        Number of isotopes
-!   Ziso        Integer array of size [1:Niso] containing atomic
-!               numbers.
-!   Aiso        Integer array of size [1:Niso] containing atomic
-!               mass numbers.
-!   fiso        Array of size [1:Niso] containing isotope mass
-!               fractions.
+!   Ziso        Integer array of size [1:Niso] containing atomic numbers.
+!   Aiso        Integer array of size [1:Niso] containing atomic mass numbers.
+!   Jiso        Array of size [1:Niso] containing isotope total spin.
+!   fiso        Array of size [1:Niso] containing isotope mass fractions.
 ! OR
 !   Nelem       Number of elements in compound.
 !   Zelem       Integer array of size [1:Nelem] containing atomic
@@ -422,7 +424,7 @@ END SUBROUTINE
 
 SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
                        Nevents_tot,Nevents_bin,Backgr_tot,Backgr_bin,   &
-                       Niso,Ziso,Aiso,fiso,Nelem,Zelem,stoich,          &
+                       Niso,Ziso,Aiso,Jiso,fiso,Nelem,Zelem,stoich,     &
                        NE,E,E_file,eff_file,eff_file_all,eff,eff_all,   &
                        Emin)
   IMPLICIT NONE
@@ -587,16 +589,21 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       IF (PRESENT(fiso)) THEN
         D%fiso = fiso(1:Niso)
       END IF
+      IF (PRESENT(Jiso)) THEN
+        D%Jiso = Jiso(1:Niso)
+      END IF
       D%Miso = IsotopeMass(D%Ziso,D%Aiso)
-    ELSE IF (PRESENT(Ziso) .AND. PRESENT(Aiso) .AND. PRESENT(fiso)) THEN
+    ELSE IF (PRESENT(Ziso) .AND. PRESENT(Aiso) .AND. PRESENT(fiso) .AND. PRESENT(Jiso)) THEN
       IF (ALLOCATED(D%Ziso)) DEALLOCATE(D%Ziso)
       IF (ALLOCATED(D%Aiso)) DEALLOCATE(D%Aiso)
+      IF (ALLOCATED(D%Jiso)) DEALLOCATE(D%Jiso)
       IF (ALLOCATED(D%fiso)) DEALLOCATE(D%fiso)
       IF (ALLOCATED(D%Miso)) DEALLOCATE(D%Miso)
-      ALLOCATE(D%Ziso(Niso),D%Aiso(Niso),D%fiso(Niso),D%Miso(Niso))
+      ALLOCATE(D%Ziso(Niso),D%Aiso(Niso),D%Jiso(Niso),D%fiso(Niso),D%Miso(Niso))
       D%Niso = Niso
       D%Ziso = Ziso(1:Niso)
       D%Aiso = Aiso(1:Niso)
+      D%Jiso = Jiso(1:Niso)
       D%fiso = fiso(1:Niso)
       D%Miso = IsotopeMass(D%Ziso,D%Aiso)
       D%InitSuccess = .False. ! If Niso is changed, a new efficiency array must be provided
@@ -611,7 +618,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
       stoich0 = 1
     END IF
     CALL CompoundIsotopeList(Nelem,Zelem,stoich0,                       &
-                             D%Niso,D%Ziso,D%Aiso,D%fiso,D%Miso)
+                             D%Niso,D%Ziso,D%Aiso,D%Jiso,D%fiso,D%Miso)
     D%InitSuccess = .False. ! If Niso is changed, a new efficiency array must be provided
   END IF
   
