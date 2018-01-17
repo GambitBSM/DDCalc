@@ -63,15 +63,16 @@ END SUBROUTINE
 !     Niso       Number of isotopes
 !     Ziso       Allocatable array (integer) of isotopes' atomic numbers (Z)
 !     Aiso       Allocatable array (integer) of isotopes' atomic masses (A)
+!     Jiso       Allocatable array of isotopes' toal spin (J)
 !     fiso       Allocatable array of isotopes' mass fractions
 !     Miso       Allocatable array of isotopes' nuclear masses [GeV]
 ! 
-SUBROUTINE ElementIsotopeList(Z,Niso,Ziso,Aiso,fiso,Miso)
+SUBROUTINE ElementIsotopeList(Z,Niso,Ziso,Aiso,Jiso,fiso,Miso)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z
   INTEGER, INTENT(OUT) :: Niso
   INTEGER, ALLOCATABLE, INTENT(OUT) :: Ziso(:),Aiso(:)
-  REAL*8, ALLOCATABLE, INTENT(OUT) :: fiso(:),Miso(:)
+  REAL*8, ALLOCATABLE, INTENT(OUT) :: Jiso(:),fiso(:),Miso(:)
   INTEGER :: I1,I2
   ! Isotope data for all elements up to Z=92 (Uranium).
   ! Data is combined into single arrays; the ELEMENT_INDEX indicates
@@ -202,18 +203,18 @@ SUBROUTINE ElementIsotopeList(Z,Niso,Ziso,Aiso,fiso,Miso)
 
   IF (Z .LE. NELEMENTS) THEN
     CALL GetNiso(Z,Niso)
-    ALLOCATE(Ziso(Niso),Aiso(Niso),fiso(Niso),Miso(Niso))
+    ALLOCATE(Ziso(Niso),Aiso(Niso),Jiso(Niso),fiso(Niso),Miso(Niso))
     I1 = ELEMENT_INDEX(Z)
     I2 = I1 + Niso - 1
     Ziso = ISOTOPE_Z(I1:I2)
     Aiso = ISOTOPE_A(I1:I2)
-    !Jiso = ISOTOPE_J(I1:I2)
+    Jiso = ISOTOPE_J(I1:I2)
     fiso = ISOTOPE_F(I1:I2)
     Miso = IsotopeMass(Ziso,Aiso)
   ELSE
     Niso = 0
     ! Zero-length arrays (nothing to fill in)
-    ALLOCATE(Ziso(Niso),Aiso(Niso),fiso(Niso),Miso(Niso))
+    ALLOCATE(Ziso(Niso),Aiso(Niso),Jiso(Niso),fiso(Niso),Miso(Niso))
   END IF
   
 END SUBROUTINE
@@ -235,25 +236,26 @@ END SUBROUTINE
 !     Niso       Number of isotopes
 !     Ziso       Allocatable array (integer) of isotopes' atomic numbers (Z)
 !     Aiso       Allocatable array (integer) of isotopes' atomic masses (A)
+!     Jiso       Allocatable array of isotopes' total spin (J)
 !     fiso       Allocatable array of isotopes' mass fractions
 !     Miso       Allocatable array of isotopes' nuclear masses [GeV]
 ! 
-SUBROUTINE CompoundIsotopeList(N,Z,stoich,Niso,Ziso,Aiso,fiso,Miso)
+SUBROUTINE CompoundIsotopeList(N,Z,stoich,Niso,Ziso,Aiso,Jiso,fiso,Miso)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: N
   INTEGER, INTENT(IN) :: Z(N),stoich(N)
   INTEGER, INTENT(OUT) :: Niso
   INTEGER, ALLOCATABLE, INTENT(OUT) :: Ziso(:),Aiso(:)
-  REAL*8, ALLOCATABLE, INTENT(OUT) :: fiso(:),Miso(:)
+  REAL*8, ALLOCATABLE, INTENT(OUT) :: Jiso(:),fiso(:),Miso(:)
   INTEGER :: tempNiso,K,I1,I2
   REAL*8 :: weight(N)
   INTEGER, ALLOCATABLE :: tempZ(:),tempA(:)
-  REAL*8, ALLOCATABLE :: tempf(:),tempM(:)
+  REAL*8, ALLOCATABLE :: tempJ(:),tempf(:),tempM(:)
   
   ! Get number of isotopes.
   Niso = 0
   DO K = 1,N
-    CALL ElementIsotopeList(Z(K),tempNiso,tempZ,tempA,tempf,tempM)
+    CALL ElementIsotopeList(Z(K),tempNiso,tempZ,tempA,tempJ,tempf,tempM)
     Niso = Niso + tempNiso
     weight(K) = stoich(K) * SUM(tempf*tempM)
   END DO
@@ -268,12 +270,13 @@ SUBROUTINE CompoundIsotopeList(N,Z,stoich,Niso,Ziso,Aiso,fiso,Miso)
   ! Allocate and fill in total arrays.
   ! Reweight isotopes' mass fractions by element's mass fraction.
   I1 = 1
-  ALLOCATE(Ziso(Niso),Aiso(Niso),fiso(Niso),Miso(Niso))
+  ALLOCATE(Ziso(Niso),Aiso(Niso),Jiso(Niso),fiso(Niso),Miso(Niso))
   DO K = 1,N
-    CALL ElementIsotopeList(Z(K),tempNiso,tempZ,tempA,tempf,tempM)
+    CALL ElementIsotopeList(Z(K),tempNiso,tempZ,tempA,tempJ,tempf,tempM)
     I2 = I1 + tempNiso - 1
     Ziso(I1:I2) = tempZ
     Aiso(I1:I2) = tempA
+    Jiso(I1:I2) = tempJ
     fiso(I1:I2) = weight(K)*tempf
     Miso(I1:I2) = tempM
     I1 = I2 + 1
