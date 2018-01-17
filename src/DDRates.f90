@@ -232,6 +232,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   ELSE IF (WIMP%DMtype .EQ. 'SDonly') THEN
    ! ap = WIMP%params(1), an = WIMP%params(2)
    ! This follows the Jungman/Kamionkowski convention of defining ap and an.
+
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
@@ -254,7 +255,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
                D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
                D%WTilde(1,1,KE,Kiso), D%WTilde(1,2,KE,Kiso), D%WTilde(1,4,KE,Kiso)) + & 
              dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
-               D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+               D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
                D%WTilde(5,1,KE,Kiso)+D%WTilde(6,1,KE,Kiso), &
                D%WTilde(5,2,KE,Kiso)+D%WTilde(6,2,KE,Kiso), &
                D%WTilde(5,4,KE,Kiso)+D%WTilde(6,4,KE,Kiso))
