@@ -9,6 +9,7 @@ MODULE DDNuclear
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 USE DDConstants
+USE DDInput
 
 IMPLICIT NONE
 PRIVATE
@@ -493,20 +494,23 @@ END SUBROUTINE
 
 
 
-SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
+SUBROUTINE CalcWTilde(Z,A,NE,qArray,WT)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z,A,NE
-  REAL*8, INTENT(IN) :: J
+  !REAL*8, INTENT(IN) :: J
+  REAL*8 :: J
   REAL*8, INTENT(IN) :: qArray(NE)
   REAL*8, INTENT(INOUT) :: WT(1:8,1:4,NE)
 
   REAL*8 :: yArray(NE)
   REAL*8 :: wbar(1:8,1:4,1:11)
   LOGICAL :: success
-  INTEGER :: alpha, t_tp
+  INTEGER :: alpha, t_tp, k
  
 
-  !CALL LoadWbarFile(Z,A,wbar,success)
+  CALL LoadWbarFile(Z,A,wbar,success)
+
+  J = 0.0d0
 
   !TODO: implement success Abfrage !!!!
 
@@ -515,15 +519,13 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
 
    DO alpha = 1,8
        DO t_tp = 1,4
-
-          WT(alpha,t_tp,:) 
-
+          WT(alpha,t_tp,:) = 0.0d0
+          DO k = 1,11
+             WT(alpha,t_tp,:) = WT(alpha,t_tp,:) + wbar(alpha,t_tp,k)*(yArray**(k-1))
+          END DO
        END DO
    END DO
-  
    WT(alpha,t_tp,:) = WT(alpha,t_tp,:)*4*PI/(2*J+1) * exp(-2*yArray)
-
-4*PI/(2*J+1) * exp(-2*yArray) * sum_k=0^10 { wbar_alpha,k,t,tp * y^k }
 
 
 
