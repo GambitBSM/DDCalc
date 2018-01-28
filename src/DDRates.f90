@@ -27,9 +27,15 @@ END INTERFACE
 
 ! Event routines (utility)
 PUBLIC :: DDCalc_Events,DDCalc_Background
-PUBLIC :: DDCalc_Signal
+PUBLIC :: DDCalc_Signal,DDCalc_Bins
+PUBLIC :: DDCalc_BinEvents,DDCalc_BinBackground
+PUBLIC :: DDCalc_BinSignal
+
 PUBLIC :: C_DDCalc_Events,C_DDCalc_Background
-PUBLIC :: C_DDCalc_Signal
+PUBLIC :: C_DDCalc_Signal, C_DDCalc_Bins
+PUBLIC :: C_DDCalc_BinEvents,C_DDCalc_BinBackground
+PUBLIC :: C_DDCalc_BinSignal
+
 INTERFACE DDCalc_Events
   MODULE PROCEDURE GetEvents
 END INTERFACE
@@ -38,6 +44,18 @@ INTERFACE DDCalc_Background
 END INTERFACE
 INTERFACE DDCalc_Signal
   MODULE PROCEDURE GetSignal
+END INTERFACE
+INTERFACE DDCalc_Bins
+  MODULE PROCEDURE GetBins
+END INTERFACE
+INTERFACE DDCalc_BinEvents
+  MODULE PROCEDURE GetBinEvents
+END INTERFACE
+INTERFACE DDCalc_BinBackground
+  MODULE PROCEDURE GetBinBackground
+END INTERFACE
+INTERFACE DDCalc_BinSignal
+  MODULE PROCEDURE GetBinSignal
 END INTERFACE
 
 CONTAINS
@@ -51,13 +69,9 @@ CONTAINS
 !   D           The DetectorStruct structure to extract rate
 !               quantities from.
 ! Optional output arguments:
-!   Nevents     Number of observed events
+!   events      Number of observed events
 !   background  Average expected background events
 !   signal      Average expected signal events
-!   signal_si   Average expected spin-independent signal events
-!                  --> In the new DDCalc setup, this is set to zero as a dummy value.
-!   signal_sd   Average expected spin-dependent signal events
-!                  --> In the new DDCalc setup, this is set to zero as a dummy value.
 !   rate        Signal rate [cpd/kg]
 ! Optional bin arguments.  Arrays will be allocated to
 ! size [1:Nbins]:
@@ -69,14 +83,16 @@ CONTAINS
 !               each bin.  Allocated to size [1:Nbins].
 !               The sum of all bins is equal to 'rate'.
 !   
-SUBROUTINE GetRates(D,Nevents,background,signal,signal_si,signal_sd,    &
-                    rate,Nbins,binsignal,binrate)
+SUBROUTINE GetRates(D,events,background,signal,   &
+                    rate,Nbins,binevents,binbackground, &
+                    binsignal,binrate)
   IMPLICIT NONE
   TYPE(DetectorStruct), INTENT(IN) :: D
-  INTEGER, INTENT(OUT), OPTIONAL :: Nevents,Nbins
-  REAL*8, INTENT(OUT), OPTIONAL :: background,signal,signal_si,signal_sd,&
-          rate
-  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: binsignal(:),binrate(:)
+  INTEGER, INTENT(OUT), OPTIONAL :: events,Nbins
+  REAL*8, INTENT(OUT), OPTIONAL :: background,signal,rate
+
+  INTEGER, ALLOCATABLE, INTENT(OUT), OPTIONAL :: binevents(:)
+  REAL*8, ALLOCATABLE, INTENT(OUT), OPTIONAL :: binbackground(:),binsignal(:),binrate(:)
   
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot get information from a detector that has not been correctly initialized.'
@@ -84,13 +100,11 @@ SUBROUTINE GetRates(D,Nevents,background,signal,signal_si,signal_sd,    &
   END IF
 
   ! Observed events and expected background events
-  IF (PRESENT(Nevents))    Nevents    = D%Nevents(0)
+  IF (PRESENT(events))    events    = D%Nevents(0)
   IF (PRESENT(background)) background = D%Backgr(0)
   
   ! Signal events
   IF (PRESENT(signal))    signal    = D%MuSignal(0)
-  IF (PRESENT(signal_si)) signal_si = 0d0 ! FIXME: delete this dummy assignment
-  IF (PRESENT(signal_sd)) signal_sd = 0d0 ! FIXME: delete this dummy assignment
   
   ! Signal rates
   IF (PRESENT(rate))    rate    = D%R(0)
@@ -98,16 +112,27 @@ SUBROUTINE GetRates(D,Nevents,background,signal,signal_si,signal_sd,    &
   ! Bins
   IF (PRESENT(Nbins)) Nbins = D%Nbins
   
+  ! Observed events and expected background events
+  IF (PRESENT(binevents))  THEN
+    ALLOCATE(binevents(0:D%Nbins))
+    binevents = D%Nevents(0:D%Nbins)
+  END IF
+
+  IF (PRESENT(binbackground))  THEN
+    ALLOCATE(binbackground(0:D%Nbins))
+    binbackground = D%Backgr(0:D%Nbins)
+  END IF
+
   ! Signal events by bin
   IF (PRESENT(binsignal)) THEN
-    ALLOCATE(binsignal(D%Nbins))
-    binsignal = D%MuSignal(1:D%Nbins)
+    ALLOCATE(binsignal(0:D%Nbins))
+    binsignal = D%MuSignal(0:D%Nbins)
   END IF
   
   ! Signal rates by bin
   IF (PRESENT(binrate)) THEN
-    ALLOCATE(binrate(D%Nbins))
-    binrate = D%MuSignal(1:D%Nbins)
+    ALLOCATE(binrate(0:D%Nbins))
+    binrate = D%R(0:D%Nbins)
   END IF
   
 END SUBROUTINE
@@ -351,7 +376,7 @@ FUNCTION GetEvents(D) RESULT(N)
   IMPLICIT NONE
   INTEGER :: N
   TYPE(DetectorStruct), INTENT(IN) :: D
-  CALL GetRates(D,Nevents=N)
+  CALL GetRates(D,events=N)
 END FUNCTION
 
 !-----------------------------------------------------------------------
@@ -418,6 +443,139 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_Signal(DetectorIndex) &
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Signal'
   C_DDCalc_Signal = REAL(GetSignal(Detectors(DetectorIndex)%p),KIND=C_DOUBLE)
+END FUNCTION
+
+
+! ----------------------------------------------------------------------
+! Returns the number of bins.
+! 
+! Required input argument:
+!   D           A DetectorStruct containing detector info.
+! 
+FUNCTION GetBins(D) RESULT(N)
+  IMPLICIT NONE
+  INTEGER :: N
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  CALL GetRates(D,Nbins=N)
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_Events
+!
+INTEGER(KIND=C_INT) FUNCTION C_DDCalc_Bins(DetectorIndex) &
+ BIND(C,NAME='C_DDRates_ddcalc_bins')
+  USE ISO_C_BINDING, only: C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
+  IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
+  C_DDCalc_Bins = GetBins(Detectors(DetectorIndex)%p)
+END FUNCTION
+
+
+
+! ----------------------------------------------------------------------
+! Returns the observed number of events in a given bin.
+! 
+! Required input argument:
+!   D           A DetectorStruct containing detector info.
+! 
+FUNCTION GetBinEvents(D, ibin) RESULT(N)
+  IMPLICIT NONE
+  INTEGER :: N
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  INTEGER, INTENT(IN) :: ibin
+  INTEGER :: Nbins
+  INTEGER, ALLOCATABLE :: bins(:)
+  Nbins = GetBins(D)
+  CALL GetRates(D,binevents=bins)
+  IF ((ibin >= 0) .AND. (ibin <= Nbins)) THEN
+    N = bins(ibin)
+  ELSE
+    stop 'Bin index out of range!'
+  END IF
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_BinEvents
+!
+INTEGER(KIND=C_INT) FUNCTION C_DDCalc_BinEvents(DetectorIndex, BinIndex) &
+ BIND(C,NAME='C_DDRates_ddcalc_binevents')
+  USE ISO_C_BINDING, only: C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
+  INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
+  IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
+  C_DDCalc_BinEvents = GetBinEvents(Detectors(DetectorIndex)%p,BinIndex)
+END FUNCTION
+
+! ----------------------------------------------------------------------
+! Returns the expected background in a given bin.
+! 
+! Required input argument:
+!   D           A DetectorStruct containing detector info.
+! 
+FUNCTION GetBinBackground(D, ibin) RESULT(N)
+  IMPLICIT NONE
+  REAL*8 :: N
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  INTEGER, INTENT(IN) :: ibin
+  INTEGER :: Nbins
+  REAL*8, ALLOCATABLE :: bins(:)
+  Nbins = GetBins(D)
+  CALL GetRates(D,binbackground=bins)
+  IF ((ibin >= 0) .AND. (ibin <= Nbins)) THEN
+    N = bins(ibin)
+  ELSE
+    stop 'Bin index out of range!'
+  END IF
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_BinBackground
+!
+REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BinBackground(DetectorIndex, BinIndex) &
+ BIND(C,NAME='C_DDRates_ddcalc_binbackground')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
+  INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
+  IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
+  C_DDCalc_BinBackground = GetBinBackground(Detectors(DetectorIndex)%p, BinIndex)
+END FUNCTION
+
+! ----------------------------------------------------------------------
+! Returns the observed number of events in a given bin.
+! 
+! Required input argument:
+!   D           A DetectorStruct containing detector info.
+! 
+FUNCTION GetBinSignal(D, ibin) RESULT(N)
+  IMPLICIT NONE
+  REAL*8 :: N
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  INTEGER, INTENT(IN) :: ibin
+  INTEGER :: Nbins
+  REAL*8, ALLOCATABLE :: bins(:)
+  Nbins = GetBins(D)
+  CALL GetRates(D,binsignal=bins)
+  IF ((ibin >= 0) .AND. (ibin <= Nbins)) THEN
+    N = bins(ibin)
+  ELSE
+    stop 'Bin index out of range!'
+  END IF
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_BinSignal
+!
+REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BinSignal(DetectorIndex, BinIndex) &
+ BIND(C,NAME='C_DDRates_ddcalc_binsignal')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
+  INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
+  IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
+  C_DDCalc_BinSignal = GetBinSignal(Detectors(DetectorIndex)%p, BinIndex)
 END FUNCTION
 
 END MODULE
