@@ -75,7 +75,7 @@ FUNCTION LogLikelihood(D, x) RESULT(lnlike)
     N = D%Nevents(0)
     b = D%Backgr(0)
     s = D%MuSignal(0)*x0
-    IF (b .EQ. 0d0) THEN
+    IF (.NOT.(b > 0d0)) THEN
       b = N - s
       IF (b .LT. 0) THEN
         b = 0
@@ -89,7 +89,7 @@ FUNCTION LogLikelihood(D, x) RESULT(lnlike)
       N = D%Nevents(ibin)
       b = D%Backgr(ibin)
       s = D%MuSignal(ibin)*x0
-      IF (b .EQ. 0d0) THEN
+      IF (.NOT.(b > 0d0)) THEN
         b = N - s
         IF (b .LT. 0) THEN
           b = 0
