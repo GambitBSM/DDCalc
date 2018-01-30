@@ -388,7 +388,7 @@ INTEGER(KIND=C_INT) FUNCTION C_DDCalc_Events(DetectorIndex) &
   IMPLICIT NONE
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
-  C_DDCalc_Events = GetEvents(Detectors(DetectorIndex)%p)
+  C_DDCalc_Events = INT(GetEvents(Detectors(DetectorIndex)%p),KIND=C_INT)
 END FUNCTION
 
 
@@ -470,7 +470,7 @@ INTEGER(KIND=C_INT) FUNCTION C_DDCalc_Bins(DetectorIndex) &
   IMPLICIT NONE
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
-  C_DDCalc_Bins = GetBins(Detectors(DetectorIndex)%p)
+  C_DDCalc_Bins = INT(GetBins(Detectors(DetectorIndex)%p),KIND=C_INT)
 END FUNCTION
 
 
@@ -507,7 +507,7 @@ INTEGER(KIND=C_INT) FUNCTION C_DDCalc_BinEvents(DetectorIndex, BinIndex) &
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
   INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
-  C_DDCalc_BinEvents = GetBinEvents(Detectors(DetectorIndex)%p,BinIndex)
+  C_DDCalc_BinEvents = INT(GetBinEvents(Detectors(DetectorIndex)%p,BinIndex),KIND=C_INT)
 END FUNCTION
 
 ! ----------------------------------------------------------------------
@@ -542,7 +542,7 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BinBackground(DetectorIndex, BinIndex) &
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
   INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
-  C_DDCalc_BinBackground = GetBinBackground(Detectors(DetectorIndex)%p, BinIndex)
+  C_DDCalc_BinBackground = REAL(GetBinBackground(Detectors(DetectorIndex)%p, BinIndex),KIND=C_DOUBLE)
 END FUNCTION
 
 ! ----------------------------------------------------------------------
@@ -577,7 +577,7 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BinSignal(DetectorIndex, BinIndex) &
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
   INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
-  C_DDCalc_BinSignal = GetBinSignal(Detectors(DetectorIndex)%p, BinIndex)
+  C_DDCalc_BinSignal = REAL(GetBinSignal(Detectors(DetectorIndex)%p, BinIndex),KIND=C_DOUBLE)
 END FUNCTION
 
 END MODULE
