@@ -456,9 +456,7 @@ FUNCTION GetBins(D) RESULT(N)
   IMPLICIT NONE
   INTEGER :: N
   TYPE(DetectorStruct), INTENT(IN) :: D
-  WRITE (*,*) 'GetBins called'
   CALL GetRates(D,Nbins=N)
-  WRITE (*,*) 'Returning Nbins = ', N
 END FUNCTION
 
 !-----------------------------------------------------------------------
