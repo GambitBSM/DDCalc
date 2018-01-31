@@ -36,6 +36,9 @@ extern "C"
   int C_DDCalc_darwin_xe_init();
   int C_DDCalc_cresst_ii_init();
   int C_DDCalc_dummyexp_init();
+  int C_DDCalc_lz_init();
+  int C_DDCalc_darkside_init();
+  int C_DDCalc_pico_500_init();
 
 }
   
@@ -129,6 +132,21 @@ namespace DDCalc
   int DummyExp_Init()
   {
     C_DDCalc_dummyexp_init();
+  }
+
+  int LZ_Init()
+  {
+    C_DDCalc_lz_init();
+  }
+
+  int DarkSide_Init()
+  {
+    C_DDCalc_darkside_init();
+  }
+
+  int PICO_500_Init()
+  {
+    C_DDCalc_pico_500_init();
   }
     
 }

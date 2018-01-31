@@ -173,7 +173,8 @@ analyses := DARWIN_Ar.f90 DARWIN_Xe.f90 LUX_2013.f90 SIMPLE_2014.f90 \
             SuperCDMS_2014.f90 XENON100_2012.f90 LUX_2016.f90 \
             PandaX_2016.f90 LUX_2015.f90 PICO_2L.f90 CDMSlite.f90 \
             PICO_60.f90  Xenon1T_2017.f90 PICO_60_2017.f90 \
-            CRESST_II.f90 PandaX_2017.f90 DummyExp.f90
+            CRESST_II.f90 PandaX_2017.f90 DummyExp.f90 \
+            LZ.f90 DarkSide.f90 PICO_500.f90
 
 # Include files
 fincludes :=
@@ -251,7 +252,10 @@ $(BUILD)/DDExperiments.o: $(BUILD)/XENON100_2012.o \
  $(BUILD)/PICO_60_2017.o \
  $(BUILD)/DummyExp.o \
  $(BUILD)/Xenon1T_2017.o \
- $(BUILD)/CRESST_II.o
+ $(BUILD)/CRESST_II.o \
+ $(BUILD)/LZ.o \
+ $(BUILD)/DarkSide.o \
+ $(BUILD)/PICO_500.o 
 $(BUILD)/DDHalo.o: $(BUILD)/DDConstants.o \
  $(BUILD)/DDTypes.o \
  $(BUILD)/DDUtils.o \
