@@ -24,9 +24,14 @@ FUNCTION DarkSide_Init() RESULT(D)
 ! We consider 10 bins of size 5 keV in the range from 30 to 80 keV
   INTEGER, PARAMETER :: NBINS = 10
 
+! The dominant background is coherent neutrino scattering.
+! We take the curves from https://arxiv.org/pdf/1307.5458.pdf and rescale them to
+! 1.6 events in the ROI as stated in https://arxiv.org/pdf/1707.08145.pdf
+! In addition, we add 0.04 events per bin from instrumental backgrounds
+  REAL*8, PARAMETER :: Bg_bin(Nbins) = (/0.077, 0.117, 0.149, 0.156,    &
+                       0.149, 0.138, 0.128, 0.119, 0.111, 0.102/)
+! Very arbitrary at the moment.
   INTEGER, PARAMETER :: Nev_bin(Nbins) = (/0,0,0,0,0,0,0,0,0,0/)
-! DarkSide claims to be virtually background-free. Here we assume 0.4 events, evenly distributed across all bins
-  REAL*8, PARAMETER :: Bg_bin(Nbins) = (/0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04,0.04/)
 
 ! The efficiencies include the f_90 cut shown in Fig. 92
   CALL SetDetector(D,exposure=3.65d7,Nevents_bin=Nev_bin,               &

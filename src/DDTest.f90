@@ -12,12 +12,13 @@ PROGRAM DDTest
   USE DDHalo
   USE DDNuclear
   USE DDNREffectiveTheory
+  USE DDCouplings
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: Detector
   TYPE(WIMPStruct) :: WIMP
   TYPE(HaloStruct) :: Halo
-  REAL*8 :: BGlogL
+  REAL*8 :: BGlogL, an, ap
   REAL*8 :: params_tmp(45)
   INTEGER :: bins, ibin
   INTEGER :: events
@@ -45,12 +46,14 @@ PROGRAM DDTest
   CALL NRET_SetDMSpin(params_tmp, 0.5d0) ! this sets the DM spin to 1/2
   CALL NRET_SetNRCoefficient(params_tmp, 'Op6', 0, 1.0d-3)  ! this sets the isoscalar operator 6 to a given value
   CALL NRET_SetNRCoefficient(params_tmp, 'Op6', 1, -0.5d-3) ! this sets the isovector operator 6 to a given value
-  CALL DDCalc_SetWIMP(WIMP,m=30.0d0,DMtype='NREffectiveTheory',params=params_tmp)
-
+!  CALL DDCalc_SetWIMP(WIMP,m=30.0d0,DMtype='NREffectiveTheory',params=params_tmp)
+  ap = SigmapSDtoAp(218.0d0,1.9d-6)
+  an = SigmanSDtoAn(218.0d0,4.2d-6)
+  CALL DDCalc_SetWIMP(WIMP,m=218.0d0,DMtype='SDonly',params=[ap,an])
   Halo = DDCalc_InitHalo()
   CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
 
-  Detector = Xenon1T_2017_Init()
+  Detector = LZ_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
 
 

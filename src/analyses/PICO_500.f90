@@ -28,6 +28,7 @@ FUNCTION PICO_500_Init() RESULT(D)
 ! We assume the number of observed events closest to the number of expected events.
   INTEGER, PARAMETER :: Nev_bin(Nbins) = (/3,1/)
 
+! We assume that the threshold for the lower bin will be identical to the one of PICO-2L and PICO-60.
 ! The shorter run-time with low threshold is reflected by a reduced efficiency for the first bin.
 ! The total exposure is corrected for the mass fraction of fluorine.
 
