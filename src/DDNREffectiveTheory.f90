@@ -40,7 +40,7 @@ END INTERFACE
 
 CONTAINS
 
-! this function creates a list for the coefficients of the non-relativistic operators.
+! This function creates a list for the coefficients of the non-relativistic operators.
 ! All coefficients are set to zero, and the DM spin is set to -1.
 FUNCTION NRET_CreateCoeffList_fct() &
      RESULT (par)
@@ -51,7 +51,7 @@ FUNCTION NRET_CreateCoeffList_fct() &
 END FUNCTION
 
 
-! this function sets the spin of the DM particle
+! This function sets the spin of the DM particle
 SUBROUTINE NRET_SetDMSpin_fct(par, DMSpin)
   IMPLICIT NONE
   REAL*8, INTENT(INOUT) :: par(45)
@@ -60,7 +60,7 @@ SUBROUTINE NRET_SetDMSpin_fct(par, DMSpin)
 END SUBROUTINE
 
 
-! this function sets a single coefficient to a non-zero value (in units GeV^(-2))
+! This function sets a single coefficient to a non-zero value (in units GeV^(-2))
 SUBROUTINE NRET_SetNRCoefficient_fct(par, OpString, tau, value)
   IMPLICIT NONE
   REAL*8, INTENT(INOUT) :: par(45)
@@ -242,7 +242,10 @@ FUNCTION NRET_SFunctions_fct(D, m, p, alpha, KE, Kiso)   &
 
 END FUNCTION
 
-
+! This function updates the final 8 parameters of the WIMP structure, which keep track of the
+! nuclear response functions that must be calculated (see DDTypes).
+! Note that the precise value of these parameters is irrelevant, it only matters whether or not
+! they are greater than zero.
 SUBROUTINE NRET_UpdateNRCoefficients_fct(par)
   IMPLICIT NONE
   REAL*8, INTENT(INOUT) :: par(45)
