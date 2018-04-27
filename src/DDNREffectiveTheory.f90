@@ -16,7 +16,8 @@ IMPLICIT NONE
 PRIVATE
 
 
-PUBLIC :: NRET_SFunctions, NRET_CreateCoeffList, NRET_SetDMSpin, NRET_SetNRCoefficient, NRET_UpdateNRCoefficients
+PUBLIC :: NRET_SFunctions, NRET_CreateCoeffList, NRET_SetDMSpin, NRET_GetParamIndex,&
+   NRET_SetNRCoefficient, NRET_UpdateNRCoefficients
 
 INTERFACE NRET_SFunctions
   MODULE PROCEDURE NRET_SFunctions_fct
@@ -28,6 +29,10 @@ END INTERFACE
 
 INTERFACE NRET_SetDMSpin
   MODULE PROCEDURE NRET_SetDMSpin_fct
+END INTERFACE
+
+INTERFACE NRET_GetParamIndex
+  MODULE PROCEDURE NRET_GetParamIndex_fct
 END INTERFACE
 
 INTERFACE NRET_SetNRCoefficient
@@ -60,53 +65,50 @@ SUBROUTINE NRET_SetDMSpin_fct(par, DMSpin)
 END SUBROUTINE
 
 
-! this function sets a single coefficient to a non-zero value (in units GeV^(-2))
-SUBROUTINE NRET_SetNRCoefficient_fct(par, OpString, tau, value)
+! This function finds the index of the parameter array corresponding to a given operator index and isospin index
+SUBROUTINE NRET_GetParamIndex_fct(OpIndex, tau, i)
   IMPLICIT NONE
-  REAL*8, INTENT(INOUT) :: par(45)
-  CHARACTER(LEN=*), INTENT(IN) :: OpString
-  REAL*8, INTENT(IN) :: value
-  INTEGER, INTENT(IN) :: tau
-  INTEGER :: i
+  INTEGER, INTENT(IN) :: OpIndex, tau
+  INTEGER, INTENT(OUT) :: i
 
-  IF (OpString.EQ.'Op1') THEN
+  IF (OpIndex.EQ.1) THEN
     i = 2
-  ELSE IF (OpString.EQ.'Op1_q2') THEN
+  ELSE IF (OpIndex.EQ.(-1)) THEN
     i = 4
-  ELSE IF (OpString.EQ.'Op3') THEN
+  ELSE IF (OpIndex.EQ.3) THEN
     i = 6
-  ELSE IF (OpString.EQ.'Op4') THEN
+  ELSE IF (OpIndex.EQ.4) THEN
     i = 8
-  ELSE IF (OpString.EQ.'Op4_q2') THEN
+  ELSE IF (OpIndex.EQ.(-4)) THEN
     i = 10
-  ELSE IF (OpString.EQ.'Op5') THEN
+  ELSE IF (OpIndex.EQ.5) THEN
     i = 12
-  ELSE IF (OpString.EQ.'Op6') THEN
+  ELSE IF (OpIndex.EQ.6) THEN
     i = 14
-  ELSE IF (OpString.EQ.'Op7') THEN
+  ELSE IF (OpIndex.EQ.7) THEN
     i = 16
-  ELSE IF (OpString.EQ.'Op8') THEN
+  ELSE IF (OpIndex.EQ.8) THEN
     i = 18
-  ELSE IF (OpString.EQ.'Op9') THEN
+  ELSE IF (OpIndex.EQ.9) THEN
     i = 20
-  ELSE IF (OpString.EQ.'Op10') THEN
+  ELSE IF (OpIndex.EQ.10) THEN
     i = 22
-  ELSE IF (OpString.EQ.'Op11') THEN
+  ELSE IF (OpIndex.EQ.11) THEN
     i = 24
-  ELSE IF (OpString.EQ.'Op12') THEN
+  ELSE IF (OpIndex.EQ.12) THEN
     i = 26
-  ELSE IF (OpString.EQ.'Op13') THEN
+  ELSE IF (OpIndex.EQ.13) THEN
     i = 28
-  ELSE IF (OpString.EQ.'Op14') THEN
+  ELSE IF (OpIndex.EQ.14) THEN
     i = 30
-  ELSE IF (OpString.EQ.'Op15') THEN
+  ELSE IF (OpIndex.EQ.15) THEN
     i = 32
-  ELSE IF (OpString.EQ.'Op17') THEN
+  ELSE IF (OpIndex.EQ.17) THEN
     i = 34
-  ELSE IF (OpString.EQ.'Op18') THEN
+  ELSE IF (OpIndex.EQ.18) THEN
     i = 36
   ELSE
-    WRITE (*,*) 'Error in NRET_SetNRCoefficient_fct: invalid operator string.'
+    WRITE (*,*) 'Error in NRET_SetNRCoefficient_fct: invalid operator index.'
     STOP
   END IF
 
@@ -115,8 +117,23 @@ SUBROUTINE NRET_SetNRCoefficient_fct(par, OpString, tau, value)
     STOP
   END IF
 
-  par(i+tau) = value
+  i=i+tau
 
+END SUBROUTINE
+
+
+! this function sets a single coefficient to a non-zero value (in units GeV^(-2))
+! OpIndex is the index of the non-relativistic operator, e.g. 6 for O_6.
+! Additionally, OpIndex = -1 corresponds to q^2*O_1, and OpIndex = -4 corresponds to q^2*O_4
+SUBROUTINE NRET_SetNRCoefficient_fct(par, OpIndex, tau, value)
+  IMPLICIT NONE
+  REAL*8, INTENT(INOUT) :: par(45)
+  REAL*8, INTENT(IN) :: value
+  INTEGER, INTENT(IN) :: OpIndex, tau
+  INTEGER :: i
+
+  CALL NRET_GetParamIndex(OpIndex, tau, i)
+  par(i) = value
   CALL NRET_UpdateNRCoefficients(par)
 
 END SUBROUTINE

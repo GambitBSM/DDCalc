@@ -195,6 +195,9 @@ PUBLIC :: DDCalc_SetWIMP_mG
 PUBLIC :: DDCalc_GetWIMP_mG
 PUBLIC :: DDCalc_SetWIMP_Higgsportal
 PUBLIC :: DDCalc_GetWIMP_Higgsportal
+PUBLIC :: DDCalc_SetWIMP_NREffectiveTheory
+PUBLIC :: DDCalc_SetNRCoefficient
+PUBLIC :: DDCalc_GetNRCoefficient
 PUBLIC :: DDCalc_SetDetectorEmin
 ! C/C++ Wrappers
 PUBLIC :: C_DDCalc_SetSHM
@@ -204,6 +207,9 @@ PUBLIC :: C_DDCalc_SetWIMP_mG
 PUBLIC :: C_DDCalc_GetWIMP_mG
 PUBLIC :: C_DDCalc_SetWIMP_Higgsportal
 PUBLIC :: C_DDCalc_GetWIMP_Higgsportal
+PUBLIC :: C_DDCalc_SetWIMP_NREffectiveTheory
+PUBLIC :: C_DDCalc_SetNRCoefficient
+PUBLIC :: C_DDCalc_GetNRCoefficient
 PUBLIC :: C_DDCalc_SetDetectorEmin
 
 ! Rate calculation
@@ -480,10 +486,10 @@ SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
   ! Set operator coefficients for the HiggsPortal model scenario
   params_HiggsPortal = NRET_CreateCoeffList()
   CALL NRET_SetDMSpin(params_HiggsPortal, 0.5d0)
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 0, 2d0*(fsp+fsn)) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op1', 1, 2d0*(fsp-fsn)) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 0, 2d0*(app+apn)*PROTON_MASS/m) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 'Op11', 1, 2d0*(app-apn)*PROTON_MASS/m) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 1, 0, 2d0*(fsp+fsn)) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 1, 1, 2d0*(fsp-fsn)) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 11, 0, 2d0*(app+apn)*PROTON_MASS/m) 
+  CALL NRET_SetNRCoefficient(params_HiggsPortal, 11, 1, 2d0*(app-apn)*PROTON_MASS/m) 
   CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params_HiggsPortal)
 END SUBROUTINE
 
@@ -540,6 +546,111 @@ SUBROUTINE C_DDCalc_GetWIMP_higgsportal(WIMPIndex,m,fsp,fsn,app,apn) &
   app = app0
   apn = apn0
 END SUBROUTINE
+
+
+
+
+
+
+
+!-----------------------------------------------------------------------
+! Sets/gets a WIMP with type 'NREffectiveTheory'. 
+! DDCalc_SetWIMP_NREffectiveTheory simply initializes a WIMP within the 
+! non-relativistic effective theory setup, setting all coefficients to zero.
+!
+! DDCalc_SetNRCoefficient sets the value of a single operator to a given value.
+! Here, OpIndex is an integer specifying the operator, e.g. 6 for O_6.
+! In addition, OpIndex = -1 stands for q^2*O_1, and 
+!   OpIndex = -4 stands for q^2*O_4, and 
+!
+! DDCalc_GetNRCoefficient gets the values of the isoscalar and isovector 
+! coefficients of a given operator.
+! 
+SUBROUTINE DDCalc_SetWIMP_NREffectiveTheory(WIMP,m,spin)
+  IMPLICIT NONE
+  REAL*8, INTENT(IN) :: m,spin
+  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
+  CHARACTER(LEN=24) :: DMtype = 'NREffectiveTheory'
+  REAL*8 :: params(45)
+
+  params = NRET_CreateCoeffList()
+  CALL NRET_SetDMSpin(params, spin) 
+  CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params)
+END SUBROUTINE
+
+SUBROUTINE DDCalc_SetNRCoefficient(WIMP, OpIndex, tau, value)
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: OpIndex, tau
+  REAL*8, INTENT(IN) :: value
+  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
+
+  IF ( WIMP%DMtype .NE. 'NREffectiveTheory' ) THEN 
+   stop 'Error in DDCalc_SetNRCoefficient: WIMP is not of type NREffectiveTheory.'
+  END IF
+
+  CALL NRET_SetNRCoefficient(WIMP%params, OpIndex, tau, value) 
+END SUBROUTINE
+
+SUBROUTINE DDCalc_GetNRCoefficient(WIMP, OpIndex, value_isoscalar, value_isovector)
+  IMPLICIT NONE
+  REAL*8, INTENT(OUT) :: value_isoscalar, value_isovector
+  TYPE(WIMPStruct), INTENT(IN) :: WIMP
+  INTEGER, INTENT(IN) :: OpIndex
+  INTEGER :: index_isoscalar, index_isovector
+
+  IF ( WIMP%DMtype .NE. 'NREffectiveTheory' ) THEN 
+   stop 'Error in DDCalc_GetNRCoefficient: WIMP is not of type NREffectiveTheory.'
+  END IF
+
+  CALL NRET_GetParamIndex(OpIndex, 0, index_isoscalar)
+  CALL NRET_GetParamIndex(OpIndex, 1, index_isovector)
+  value_isoscalar = WIMP%params(index_isoscalar)
+  value_isovector = WIMP%params(index_isovector)
+
+END SUBROUTINE
+
+! C++ interface wrappers
+SUBROUTINE C_DDCalc_SetWIMP_NREffectiveTheory(WIMPIndex,m,spin) &
+           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_nreffectivetheory')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: m,spin
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) &
+    stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_NREffectiveTheory' 
+  CALL DDCalc_SetWIMP_NREffectiveTheory(WIMPs(WIMPIndex)%p,&
+               m=REAL(m,KIND=8),spin=REAL(m,KIND=8))
+END SUBROUTINE
+
+SUBROUTINE C_DDCalc_SetNRCoefficient(WIMPIndex, OpIndex, tau, value) &
+           BIND(C,NAME='C_DDCalc_ddcalc_setnrcoefficient')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex, OpIndex, tau
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: value
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) &
+    stop 'Invalid WIMP index given to C_DDCalc_SetNRCoefficient' 
+  CALL DDCalc_SetNRCoefficient(WIMPs(WIMPIndex)%p,OpIndex,&
+               tau,value=REAL(value,KIND=8))
+END SUBROUTINE
+
+
+SUBROUTINE C_DDCalc_GetNRCoefficient(WIMPIndex,OpIndex, value_isoscalar, value_isovector) &
+           BIND(C,NAME='C_DDCalc_ddcalc_getnrcoefficient')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(OUT) :: value_isoscalar, value_isovector
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex, OpIndex
+  REAL*8 :: value_isoscalar0, value_isovector0
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetNRCoefficient' 
+  CALL DDCalc_GetNRCoefficient(WIMPs(WIMPIndex)%p,OpIndex,&
+    value_isoscalar=value_isoscalar0,value_isovector=value_isovector0)
+  ! Automatic type conversions here
+  value_isoscalar = value_isoscalar0
+  value_isovector = value_isovector0
+END SUBROUTINE
+
+
 
 ! ----------------------------------------------------------------------
 ! Sets the minimum recoil energy to be included in the calculations.

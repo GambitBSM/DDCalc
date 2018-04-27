@@ -45,6 +45,12 @@ extern "C"
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_higgsportal(const int&, double&,
                   double&, double&, double&, double&);
+  void C_DDCalc_ddcalc_setwimp_nreffectivetheory(const int&, const double&,
+                  const double&);
+  void C_DDCalc_ddcalc_setnrcoefficient(const int&, const int&,
+                  const int&, const double&);
+  void C_DDCalc_ddcalc_getnrcoefficient(const int&, const int&,
+                  const double&, const double&);
   
   // Detector parameter setter (minimum recoil energy to consider)
   void C_DDCalc_ddcalc_setdetectoremin(const int&, const double&);
@@ -134,7 +140,19 @@ namespace DDCalc
   {
     C_DDCalc_ddcalc_setwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
   }
-    
+
+  void SetWIMP_NREffectiveTheory(const int WIMPIndex, const double m, const double spin)
+  {
+    C_DDCalc_ddcalc_setwimp_nreffectivetheory(WIMPIndex,m,spin);
+  }
+
+  void SetNRCoefficient(const int WIMPIndex, const int OpIndex, const int tau,
+                  const double value)
+  {
+    C_DDCalc_ddcalc_setnrcoefficient(WIMPIndex, OpIndex, tau, value);
+  }
+   
+
   // Get the WIMP parameters with the same signatures and units as above.
   // The only difference is that WIMP-nucleon cross-sections are always
   // positive.
@@ -154,6 +172,12 @@ namespace DDCalc
                           double& app, double& apn)
   {
     C_DDCalc_ddcalc_getwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
+  }
+
+  void GetNRCoefficient(const int WIMPIndex, const int OpIndex,
+                  const double value_isoscalar, const double value_isovector)
+  {
+    C_DDCalc_ddcalc_getnrcoefficient(WIMPIndex,OpIndex, value_isoscalar, value_isovector);
   }
   
   //########## Detector setter #########################################

@@ -44,8 +44,8 @@ PROGRAM DDTest
   !!!            the operators to non-zero values
   params_tmp = NRET_CreateCoeffList() ! this creates an empty list of coefficients
   CALL NRET_SetDMSpin(params_tmp, 0.5d0) ! this sets the DM spin to 1/2
-  CALL NRET_SetNRCoefficient(params_tmp, 'Op6', 0, 1.0d-3)  ! this sets the isoscalar operator 6 to a given value
-  CALL NRET_SetNRCoefficient(params_tmp, 'Op6', 1, -0.5d-3) ! this sets the isovector operator 6 to a given value
+  CALL NRET_SetNRCoefficient(params_tmp, 6, 0, 1.0d-3)  ! this sets the isoscalar operator 6 to a given value
+  CALL NRET_SetNRCoefficient(params_tmp, 6, 1, -0.5d-3) ! this sets the isovector operator 6 to a given value
 !  CALL DDCalc_SetWIMP(WIMP,m=30.0d0,DMtype='NREffectiveTheory',params=params_tmp)
   ap = SigmapSDtoAp(218.0d0,1.9d-6)
   an = SigmanSDtoAn(218.0d0,4.2d-6)
