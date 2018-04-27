@@ -29,8 +29,8 @@ FUNCTION DARWIN_Init() RESULT(D)
 
   CALL SetDetector(D,exposure=7.3d7,Nevents_bin=Nev_bin,                &
                    Backgr_bin=Bg_bin,Nelem=1,Zelem=(/54/),              &
-                   Nbins=NBINS,E_file='data/DARWIN/energies.dat',       &
-                   eff_file_all='data/DARWIN/efficiencies.dat')
+                   Nbins=NBINS,E_file='DARWIN/energies.dat',            &
+                   eff_file_all='DARWIN/efficiencies.dat')
   
 END FUNCTION  
 

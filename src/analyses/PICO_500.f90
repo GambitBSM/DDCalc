@@ -34,8 +34,8 @@ FUNCTION PICO_500_Init() RESULT(D)
 
   CALL SetDetector(D,exposure=1.03d5,Nevents_bin=Nev_bin,               &
                    Backgr_bin=Bg_bin,Nelem=1,Zelem=(/9/),               &
-                   Nbins=NBINS,E_file='data/PICO-500/energies.dat',     &
-                   eff_file_all='data/PICO-500/efficiencies.dat')
+                   Nbins=NBINS,E_file='PICO-500/energies.dat',          &
+                   eff_file_all='PICO-500/efficiencies.dat')
   
 END FUNCTION  
 

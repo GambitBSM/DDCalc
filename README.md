@@ -3,10 +3,8 @@ DDCalc
 
 The DDCalc software package is a set of routines and a frontend for
 doing various dark matter direct detection calculations for several
-experimental results.  Most notably, these include likelihood
-constraints: either Poisson-based with Feldman-Cousins ordering
-(Feldman & Cousins 1998), or exclusion limits  based on the maximum
-gap method (Yellin 2002).
+experimental results.  Most notably, these include Poisson likelihoods
+(binned and unbinned) and p-values based on the maximum gap method (Yellin 2002).
 
 A full description of this package and the physics framework behind
 it can be found in the [GAMBIT DarkBit paper](DarkBitPaper.pdf):
@@ -126,29 +124,6 @@ This will generate the following:
   * DDCalc_exampleF, DDCalc_exampleC
     Simple example programs with source code showing how to use
     the DDCalc routines externally from either Fortran or C++.
-
-
-Command-line usage
----------------
-
-The program 'DDCalc_run' is a frontend to the DDCalc routines.
-It can perform a variety of calculations.  Full details of its
-usage can be found by running:
-
-  ./DDCalc_run --help
-
-or by looking at the 'doc/DDCalc_run.help' file.
-
-As a quick example, try:
-
-  ./DDCalc_run --Xenon1T-2017 --limits-SI --verbosity=3
-
-This will use the Xenon1T results (--Xenon1T-2017) to generate
-upper limits on the spin-independent WIMP-nucleon cross-section
-using the maximum gap method (--limits-SI). The last flag
-(--verbosity=3) gives more detailed output.  Likelihood constraints
-can be generated using '--constraints-SI' instead.  Replace 'SI'
-with 'SD' for spin-dependent limits.
 
 
 Usage as a library

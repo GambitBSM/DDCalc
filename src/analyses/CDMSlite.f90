@@ -7,6 +7,7 @@ MODULE CDMSlite
 
 USE DDTypes
 USE DDDetectors
+USE DDInput
 
 IMPLICIT NONE
 
@@ -27,8 +28,8 @@ FUNCTION CDMSlite_Init() RESULT(D)
 
   CALL SetDetector(D,exposure=70.1d0,Nevents_bin=Nev_bin,               &
                    Backgr_bin=Bg_bin,Nelem=1,Zelem=(/32/),              &
-                   Nbins=NBINS,E_file='data/CDMSlite/energies.dat',     &
-                   eff_file_all='data/CDMSlite/efficiencies.dat')
+                   Nbins=NBINS,E_file='CDMSlite/energies.dat',          &
+                   eff_file_all='CDMSlite/efficiencies.dat')
   D%eff_file = '[CDMSlite]'
   
 END FUNCTION  

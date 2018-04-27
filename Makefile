@@ -119,7 +119,7 @@ ifeq (,$(findstring -fPIC,$(FFLAGS)))
 endif
 
 # Flags used to specify DDCalc folder
-FFLAGS += -D DDCALC_DIR=\"$(DDCALC_DIR)\"
+FFLAGS += -D DDCALC_DIR=\"$(DDCALC_DIR)\" -D DATA_DIR=\"$(DATA)\"
 
 # C++ compiler and flags.  Only used for test program.
 # CXX_FLIBS are libraries necessary for linking fortran
@@ -157,7 +157,7 @@ endif
 #################### FILES / TARGETS #######################
 
 # Main programs
-fprograms := DDTest DDLikelihood DDExclusion
+fprograms := DDTest DDExclusion
 
 # Example/test programs
 ftestprograms := DDCalc_exampleF

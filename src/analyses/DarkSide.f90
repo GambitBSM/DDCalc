@@ -36,8 +36,8 @@ FUNCTION DarkSide_Init() RESULT(D)
 ! The efficiencies include the f_90 cut shown in Fig. 92
   CALL SetDetector(D,exposure=3.65d7,Nevents_bin=Nev_bin,               &
                    Backgr_bin=Bg_bin,Nelem=1,Zelem=(/18/),              &
-                   Nbins=NBINS,E_file='data/DarkSide/energies.dat',     &
-                   eff_file_all='data/DarkSide/efficiencies.dat')
+                   Nbins=NBINS,E_file='DarkSide/energies.dat',          &
+                   eff_file_all='DarkSide/efficiencies.dat')
   
 END FUNCTION  
 

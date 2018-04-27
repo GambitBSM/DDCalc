@@ -237,6 +237,7 @@ SUBROUTINE LoadTable(file,fid,commentchar,Nrow,Ncol,data,status)
   LOGICAL :: status0
   CHARACTER :: commentchar0
   CHARACTER*256 :: buf
+  CHARACTER*256 :: DIR, full_file
   
   ! Argument checking
   IF (.NOT. (PRESENT(file) .OR. PRESENT(fid))) THEN
@@ -257,7 +258,9 @@ SUBROUTINE LoadTable(file,fid,commentchar,Nrow,Ncol,data,status)
     fid0 = fid
   ELSE
     fid0 = FreeIOUnit()
-    OPEN(UNIT=fid0,FILE=file,STATUS='OLD',FORM='FORMATTED',             &
+    DIR = DATA_DIR
+    full_file = trim(DIR)//'/'//file
+    OPEN(UNIT=fid0,FILE=full_file,STATUS='OLD',FORM='FORMATTED',             &
          ACTION='READ',IOSTAT=ios)
     IF (ios .NE. 0) RETURN
   END IF
@@ -356,7 +359,8 @@ SUBROUTINE LoadArrays(file,fid,commentchar,N,N1,C1,N2,C2,N3,C3,N4,C4,   &
   LOGICAL :: status0
   REAL*8, ALLOCATABLE :: data(:,:)
   CHARACTER :: commentchar0
-  CHARACTER*256 :: buf
+  CHARACTER*1024 :: buf
+  CHARACTER*1024 :: DIR, full_file
   
   ! Argument checking
   IF (.NOT. (PRESENT(file) .OR. PRESENT(fid))) THEN
@@ -377,7 +381,9 @@ SUBROUTINE LoadArrays(file,fid,commentchar,N,N1,C1,N2,C2,N3,C3,N4,C4,   &
     fid0 = fid
   ELSE
     fid0 = FreeIOUnit()
-    OPEN(UNIT=fid0,FILE=file,STATUS='OLD',FORM='FORMATTED',             &
+    DIR = DATA_DIR
+    full_file = trim(DIR)//'/'//file
+    OPEN(UNIT=fid0,FILE=full_file,STATUS='OLD',FORM='FORMATTED',             &
          ACTION='READ',IOSTAT=ios)
     IF (ios .NE. 0) RETURN
   END IF

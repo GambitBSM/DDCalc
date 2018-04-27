@@ -29,8 +29,8 @@ FUNCTION LZ_Init() RESULT(D)
 
   CALL SetDetector(D,exposure=5.6d6,Nevents_bin=Nev_bin,                &
                    Backgr_bin=Bg_bin,Nelem=1,Zelem=(/54/),              &
-                   Nbins=NBINS,E_file='data/LZ/energies.dat',           &
-                   eff_file_all='data/LZ/efficiencies.dat')
+                   Nbins=NBINS,E_file='LZ/energies.dat',                &
+                   eff_file_all='LZ/efficiencies.dat')
   
 END FUNCTION  
 
