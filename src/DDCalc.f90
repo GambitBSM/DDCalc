@@ -15,8 +15,8 @@ MODULE DDCalc
 !     Andre Scaffidi            University of Adelaide (2014)
 !     Lauren Hsu                FermiLab (2015)
 !     Pat Scott                 Imperial College London (2016)
-!     Felix Kahlhoefer          RWTH Aachen (2017)
-!     Sebastian Wild		DESY (2017)
+!     Felix Kahlhoefer          RWTH Aachen (2018)
+!     Sebastian Wild		DESY (2018)
 ! 
 ! 
 ! 
@@ -87,9 +87,7 @@ MODULE DDCalc
 ! See DDExperiments.f90 and analyses/[Analysis].f90 for more details.
 ! Note that these functions are only available directly by USE-ing the
 ! DDExperiments module in the calling program, and will not be made
-! available simply by USE-ing the DDCalc module.  (They can however be
-! accessed indirectly by the various Main programs later in this file,
-! but those are part of the advanced interface.)
+! available simply by USE-ing the DDCalc module.
 !
 ! To run any of the following routines with a particular experiment, the
 ! corresponding Init routine must be called only once, and the resulting
@@ -131,6 +129,20 @@ MODULE DDCalc
 !    Calculates the factor x by which the cross-sections must be scaled
 !    (sigma -> x*sigma) to achieve the desired p-value (given as log(p)).f
 !
+! For experiments with binned analyses, one can also use the following functions
+!
+! 6. Number of bins in the analysis:
+!     INTEGER FUNCTION DDCalc_Bins(Detector)
+!
+! 7. Number of observed events in the bin with index ibin:
+!     INTEGER FUNCTION DDCalc_BinEvents(Detector, ibin)
+!
+! 8. Average expected number of background events in the bin with index ibin:
+!     REAL*8 FUNCTION DDCalc_BinBackground(Detector, ibin)
+!
+! 9. Average expected number of signal events in the bin with index ibin:
+!     REAL*8 FUNCTION DDCalc_BinSignal(Detector, ibin)
+
 !
 ! C/C++ INTERFACE 
 !=================

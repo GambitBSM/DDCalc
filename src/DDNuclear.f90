@@ -472,7 +472,7 @@ SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
 
   WRITE (format_string,"(A6,I1,A5,I1,A4)") "(A10,I",Zlength,",A1,I",Alength,",A4)"
 
-  WRITE (filename,format_string) "data/Wbar/",Z,"_",A,".dat"
+  WRITE (filename,format_string) "Wbar/",Z,"_",A,".dat"
 
   ! Load table from file
   CALL LoadTable(file=TRIM(filename),Nrow=Nrow,Ncol=Ncol,data=data,status=status)

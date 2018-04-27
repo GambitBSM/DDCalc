@@ -13,21 +13,6 @@ MODULE DDTypes
 IMPLICIT NONE
 PRIVATE
 
-
-! Commandline argument structure
-TYPE, PUBLIC :: ArgumentStruct
-  ! Currently, only the parameters are used (options are parsed directly).
-  INTEGER :: Noptions    = -1
-  INTEGER :: Nparameters = -1
-  !Arguments that begin with '--', e.g. --<flag> or --<flag>=<value>
-  CHARACTER*256, ALLOCATABLE :: options(:)
-  !Arguments that are not options
-  CHARACTER*256, ALLOCATABLE :: parameters(:)
-  !Conversion of parameters to floating point (if possible)
-  REAL*8, ALLOCATABLE :: values(:)
-END TYPE 
-
-
 ! WIMP Structure
 TYPE, PUBLIC :: WIMPStruct
   REAL*8 :: m   ! WIMP mass [GeV]

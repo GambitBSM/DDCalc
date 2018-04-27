@@ -73,15 +73,20 @@ CONTAINS
 !   background  Average expected background events
 !   signal      Average expected signal events
 !   rate        Signal rate [cpd/kg]
-! Optional bin arguments.  Arrays will be allocated to
-! size [1:Nbins]:
 !   Nbins       Number of bins
+! Optional bin arguments.  Arrays will be allocated to size [0:Nbins]:
+!   binevents   Allocatable array to be filled with observed events
+!               in each bin.  Allocated to size [0:Nbins].
+!               The entry with index 0 contains the sum of all bins, which is equal to 'events'.
+!   binbackground  Allocatable array to be filled with average expected
+!               background in each bin.  Allocated to size [1:Nbins].
+!               The entry with index 0 contains the sum of all bins, which is equal to 'background'.
 !   binsignal   Allocatable array to be filled with average expected
 !               signal in each bin.  Allocated to size [1:Nbins].
-!               The sum of all bins is equal to 'signal'.
+!               The entry with index 0 contains the sum of all bins, which is equal to 'signal'.
 !   binrate      Allocatable array to be filled with recoil rate in
 !               each bin.  Allocated to size [1:Nbins].
-!               The sum of all bins is equal to 'rate'.
+!               The entry with index 0 contains the sum of all bins, which is equal to 'rate'.
 !   
 SUBROUTINE GetRates(D,events,background,signal,   &
                     rate,Nbins,binevents,binbackground, &
@@ -112,7 +117,7 @@ SUBROUTINE GetRates(D,events,background,signal,   &
   ! Bins
   IF (PRESENT(Nbins)) Nbins = D%Nbins
   
-  ! Observed events and expected background events
+  ! Observed events and expected background events by bin
   IF (PRESENT(binevents))  THEN
     ALLOCATE(binevents(0:D%Nbins))
     binevents = D%Nevents(0:D%Nbins)
@@ -136,8 +141,6 @@ SUBROUTINE GetRates(D,events,background,signal,   &
   END IF
   
 END SUBROUTINE
-
-
 
 
 ! -------------------------------------------------------------------------------
@@ -478,6 +481,7 @@ END FUNCTION
 ! 
 ! Required input argument:
 !   D           A DetectorStruct containing detector info.
+!   ibin        Index of the bin to be returned.
 ! 
 FUNCTION GetBinEvents(D, ibin) RESULT(N)
   IMPLICIT NONE
@@ -513,6 +517,7 @@ END FUNCTION
 ! 
 ! Required input argument:
 !   D           A DetectorStruct containing detector info.
+!   ibin        Index of the bin to be returned.
 ! 
 FUNCTION GetBinBackground(D, ibin) RESULT(N)
   IMPLICIT NONE
@@ -544,10 +549,11 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BinBackground(DetectorIndex, BinIndex) &
 END FUNCTION
 
 ! ----------------------------------------------------------------------
-! Returns the observed number of events in a given bin.
+! Returns the expected signal in a given bin.
 ! 
 ! Required input argument:
 !   D           A DetectorStruct containing detector info.
+!   ibin        Index of the bin to be returned.
 ! 
 FUNCTION GetBinSignal(D, ibin) RESULT(N)
   IMPLICIT NONE

@@ -6,6 +6,8 @@
  *      A Scaffidi     U of Adelaide    2014
  *      M White        U of Adelaide    2014
  *      P Scott        Imperial College 2016
+ *      F Kahlhoefer   RWTH Aachen      2018
+ *      S Wild         DESY             2018
  *
  **********************************************************************/
 

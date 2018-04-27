@@ -29,10 +29,10 @@ FUNCTION CRESST_II_Init() RESULT(D)
   CALL SetDetector(D,mass=0.3d0,time=174.d0,Nevents_bin=Nev_bin,         &
                    Backgr_bin=Bg_bin,Nelem=NELEM,Nbins=NBINS,            &
                    Zelem=(/8,20,74/),stoich=(/4,1,1/),                   &
-                   E_file='data/CRESST-II/energies.dat',                 &
-                   eff_file=(/'data/CRESST-II/08.dat',                   &
-                   'data/CRESST-II/20.dat',                              &
-                   'data/CRESST-II/74.dat'/))
+                   E_file='CRESST-II/energies.dat',                      &
+                   eff_file=(/'CRESST-II/08.dat',                        &
+                   'CRESST-II/20.dat',                                   &
+                   'CRESST-II/74.dat'/))
   D%eff_file = '[CRESST_II]'
   
 END FUNCTION
