@@ -14,7 +14,12 @@ F Kahlhoefer, A Kvellestad, A Putze, C Savage, P Scott, C Weniger,
 M White & S Wild, DarkBit: A GAMBIT module for computing dark matter
 observables and likelihoods, EPJC submitted (2017), arXiv:1705.07920.
 
-If you write a paper that uses DDCalc, please cite this paper.
+The new features in DDCalc_v2 (in particular momentum and velocity
+dependent interactions and binned likelihoods) are described in:
+
+XXX
+
+If you write a paper that uses DDCalc, please cite both papers. 
 
 
 Experiments
@@ -74,31 +79,17 @@ F Kahlhoefer, A Kvellestad, A Putze, C Savage, P Scott, C Weniger,
 M White & S Wild, DarkBit: A GAMBIT module for computing dark matter
 observables and likelihoods, EPJC submitted (2017), arXiv:1705.07920.
 
-Constraints are generated using the Feldman-Cousins method for a
-likelihood-based analysis with background subtraction, or using the
-Yellin maximum gap method for a conservative exclusion limit with no
-background subtraction.  If you use one of those constraints,
-please cite the associated paper:
+The new features in DDCalc_v2 are described in:
 
-  G. Feldman & R. Cousins, PRD 57, 3873 (1998) [physics/9711021]  
-    http://inspirehep.net/record/454197  
+XXX
+
+If you use the Yellin maximum gap method, please cite:
+
   S. Yellin, PRD 66, 032005 (2002) [physics/0203002]  
     http://inspirehep.net/record/583791  
 
-Efficiencies for liquid noble gas time-projection chamber (TPC)
-experiments can be generated using the TPCMC software, which itself uses
-the NEST model.  If using any TPC experimental results that rely on
-TPCMC-generated efficiencies, these papers should be cited:
-
-  NEST:  
-    M. Szydagis et al., JINST 6, P10002 (2011) [arxiv:1106.1613]  
-      http://inspirehep.net/record/913031  
-    M. Szydagis et al., JINST 8, C10003 (2013) [arxiv:1307.6601]  
-      http://inspirehep.net/record/1244479
-
-
-If using DDCalc for calculations involving an  experimental result,
-please cite the appropriate one of the experimental papers listed above.
+If using DDCalc for calculations involving experimental results,
+please cite the appropriate experimental papers listed above.
 
 
 Compiling
@@ -123,8 +114,13 @@ This will generate the following:
 
   * DDCalc_exampleF, DDCalc_exampleC
     Simple example programs with source code showing how to use
-    the DDCalc routines externally from either Fortran or C++.
+    the DDCalc routines externally from either Fortran or C++ to 
+    calculate observables and likelihoods.
 
+  * DDCalc_exclusionF, DDCalc_exclusionC
+    Simple example programs with source code showing how to use
+    the DDCalc routines externally from either Fortran or C++ to
+    calculate exclusion limits.
 
 Usage as a library
 ---------------
@@ -153,25 +149,27 @@ Contributors
 The following have contributed to the development and
 testing of the DDCalc package:
 
-  * Felix Kahlhoefer, DESY  
-    LUX 2015/16, PICO, Panda X, Xenon1T
-
-  * Sebastian Wild, DESY  
-
-  * Lauren Hsu, FermiLab  
-    SuperCDMS.
-
-  * Miguel Pato, Stockholm University  
-    Calibration/tuning of LUX parameters.
-
   * Chris Savage  
     Most fortran procedures.
 
-  * Andre Scaffidi, Univ of Adelaide  
-    SD form factors, C++ interface and example, testing.
+  * Felix Kahlhoefer, RWTH Aachen  
+    DDCalc_v2.
+
+  * Sebastian Wild, DESY  
+    DDCalc_v2.
 
   * Pat Scott, Imperial College London  
     C++ interface and example, testing, fortran structure, bug fixes, writeup.
 
   * Martin White, Univ of Adelaide  
     C++ interface and example, testing, writeup.
+
+  * Andre Scaffidi, Univ of Adelaide  
+    SD form factors, C++ interface and example, testing.
+
+  * Lauren Hsu, FermiLab  
+    SuperCDMS.
+
+  * Miguel Pato
+    Calibration/tuning of LUX parameters.
+

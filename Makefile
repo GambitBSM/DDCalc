@@ -25,14 +25,14 @@ DDDCALC_VERSION=$(shell grep "VERSION_STRING =" $(SRC)/DDConstants.f90 | cut -d 
 
 #################### DIRECTORIES ###########################
 
-DDCALC_DIR := $(shell pwd)
-SRC := $(DDCALC_DIR)/src
-INCLUDE := $(DDCALC_DIR)/include
-EXAMPLES := $(DDCALC_DIR)/examples
-DOC := $(DDCALC_DIR)/doc
-DATA := $(DDCALC_DIR)/data
-BUILD := $(DDCALC_DIR)/build
-LIB := $(DDCALC_DIR)/lib
+DDCALC_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+SRC := $(DDCALC_DIR)src
+INCLUDE := $(DDCALC_DIR)include
+EXAMPLES := $(DDCALC_DIR)examples
+DOC := $(DDCALC_DIR)doc
+DATA := $(DDCALC_DIR)data
+BUILD := $(DDCALC_DIR)build
+LIB := $(DDCALC_DIR)lib
 
 #################### COMPILER ##############################
 
