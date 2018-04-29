@@ -470,7 +470,7 @@ SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
     Alength = 3
   END IF
 
-  WRITE (format_string,"(A6,I1,A5,I1,A4)") "(A10,I",Zlength,",A1,I",Alength,",A4)"
+  WRITE (format_string,"(A6,I1,A5,I1,A4)") "(A5,I",Zlength,",A1,I",Alength,",A4)"
 
   WRITE (filename,format_string) "Wbar/",Z,"_",A,".dat"
 
@@ -489,21 +489,73 @@ SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
 
 END SUBROUTINE
 
+SUBROUTINE LoadSDFFFile(Z,A,SDFF,success)
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: Z,A
+  REAL*8, INTENT(INOUT) :: SDFF(5,10)
+  LOGICAL, INTENT(INOUT) :: success
+  INTEGER :: Nrow,Ncol
+  REAL*8, ALLOCATABLE :: data(:,:)
+  LOGICAL :: status
 
+  character(len=1024) :: filename
+  character(len=1024) :: format_string
+  
+  INTEGER :: Zlength, Alength
+  IF (Z < 10) THEN
+    Zlength = 1
+  ELSE
+    Zlength = 2
+  END IF
 
+  IF (A < 10) THEN
+    Alength = 1
+  ELSE IF (A < 100) THEN
+    Alength = 2
+  ELSE
+    Alength = 3
+  END IF
+
+  WRITE (format_string,"(A6,I1,A5,I1,A4)") "(A5,I",Zlength,",A1,I",Alength,",A4)"
+
+  WRITE (filename,format_string) "SDFF/",Z,"_",A,".dat"
+
+  ! Load table from file
+  CALL LoadTable(file=TRIM(filename),Nrow=Nrow,Ncol=Ncol,data=data,status=status)
+  IF (.NOT. status) THEN
+    success = .FALSE.
+    SDFF(:,:) = 0
+  ELSE IF ((Ncol .NE. 5) .OR. (Nrow .NE. 10)) THEN
+    WRITE(0,*) 'ERROR: Number of entries in file ' // TRIM(filename) // ' does not agree with expectation.'
+    STOP
+  ELSE
+    success = .TRUE.
+    SDFF = reshape(data,shape(SDFF),order = (/2,1/))
+  END IF
+
+END SUBROUTINE
 
 SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z,A,NE
   REAL*8, INTENT(IN) :: J
   REAL*8, INTENT(IN) :: qArray(NE)
-  REAL*8, INTENT(INOUT) :: WT(1:8,1:4,NE)
+  REAL*8, INTENT(INOUT) :: WT(0:9,1:4,NE)
 
   REAL*8 :: yArray(NE)
   REAL*8 :: wbar(1:8,1:4,1:11)
+  REAL*8 :: SDFF(1:5,1:10)
   REAL*8 :: F2(1:NE)
   LOGICAL :: success
   INTEGER :: alpha, t_tp, k
+
+  WT(:,:,:) = 0
+
+  CALL CalcF2(A,NE,qArray,F2)
+  WT(0,1,:) = 1.d0/4.d0 * A**2 * F2(:)
+  WT(0,2,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
+  WT(0,3,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
+  WT(0,4,:) = 1.d0/4.d0 * (2*Z-A)**2 * F2(:)
  
   CALL LoadWbarFile(Z,A,wbar,success)
 
@@ -517,17 +569,30 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
           DO k = 1,11
              WT(alpha,t_tp,:) = WT(alpha,t_tp,:) + wbar(alpha,t_tp,k)*(yArray**(k-1))
           END DO
-          WT(alpha,t_tp,:) = WT(alpha,t_tp,:)*4*PI/(2*J+1) * exp(-2*yArray)
+          WT(alpha,t_tp,:) = WT(alpha,t_tp,:)*4.0*PI/(2.0*J+1.0) * exp(-2.0*yArray)
        END DO
      END DO
-   ELSE ! Use Helm form factor for SI interaction and set the rest to zero
-     WT(:,:,:) = 0
-     CALL CalcF2(A,NE,qArray,F2)
-     WT(1,1,:) = 1.d0/4.d0 * A**2 * F2(:)
-     WT(1,2,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
-     WT(1,3,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
-     WT(1,4,:) = 1.d0/4.d0 * (2*Z-A)**2 * F2(:)
-   END IF
+     WT(9,:,:) = WT(5,:,:) + WT(6,:,:)
+  ELSE
+     WT(1,:,:) = WT(0,:,:)
+  END IF
+
+  CALL LoadSDFFFile(Z,A,SDFF,success)
+
+  IF (success) THEN
+    yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray**2/2.0 
+    DO k = 1,10
+      WT(9,1,:) = WT(9,1,:) + SDFF(1,k)*(yArray**(k-1))
+      WT(9,2,:) = WT(9,2,:) + (SDFF(2,k)+SDFF(3,k))/2.0*(yArray**(k-1))
+      WT(9,3,:) = WT(9,3,:) + (SDFF(4,k)+SDFF(5,k))/4.0*(yArray**(k-1))
+      WT(9,4,:) = WT(9,4,:) + (SDFF(4,k)+SDFF(5,k))/4.0*(yArray**(k-1))
+    END DO
+    DO t_tp = 1,4
+      WT(9,t_tp,:) = WT(9,t_tp,:)*4.0*PI/(2.0*J+1.0) * exp(-1.0*yArray)
+    END DO
+  ELSE
+      WT(9,:,:) = WT(5,:,:) + WT(6,:,:)
+  END IF
 
 END SUBROUTINE
 

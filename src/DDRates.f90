@@ -248,6 +248,9 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
     ! Notice: WTilde1_00 corresponds to D%WTilde(1,1,KE,Kiso) 
     ! Notice: WTilde1_01 corresponds to D%WTilde(1,2,KE,Kiso) 
     ! Notice: WTilde1_11 corresponds to D%WTilde(1,4,KE,Kiso) 
+
+    IF (PreferNewFF) THEN
+
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
@@ -257,9 +260,25 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
        END DO
      END DO
 
+   ELSE
+
+     DO KE = 1,D%NE
+       DO Kiso = 1,D%Niso
+         D%dRdEiso(KE,Kiso) = &
+             dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+             D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+             D%WTilde(0,1,KE,Kiso), D%WTilde(0,2,KE,Kiso), D%WTilde(0,4,KE,Kiso))
+       END DO
+     END DO
+
+   END IF
+
+
   ELSE IF (WIMP%DMtype .EQ. 'SDonly') THEN
    ! ap = WIMP%params(1), an = WIMP%params(2)
    ! This follows the Jungman/Kamionkowski convention of defining ap and an.
+
+   IF(PreferNewFF) THEN
 
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
@@ -272,10 +291,26 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
        END DO
      END DO
 
+   ELSE
+
+     DO KE = 1,D%NE
+       DO Kiso = 1,D%Niso
+         D%dRdEiso(KE,Kiso) = &
+             dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+             D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+              D%WTilde(9,1,KE,Kiso), D%WTilde(9,2,KE,Kiso), &
+              D%WTilde(9,4,KE,Kiso))
+       END DO
+     END DO
+
+   END IF
 
   ELSE IF (WIMP%DMtype .EQ. 'SISD') THEN
    ! combination of SIonly and SD only, see above.
    ! fp = WIMP%params(1), fn = WIMP%params(2), ap = WIMP%params(3), an = WIMP%params(4)
+
+   IF(PreferNewFF) THEN
+
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso
          D%dRdEiso(KE,Kiso) = &
@@ -289,6 +324,24 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
                D%WTilde(5,4,KE,Kiso)+D%WTilde(6,4,KE,Kiso))
        END DO
      END DO
+
+   ELSE
+
+     DO KE = 1,D%NE
+       DO Kiso = 1,D%Niso
+         D%dRdEiso(KE,Kiso) = &
+             dRdE_SI(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+               D%fiso(Kiso), WIMP%params(1), WIMP%params(2), &
+               D%WTilde(0,1,KE,Kiso), D%WTilde(0,2,KE,Kiso), D%WTilde(0,4,KE,Kiso)) + & 
+             dRdE_SD(WIMP%m, Halo%rho, D%g_vmin(KE,Kiso), &
+               D%fiso(Kiso), WIMP%params(3), WIMP%params(4), &
+              D%WTilde(9,1,KE,Kiso), D%WTilde(9,2,KE,Kiso), &
+              D%WTilde(9,4,KE,Kiso))
+       END DO
+     END DO
+
+   END IF
+
 
   ELSE IF (WIMP%DMtype .EQ. 'NREffectiveTheory') THEN
 

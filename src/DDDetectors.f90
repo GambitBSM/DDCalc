@@ -757,7 +757,7 @@ SUBROUTINE SetDetector(D,mass,time,exposure,Nbins,                      &
   
   ! Calculate weighted form factors
   IF (ALLOCATED(D%WTilde)) DEALLOCATE(D%WTilde)
-  ALLOCATE(D%WTilde(1:8,1:4,D%NE,D%Niso))
+  ALLOCATE(D%WTilde(0:9,1:4,D%NE,D%Niso))
   DO Kiso = 1,D%Niso
     CALL CalcWTilde(D%Ziso(Kiso),D%Aiso(Kiso),D%Jiso(Kiso),D%NE,                   &
                  EToQ(D%E,D%Miso(Kiso)),D%WTilde(:,:,:,Kiso))

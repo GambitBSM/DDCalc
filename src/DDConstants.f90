@@ -5,6 +5,8 @@ MODULE DDConstants
 !    Constants, global variables and types for DDCalc
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+LOGICAL, PUBLIC, PARAMETER :: PreferNewFF = .TRUE.
+
 ! MATH CONSTANTS -------------------------------------------------------
 
 REAL*8, PUBLIC, PARAMETER :: PI         = 3.1415926535897932d0   ! Pi
