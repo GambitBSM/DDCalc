@@ -32,7 +32,7 @@ PROGRAM DDLikelihood
   CALL DDCalc_SetWIMP(WIMP,m=1d0,DMtype='SIonly',params=[0.d0,0.d0])
   Halo = DDCalc_InitHalo()
   CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
-  Detector = DarkSide_Init()
+  Detector = LUX_2016_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
 
   BGlogL = DDCalc_LogLikelihood(Detector)
@@ -41,12 +41,12 @@ PROGRAM DDLikelihood
 
   DO mDMi = 0,mDMsteps
     mDM = mDMmin * (mDMmax/mDMmin)**(REAL(mDMi)/mDMsteps)
-    fp = SigmapSItoFp(mDM,sigmaSItest)
-    fn = SigmanSItoFn(mDM,sigmaSItest)
-!    fp = SigmapSDtoAp(mDM,sigmaSItest)
-!    fn = SigmanSDtoAn(mDM,sigmaSItest)
-    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SIonly',params=[fp,fn])
-!    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SDonly',params=[0d0,fn])
+!    fp = SigmapSItoFp(mDM,sigmaSItest)
+!    fn = SigmanSItoFn(mDM,sigmaSItest)
+    fp = SigmapSDtoAp(mDM,sigmaSItest)
+    fn = SigmanSDtoAn(mDM,sigmaSItest)
+!    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SIonly',params=[fp,fn])
+    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SDonly',params=[fn,0d0])
     CALL DDCalc_CalcRates(Detector, WIMP, Halo)
     WRITE (*,*) mDM,DDCalc_ScaleToPValue(Detector,logLlimit)*sigmaSItest
   END DO
