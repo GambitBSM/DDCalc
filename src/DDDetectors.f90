@@ -303,7 +303,7 @@ SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
   
   ! Form factors
   IF (PRESENT(WTilde)) THEN
-    ALLOCATE(WTilde(1:8,1:4,D%NE,D%Niso))
+    ALLOCATE(WTilde(0:9,1:4,D%NE,D%Niso))
     WTilde = D%WTilde
   END IF
   

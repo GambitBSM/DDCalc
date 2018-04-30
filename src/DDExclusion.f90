@@ -46,7 +46,7 @@ PROGRAM DDLikelihood
     fp = SigmapSDtoAp(mDM,sigmaSItest)
     fn = SigmanSDtoAn(mDM,sigmaSItest)
 !    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SIonly',params=[fp,fn])
-    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SDonly',params=[fn,0d0])
+    CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='SDonly',params=[fp,0d0])
     CALL DDCalc_CalcRates(Detector, WIMP, Halo)
     WRITE (*,*) mDM,DDCalc_ScaleToPValue(Detector,logLlimit)*sigmaSItest
   END DO

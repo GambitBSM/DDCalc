@@ -238,7 +238,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   D%h_vmin  = MeanSpeed(D%NE,D%Niso,D%vmin,Halo)
   D%dRdEiso = 0.0d0
 
-
   ! ...................... CALCULATE DIFFERENTIAL RATES ............................
   IF (WIMP%DMtype .EQ. 'SIonly') THEN
     ! fp = WIMP%params(1), fn = WIMP%params(2)

@@ -546,14 +546,10 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
   REAL*8 :: wbar(1:8,1:4,1:11)
   REAL*8 :: SDFF(1:5,1:10)
   REAL*8 :: F2(1:NE)
-  REAL*8 :: qArray2(NE)
-  REAL*8 :: Wtest
   LOGICAL :: success
   INTEGER :: alpha, t_tp, k
 
   WT(:,:,:) = 0
-
-  qArray2(:) = qArray(:)*3.0
 
   CALL CalcF2(A,NE,qArray,F2)
   WT(0,1,:) = 1.d0/4.d0 * A**2 * F2(:)
@@ -564,7 +560,7 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
   CALL LoadWbarFile(Z,A,wbar,success)
 
   IF (success) THEN
-    yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray2**2/4.0 
+    yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray**2/4.0 
 	! Parameter y following 1308.6288
 
      DO alpha = 1,8
@@ -583,7 +579,7 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
   CALL LoadSDFFFile(Z,A,SDFF,success)
 
   IF (success) THEN
-    yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray2**2/2.0 
+    yArray = 25.6819 * (41.467/(45.0*A**(-1.0/3) - 25.0*A**(-2.0/3))) * qArray**2/2.0 
     DO k = 1,10
       WT(9,1,:) = WT(9,1,:) + SDFF(1,k)*(yArray**(k-1))
       WT(9,2,:) = WT(9,2,:) + (SDFF(4,k)+SDFF(5,k))/4.0*(yArray**(k-1))

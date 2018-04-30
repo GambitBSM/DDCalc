@@ -32,8 +32,8 @@ PROGRAM DDTest
   !CALL DDCalc_SetWIMP(WIMP,m=30d0,DMtype='SIonly',params=[SigmapSItoFp(30d0,1d-11), SigmanSItoFn(30d0,1d-11)])
 
   !!! Example 2: standard SD interaction, specified by params = [ap, an]
-  ! CALL DDCalc_SetWIMP(WIMP,m=30d0,DMtype='SDonly',params=[0d0, SigmanSDtoAn(30d0,1d-01)])
-  CALL DDCalc_SetWIMP(WIMP,m=30d0,DMtype='SDonly',params=[SigmapSDtoAp(30d0,1d-01), 0d0])
+   CALL DDCalc_SetWIMP(WIMP,m=30d0,DMtype='SDonly',params=[0d0, 1.d-1])
+  !CALL DDCalc_SetWIMP(WIMP,m=30d0,DMtype='SDonly',params=[SigmapSDtoAp(30d0,1d-01), 0d0])
 
   !!! Example 3: mixed SI and SD interaction, specified by params = [fp, fn, ap, an]
   !CALL DDCalc_SetWIMP(WIMP,m=30d0,DMtype='SISD',params=[0.7d-8, -0.3d-8, 1.0d-1, 5.0d-2])
@@ -52,7 +52,7 @@ PROGRAM DDTest
   !an = SigmanSDtoAn(218.0d0,4.2d-6)
   !CALL DDCalc_SetWIMP(WIMP,m=218.0d0,DMtype='SDonly',params=[ap,an])
   Halo = DDCalc_InitHalo()
-  CALL DDCalc_SetHalo(Halo,rho=0.3d0,vrot=220.d0,v0=220.d0)
+!  CALL DDCalc_SetHalo(Halo,rho=0.4d0,vrot=220.d0,v0=220.d0)
 
   Detector = LZ_Init()
   CALL DDCalc_CalcRates(Detector, WIMP, Halo)
