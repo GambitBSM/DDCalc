@@ -47,6 +47,10 @@ extern "C"
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_higgsportal(const int&, double&,
                   double&, double&, double&, double&);
+  void C_DDCalc_ddcalc_setwimp_msigma(const int&, const double&,
+                  const double&, const double&, const double&, const double&);
+  void C_DDCalc_ddcalc_getwimp_msigma(const int&, double&,
+                  double&, double&, double&, double&);
   void C_DDCalc_ddcalc_setwimp_nreffectivetheory(const int&, const double&,
                   const double&);
   void C_DDCalc_ddcalc_setnrcoefficient(const int&, const int&,
@@ -123,6 +127,10 @@ namespace DDCalc
   //     [GeV^-2], related by:
   //         GpSI = 2 fp        GpSD = 2\sqrt{2} G_F ap
   //         GnSI = 2 fn        GnSD = 2\sqrt{2} G_F an
+  //   * SetWIMP_msigma(m,sigmaSIp,sigmaSIn,sigmaSDp,sigmaSDn)
+  //      Each sigma is a WIMP-nucleon scattering cross-section [pb].
+  //      Negative cross-sections indicate the corresponding coupling should
+  //      be negative. 
   // In the above, 'p' is for proton, 'n' is for neutron, 'SI' is for
   // spin-independent, and 'SD' is for spin-dependent.
   void SetWIMP_mfa(const int WIMPIndex, const double m, const double fp, const double fn,
@@ -141,6 +149,12 @@ namespace DDCalc
                    const double app, const double apn)
   {
     C_DDCalc_ddcalc_setwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
+  }
+
+  void SetWIMP_msigma(const int WIMPIndex, const double m, const double sigmaSIp, const double sigmaSIn,
+                   const double sigmaSDp, const double sigmaSDn)
+  {
+    C_DDCalc_ddcalc_setwimp_msigma(WIMPIndex,m,sigmaSIp,sigmaSIn,sigmaSDp,sigmaSDn);
   }
 
   void SetWIMP_NREffectiveTheory(const int WIMPIndex, const double m, const double spin)
@@ -175,6 +189,13 @@ namespace DDCalc
   {
     C_DDCalc_ddcalc_getwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
   }
+
+  void GetWIMP_msigma(const int WIMPIndex, double& m, double& sigmaSIp, double& sigmaSIn,
+                   double& sigmaSDp, double& sigmaSDn)
+  {
+    C_DDCalc_ddcalc_getwimp_msigma(WIMPIndex,m,sigmaSIp,sigmaSIn,sigmaSDp,sigmaSDn);
+  }
+
 
   void GetNRCoefficient(const int WIMPIndex, const int OpIndex,
                   const double value_isoscalar, const double value_isovector)

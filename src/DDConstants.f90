@@ -5,7 +5,7 @@ MODULE DDConstants
 !    Constants, global variables and types for DDCalc
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-LOGICAL, PUBLIC, PARAMETER :: PreferNewFF = .FALSE.
+LOGICAL, PUBLIC, PARAMETER :: PreferNewFF = .TRUE.
 
 ! MATH CONSTANTS -------------------------------------------------------
 

@@ -69,13 +69,13 @@ int main()
   DDCalc::SetSHM(Halo, 0.3, 235.0, 235.0, 550.0);
  
   mDM = 100.0;
-  DDCalc::SetWIMP_mfa(WIMP,mDM,1.0,-2.0,0.0,0.0);
+  DDCalc::SetWIMP_msigma(WIMP,mDM,1.0,-2.0,0.0,0.0);
 
   /* Do rate calculations using the specified WIMP and halo parameters.*/
   DDCalc::CalcRates(LUX,WIMP,Halo);
     
   /* Event quantities. */
-  printf("%-20s  %e     \n", "Expected signal     ",DDCalc::Signal(LUX));
+  printf("%-20s  %.15e     \n", "Expected signal     ",DDCalc::Signal(LUX));
     
   // Clean up all the objects
   DDCalc::FreeAll();
