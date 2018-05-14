@@ -736,7 +736,7 @@ SUBROUTINE C_DDCalc_SetWIMP_NREffectiveTheory(WIMPIndex,m,spin) &
   IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) &
     stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_NREffectiveTheory' 
   CALL DDCalc_SetWIMP_NREffectiveTheory(WIMPs(WIMPIndex)%p,&
-               m=REAL(m,KIND=8),spin=REAL(m,KIND=8))
+               m=REAL(m,KIND=8),spin=REAL(spin,KIND=8))
 END SUBROUTINE
 
 SUBROUTINE C_DDCalc_SetNRCoefficient(WIMPIndex, OpIndex, tau, value) &

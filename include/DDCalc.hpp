@@ -71,6 +71,10 @@ extern "C"
   double C_DDStats_ddcalc_loglikelihood(const int&); // Log-likelihood
   double C_DDStats_ddcalc_scaletopvalue(const int&, const double&);
    // Factor x by which sigma -> x*sigma would yield given p-value (given as log(p))
+  int C_DDRates_ddcalc_bins(const int&);          // Number of bins
+  int C_DDRates_ddcalc_binevents(const int&, const int&);          // Number of events in each bin
+  double C_DDRates_ddcalc_binbackground(const int&, const int&);   // Number of expected backgrounds in each bin
+  double C_DDRates_ddcalc_binsignal(const int&, const int&);   // Number of expected signal in each bin
 
   // Do memory cleanup
   void C_DDUtils_ddcalc_freewimps();
@@ -198,7 +202,7 @@ namespace DDCalc
 
 
   void GetNRCoefficient(const int WIMPIndex, const int OpIndex,
-                  const double value_isoscalar, const double value_isovector)
+                  double& value_isoscalar, double& value_isovector)
   {
     C_DDCalc_ddcalc_getnrcoefficient(WIMPIndex,OpIndex, value_isoscalar, value_isovector);
   }
@@ -239,6 +243,31 @@ namespace DDCalc
     return C_DDRates_ddcalc_signal(DetectorIndex);
   }
  
+
+
+  // Read off the number of bins for the specified analysis
+  int Bins(const int DetectorIndex)
+  {
+    return C_DDRates_ddcalc_bins(DetectorIndex);
+  }
+
+  // Read off the observed events for the specified analysis, for a given bin
+  int BinEvents(const int DetectorIndex, const int BinIndex)
+  {
+    return C_DDRates_ddcalc_binevents(DetectorIndex, BinIndex);
+  }
+
+  // Read off the expected background  for the specified analysis, for a given bin
+  double BinBackground(const int DetectorIndex, const int BinIndex)
+  {
+    return C_DDRates_ddcalc_binbackground(DetectorIndex, BinIndex);
+  }
+
+  // Read off the expected signal  for the specified analysis, for a given bin
+  double BinSignal(const int DetectorIndex, const int BinIndex)
+  {
+    return C_DDRates_ddcalc_binsignal(DetectorIndex, BinIndex);
+  }
   
   // Read off the log-likelihoods for the specificed analysis; note these
   // are _not_ multiplied by -2.  The likelihood is calculated using a Poisson
