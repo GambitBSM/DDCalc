@@ -176,8 +176,13 @@ TYPE, PUBLIC :: DetectorStruct
   
   ! Form factors -------------------------------
   ! Tabulated form factors combined with prefactors.
-  ! Arrays of size [1:8,1:4,1:NE,1:Niso].  
-  ! The first index denotes the type of nuclear response function
+  ! Arrays of size [0:9,1:4,1:NE,1:Niso].  
+  ! The first index denotes the type of nuclear response function:
+  !		alpha = 0:	 Helm form factor
+  !		alpha = 1 ... 8: Nuclear response functions given by the tables in Wbar/.
+  !				 Currently, these are the ones provided by Anand et. al. [1308.6288].
+  !		alpha = 9:	 speficic response functions for SD scattering, given via the tables in SDFF/.
+  !				 Currently, these are the ones provided by Klos et. al. [1304.7684].
   ! The second index denotes the isospin combination in the order
   ! (00, 01, 10, 11).
   ! The third index corresponds to the energies stored in E(:)

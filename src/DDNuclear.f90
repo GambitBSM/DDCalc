@@ -443,6 +443,17 @@ ELEMENTAL FUNCTION EToQ(E,Miso) RESULT(q)
   q = SQRT(2*Miso*(1d-6*E))
 END FUNCTION
 
+
+
+
+
+! ----------------------------------------------------------------------
+! Loads the table containing the coefficients of the nuclear response functions Wbar,
+! for a given isotope specified by Z and A. The output array is Wbar[alpha,t_tp,k],
+! corresponding to the dimensionless coefficients wbar in eq. (A.8) of 1607.04418.
+! If the corresponding file does not exist, all form factor coeffiecients are set to zero.
+!
+! Currently, the tables in Wbar/ are taken from Anand et. al. [1308.6288].
 SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z,A
@@ -489,6 +500,12 @@ SUBROUTINE LoadWbarFile(Z,A,Wbar,success)
 
 END SUBROUTINE
 
+
+
+! ----------------------------------------------------------------------
+! Loads the table containing the coefficients of the SD response function,
+! for a given isotope specified by Z and A.
+! Currently, the tables in SDFF/ are taken from Klos et. al. [1304.7684].
 SUBROUTINE LoadSDFFFile(Z,A,SDFF,success)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z,A
@@ -535,6 +552,25 @@ SUBROUTINE LoadSDFFFile(Z,A,SDFF,success)
 
 END SUBROUTINE
 
+
+! This provides the nuclear response function WTilde = 4*pi/(2*J + 1) * W (unitless),
+! with W defined as in 1308.6288.
+! Input arguments:
+!   Z,A,J       Isotope atomic number, mass number and nuclear spin
+!   NE		number of grid points in energy ( = length of qArray)
+!   qArray	list of momentum transfer values in GeV for which the response functions should be calculated.
+!
+! Output argument:
+!   WT		Array of WTilde values with indices [alpha, t_tp, i_q]
+!		alpha = 0:	 Helm form factor
+!		alpha = 1 ... 8: Nuclear response functions given by the tables in Wbar/.
+!				 Currently, these are the ones provided by Anand et. al. [1308.6288].
+!		alpha = 9:	 speficic response functions for SD scattering, given via the tables in SDFF/.
+!				 Currently, these are the ones provided by Klos et. al. [1304.7684].
+!
+!		t_tp = 0, 1, 2, 3 correspond to (tau, tau_prime) = (0,0), (0,1), (1,0), (1,1)
+!
+!		i_q is the index of qArray, i.e. it specifies the momentum transfer.
 SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: Z,A,NE
@@ -551,12 +587,16 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
 
   WT(:,:,:) = 0
 
+  ! First calculate the Helm form factor, and place it into the first column of WT
   CALL CalcF2(A,NE,qArray,F2)
   WT(0,1,:) = 1.d0/4.d0 * A**2 * F2(:)
   WT(0,2,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
   WT(0,3,:) = 1.d0/4.d0 * A*(2*Z-A) * F2(:)
   WT(0,4,:) = 1.d0/4.d0 * (2*Z-A)**2 * F2(:)
  
+
+  ! Try to calculate the response functions from the wbar tables, and place them into columns 1-8 of WT.
+  ! If the correpsonidng file is not present, all these columns will be left with values zero.
   CALL LoadWbarFile(Z,A,wbar,success)
 
   IF (success) THEN
@@ -576,6 +616,9 @@ SUBROUTINE CalcWTilde(Z,A,J,NE,qArray,WT)
      WT(1,:,:) = WT(0,:,:)
   END IF
 
+
+  ! Lastly, load the SD response functions from a different file, and place it into column 9 of WT.
+  ! If the correpsonidng file is not present, column 9 will be left with values zero.
   CALL LoadSDFFFile(Z,A,SDFF,success)
 
   IF (success) THEN

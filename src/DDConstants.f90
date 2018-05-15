@@ -5,7 +5,13 @@ MODULE DDConstants
 !    Constants, global variables and types for DDCalc
 !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-LOGICAL, PUBLIC, PARAMETER :: PreferNewFF = .TRUE.
+LOGICAL, PUBLIC, PARAMETER :: PreferNewFF = .FALSE.
+ ! If this is .TRUE., all calculations are performed using the nuclear response functions from Haxton [1308.6288],
+ !     also for standard SI and SD scattering.
+ ! If this is .FALSE., and if the WIMP type is 'SIonly', 'SDonly' or 'SISD', instead the
+ !    Helm form factor is employed for SI scattering, as well as the SD form factors 
+ !    from Klos [1304.7684]. Notice that for a WIMP of type 'NREffectiveTheory', the form factors from Haxton are
+ !    used irrespectively of this switch.
 
 ! MATH CONSTANTS -------------------------------------------------------
 

@@ -248,6 +248,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
     ! Notice: WTilde1_01 corresponds to D%WTilde(1,2,KE,Kiso) 
     ! Notice: WTilde1_11 corresponds to D%WTilde(1,4,KE,Kiso) 
 
+    ! If the parameter PreferNewFF is set to .TRUE., use the Haxton form factor for SI scattering
     IF (PreferNewFF) THEN
 
      DO KE = 1,D%NE
@@ -259,6 +260,8 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
        END DO
      END DO
 
+
+   ! If the parameter PreferNewFF is set to .FALSE., use the Helm form factor for SI scattering
    ELSE
 
      DO KE = 1,D%NE
@@ -277,6 +280,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! ap = WIMP%params(1), an = WIMP%params(2)
    ! This follows the Jungman/Kamionkowski convention of defining ap and an.
 
+   ! If the parameter PreferNewFF is set to .TRUE., use the Haxton form factor for SD scattering
    IF(PreferNewFF) THEN
 
      DO KE = 1,D%NE
@@ -290,6 +294,8 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
        END DO
      END DO
 
+
+   ! If the parameter PreferNewFF is set to .FALSE., use the form factor from Klos et. al. for SD scattering
    ELSE
 
      DO KE = 1,D%NE
@@ -308,6 +314,8 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! combination of SIonly and SD only, see above.
    ! fp = WIMP%params(1), fn = WIMP%params(2), ap = WIMP%params(3), an = WIMP%params(4)
 
+
+   ! If the parameter PreferNewFF is set to .TRUE., use the Haxton form factor for SI and SD scattering
    IF(PreferNewFF) THEN
 
      DO KE = 1,D%NE
@@ -324,6 +332,9 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
        END DO
      END DO
 
+
+   ! If the parameter PreferNewFF is set to .FALSE., use the Helm form factor for SI scattering,
+   !   and the Klos form factor for SD scattering
    ELSE
 
      DO KE = 1,D%NE
@@ -347,6 +358,9 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! WIMP%params has to be a 45-element list, interpreted as coefficients in units GeV^(-2) of the non-relativistic operators
    ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1, alpha_1, ..., alpha_8)
    ! See DDTypes for more information.
+   !
+   ! Notice that the form factors from Haxton are used for this WIMPType. For using instead the Helm form factor for SI scattering,
+   !   or the Klos form factor for SD scattering, use the types SIonly, SDonly or SISD, together with the switch PreferNewFF = .FALSE.
      
      IF (WIMP%params(1).LE.0) THEN
         WRITE (*,*) 'Error in using WIMP type NREffectiveTheory: the dark matter spin is not set correctly.'

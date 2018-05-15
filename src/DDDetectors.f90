@@ -237,7 +237,7 @@ END SUBROUTINE
 !               the second index is over recoil energies and the third
 !               index is over the bins.
 !   WTilde      Allocatable dimension=4 array containing form factors.
-!		Allocated to size [1:8,1:4,1:NE,1:Niso] (see DDTypes).
+!		Allocated to size [0:9,1:4,1:NE,1:Niso] (see DDTypes).
 ! 
 SUBROUTINE GetDetector(D,mass,time,exposure,Nevents,background,         &
                        Niso,Ziso,Aiso,Jiso,fiso,Miso,NE,E,                   &

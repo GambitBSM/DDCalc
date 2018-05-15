@@ -99,8 +99,11 @@ int main()
 
 
   /* **************************************************************************************************************** */
-  /* Example 2: PICO-60 (2017) analysis, with standard SD interactions specified by the couplings ap and an.          */
-  /*            The definition of ap and an follow the convention in Jungman&Kamionkowski, 'SUPERSYMMETRIC DARK MATTER'. */
+  /* Example 2: PICO-60 (2017) analysis, with standard SI and SD interactions
+                specified by the couplings fp, fn, ap, an.          
+                fp and fn are the coefficients of the DM DM N N term in the Lagrangian, assuming a Majorana DM particle.
+                The definition of ap and an follow the convention in Jungman&Kamionkowski, 'SUPERSYMMETRIC DARK MATTER'.
+  */ 
   Detector = DDCalc::PICO_60_2017_Init();	// Initalize the PICO_60_2017 detector.
   mDM = 30.0;                           	// DM Mass in GeV.
   fp = 1.0e-8;					// SI WIMP-proton coupling fp, in units [GeV^(-2)].
@@ -124,8 +127,6 @@ int main()
   printf("Log(likelihood):                      %.5e\n",DDCalc::LogLikelihood(Detector));
   printf("********************************************************************************\n\n");
   /* **************************************************************************************************************** */
-
-
 
 
 
