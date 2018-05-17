@@ -1,0 +1,3 @@
+Tabulated velocity integrals from Kuhlen et al. [arXiv:0912.2358], downloaded from http://w.astro.berkeley.edu/~mqk/dmdd/
+
+The 12 different columns correspond to different times of the year; in particular, one can obtain the annual modulation by calculating the difference between column 2 and column 8.

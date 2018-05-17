@@ -40,7 +40,7 @@ int main()
   // are the bedrock of DDCalc.  (Almost) every calculation needs to be
   // provided with an instance of each of these to do its job.  Passing the
   // index of one of them to DDCalc tells it which one in its internal cache
-  // to use for the calculation requested. You can make have as many
+  // to use for the calculation requested. You can create as many
   // different instances as you want, corresponding to e.g. different
   // detectors/analyses, WIMP models and DM halo models; the factory
   // funcions create the instances in DDCalc and return you the index of
@@ -69,8 +69,8 @@ int main()
 
 
   /* **************************************************************************************************************** */
-  /* Example 1: Xenon1T (2017) analysis, with standard SI/SD interactions specified by WIMP-nucleon cross sections.   */
-  Detector = DDCalc::Xenon1T_2017_Init();	// Initalize the Xenon1T_2017 detector.
+  /* Example 1: XENON1T (2017) analysis, with standard SI/SD interactions specified by WIMP-nucleon cross sections.   */
+  Detector = DDCalc::XENON1T_2017_Init();	// Initalize the XENON1T_2017 detector.
   mDM = 100.0;                           	// DM Mass in GeV.
   sigmap_SI = 4.0e-9;				// SI WIMP-proton cross section in pb.
   sigman_SI = -0.3e-9;				// SI WIMP-neutron cross section in pb.
@@ -81,7 +81,7 @@ int main()
   DDCalc::CalcRates(Detector,WIMP,Halo); 	// This performs the actual calculation of the rates.
 
   printf("********************************************************************************\n");
-  printf("Example 1: Mixed SI and SD interactions at Xenon1T (2017),\n");
+  printf("Example 1: Mixed SI and SD interactions at XENON1T (2017),\n");
   printf("           specified by the WIMP-nucleon cross sections.\n\n");
   printf("mDM       = %.5e GeV\n", mDM);
   printf("sigmap_SI = %.5e pb\n", sigmap_SI);

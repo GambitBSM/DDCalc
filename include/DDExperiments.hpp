@@ -32,8 +32,6 @@ extern "C"
   int C_DDCalc_supercdms_2014_init();
   int C_DDCalc_cdmslite_init();
   int C_DDCalc_simple_2014_init();
-  int C_DDCalc_darwin_ar_init();
-  int C_DDCalc_darwin_xe_init();
   int C_DDCalc_cresst_ii_init();
   int C_DDCalc_dummyexp_init();
   int C_DDCalc_lz_init();
@@ -80,7 +78,7 @@ namespace DDCalc
     C_DDCalc_pandax_2017_init();
   }
 
-  int Xenon1T_2017_Init()
+  int XENON1T_2017_Init()
   {
     C_DDCalc_xenon1t_2017_init();
   }
@@ -113,16 +111,6 @@ namespace DDCalc
   int SIMPLE_2014_Init()
   {
     C_DDCalc_simple_2014_init();
-  }
-  
-  int DARWIN_Ar_Init()
-  {
-    C_DDCalc_darwin_ar_init();
-  }
-  
-  int DARWIN_Xe_Init()
-  {
-    C_DDCalc_darwin_xe_init();
   }
 
   int CRESST_II_Init()

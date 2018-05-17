@@ -1,7 +1,7 @@
-MODULE Xenon1T_2017
+MODULE XENON1T_2017
 
 !=======================================================================
-! Xenon1T 2017 ANALYSIS ROUTINES
+! XENON1T 2017 ANALYSIS ROUTINES
 ! Based upon arXiv:1705.06655.  
 !=======================================================================
 
@@ -14,9 +14,9 @@ CONTAINS
 
 
 !-----------------------------------------------------------------------
-! Initializes a DetectorStruct to the Xenon1T 2017 analysis.
+! Initializes a DetectorStruct to the XENON1T 2017 analysis.
 ! 
-FUNCTION Xenon1T_2017_Init() RESULT(D)
+FUNCTION XENON1T_2017_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
@@ -70,20 +70,20 @@ FUNCTION Xenon1T_2017_Init() RESULT(D)
                    Backgr_tot=0.36d0,Nelem=1,Zelem=(/54/),              &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
                    Emin=EMIN)
-  D%eff_file = '[Xenon1T 2017]'
+  D%eff_file = '[XENON1T 2017]'
   
 END FUNCTION  
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_Xenon1T_2017_Init() &
+INTEGER(KIND=C_INT) FUNCTION C_XENON1T_2017_Init() &
  BIND(C,NAME='C_DDCalc_xenon1t_2017_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = Xenon1T_2017_Init()
-  C_Xenon1T_2017_Init = N_Detectors
+  Detectors(N_Detectors)%p = XENON1T_2017_Init()
+  C_XENON1T_2017_Init = N_Detectors
 END FUNCTION
 
 

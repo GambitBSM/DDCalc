@@ -157,10 +157,10 @@ endif
 #################### FILES / TARGETS #######################
 
 # Main programs
-fprograms := DDTest DDExclusion
+fprograms := DDCalc_test
 
 # Example/test programs
-ftestprograms := DDCalc_exampleF
+ftestprograms := DDCalc_exampleF DDCalc_exclusionF
 ctestprograms := DDCalc_exampleC
 
 # Fortran sources
@@ -169,12 +169,12 @@ fsrc := DDConstants.f90 DDTypes.f90 DDNuclear.f90 \
         DDWIMP.f90 DDInput.f90 DDHalo.f90 DDRates.f90 \
         DDDetectors.f90 DDExperiments.f90 \
         DDCalc.f90 DDNREffectiveTheory.f90
-analyses := DARWIN_Ar.f90 DARWIN_Xe.f90 LUX_2013.f90 SIMPLE_2014.f90 \
+analyses := LUX_2013.f90 SIMPLE_2014.f90 DARWIN.f90 \
             SuperCDMS_2014.f90 XENON100_2012.f90 LUX_2016.f90 \
             PandaX_2016.f90 LUX_2015.f90 PICO_2L.f90 CDMSlite.f90 \
-            PICO_60.f90  Xenon1T_2017.f90 PICO_60_2017.f90 \
+            PICO_60.f90  XENON1T_2017.f90 PICO_60_2017.f90 \
             CRESST_II.f90 PandaX_2017.f90 \
-            LZ.f90 DarkSide.f90 PICO_500.f90 DARWIN.f90
+            LZ.f90 DarkSide.f90 PICO_500.f90
 
 # Include files
 fincludes :=
@@ -241,8 +241,6 @@ $(BUILD)/DDExperiments.o: $(BUILD)/XENON100_2012.o \
  $(BUILD)/SIMPLE_2014.o \
  $(BUILD)/SuperCDMS_2014.o \
  $(BUILD)/CDMSlite.o \
- $(BUILD)/DARWIN_Ar.o \
- $(BUILD)/DARWIN_Xe.o \
  $(BUILD)/LUX_2016.o \
  $(BUILD)/PandaX_2016.o \
  $(BUILD)/PandaX_2017.o \
@@ -250,7 +248,7 @@ $(BUILD)/DDExperiments.o: $(BUILD)/XENON100_2012.o \
  $(BUILD)/PICO_2L.o \
  $(BUILD)/PICO_60.o \
  $(BUILD)/PICO_60_2017.o \
- $(BUILD)/Xenon1T_2017.o \
+ $(BUILD)/XENON1T_2017.o \
  $(BUILD)/CRESST_II.o \
  $(BUILD)/LZ.o \
  $(BUILD)/DARWIN.o \
