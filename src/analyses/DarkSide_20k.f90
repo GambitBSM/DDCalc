@@ -30,10 +30,10 @@ FUNCTION DarkSide_20k_Init() RESULT(D)
 ! In addition, we add 0.04 events per bin from instrumental backgrounds
   REAL*8, PARAMETER :: Bg_bin(Nbins) = (/0.077, 0.117, 0.149, 0.156,    &
                        0.149, 0.138, 0.128, 0.119, 0.111, 0.102/)
-! Very arbitrary at the moment.
+
   INTEGER, PARAMETER :: Nev_bin(Nbins) = (/0,0,0,0,0,0,0,0,0,0/)
 
-! The efficiencies include the f_90 cut shown in Fig. 92
+! The efficiencies include the f_200 cut shown in Fig. 92
   CALL SetDetector(D,exposure=3.65d7,Nevents_bin=Nev_bin,               &
                    Backgr_bin=Bg_bin,Nelem=1,Zelem=(/18/),              &
                    Nbins=NBINS,E_file='DarkSide/energies.dat',          &
