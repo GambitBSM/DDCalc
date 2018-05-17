@@ -62,8 +62,7 @@ The experimental results implemented in DDCalc at this time are:
   * SIMPLE 2014: 18.24 kg-days (C2ClF5)  
     M. Felizardo et al., PRD 89, 072013 (2014) [arXiv:1404.4309]
 
-  * DARWIN projections (argon & xenon)  
-    J. Conrad et al., in preparation.
+NEEDS UPDATING!
 
 
 Citation Policy
@@ -86,7 +85,10 @@ XXX
 If you use the Yellin maximum gap method, please cite:
 
   S. Yellin, PRD 66, 032005 (2002) [physics/0203002]  
-    http://inspirehep.net/record/583791  
+
+If you use the tabulated velocity integrals, please cite:
+
+  M. Kuhlen et al., JCAP 1002 (2010) 030 [arXiv:0912.2358]
 
 If using DDCalc for calculations involving experimental results,
 please cite the appropriate experimental papers listed above.
@@ -104,9 +106,8 @@ To build, simply do
 
 This will generate the following:
 
-  * DDCalc_run
-    The main program for performing various rate and likelihood
-    calculations.
+  * DDCalc_test
+    Tests whether DDCalc has been correctly compiled. This program simply serves as a placeholder for more complex main programs.
 
   * DDCalc.o, DDCalc.a, DDCalc.so
     Object, static library, and shared object files for linking
