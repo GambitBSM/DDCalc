@@ -1,7 +1,7 @@
-MODULE DarkSide
+MODULE DarkSide_20k
 
 !=======================================================================
-! DarkSide ANALYSIS ROUTINES
+! DarkSide_20k ANALYSIS ROUTINES
 ! Based upon arXiv:1707.08145.  
 !=======================================================================
 
@@ -14,9 +14,9 @@ CONTAINS
 
 
 !-----------------------------------------------------------------------
-! Initializes a DetectorStruct to the DarkSide analysis.
+! Initializes a DetectorStruct to the DarkSide_20k analysis.
 ! 
-FUNCTION DarkSide_Init() RESULT(D)
+FUNCTION DarkSide_20k_Init() RESULT(D)
 
   IMPLICIT NONE
   TYPE(DetectorStruct) :: D
@@ -43,14 +43,14 @@ END FUNCTION
 
 
 ! C++ interface wrapper
-INTEGER(KIND=C_INT) FUNCTION C_DarkSide_Init() &
- BIND(C,NAME='C_DDCalc_darkside_init') 
+INTEGER(KIND=C_INT) FUNCTION C_DarkSide_20k_Init() &
+ BIND(C,NAME='C_DDCalc_darkside_20k_init') 
   USE ISO_C_BINDING, only: C_BOOL, C_INT
   IMPLICIT NONE
   N_Detectors = N_Detectors + 1
   ALLOCATE(Detectors(N_Detectors)%p)
-  Detectors(N_Detectors)%p = DarkSide_Init()
-  C_DarkSide_Init = N_Detectors
+  Detectors(N_Detectors)%p = DarkSide_20k_Init()
+  C_DarkSide_20k_Init = N_Detectors
 END FUNCTION
 
 

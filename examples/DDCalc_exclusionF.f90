@@ -36,7 +36,7 @@ PROGRAM DDCalc_exclusionF
   BGlogL = DDCalc_LogLikelihood(Detector)
 
 ! Step 2: Calculate the critical value of the log likelihood that corresponds to the exclusion limit
-! Here we assume that -2 delta log L follows a 1/2 chi^2 distribution with 1 degree of freedom
+! Here we assume the asymptotic limit, such that -2 delta log L follows a 1/2 chi^2 distribution with 1 degree of freedom
 ! The one-sided upper bound at 90% confidence level is then given by -2 delta log L = 1.64
   limit = 1.64
   logLlimit = BGlogL - (limit / 2.d0)

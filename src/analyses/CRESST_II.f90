@@ -2,7 +2,7 @@ MODULE CRESST_II
 
 !=======================================================================
 ! CRESST_II ANALYSIS ROUTINES
-! Based upon https://arxiv.org/pdf/1510.07754v3.pdf .  
+! Based upon arXiv:1509.01515 and arXiv:1701.08157 .  
 !=======================================================================
 
 USE DDTypes

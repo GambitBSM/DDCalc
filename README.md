@@ -25,10 +25,22 @@ If you write a paper that uses DDCalc, please cite both papers.
 Experiments
 --
 
-The experimental results implemented in DDCalc at this time are:
+The experimental results implemented in DDCalc at this time are (in alphabetical order):
 
-  * Xenon1T 2017: 1042*34.2 kg-days (Xe)  
-    E. Aprile et al., [arxiv:1705.06655]
+  * CDMSlite: 70.1 kg-days (Ge)  
+    R. Agnese et al., PRL 116, 071301 (2016) [arxiv:1509.02448]
+
+  * CRESST-II: 52 kg-days (CaWO4)  
+    G. Angloher et al., Eur.Phys.J. C76, 25 (2016) [arXiv:1509.01515]
+
+  * DarkSide-50: 19600 kg-days (Ar)  
+    P. Agnes et al., arXiv:1802.07198
+
+  * LUX 2013: 118*85.3 kg-days (Xe)  
+    D.S. Akerib et al., PRL 112, 091303 (2014) [arxiv:1310.8214]
+
+  * LUX 2015: 118*85.3 kg-days (Xe)  
+    D.S. Akerib et al., PRL 116, 161301 (2016) [arXiv:1512.03506]
 
   * LUX 2016: 33500 kg-days (Xe)  
     D.S. Akerib et al., PRL 118, 021303 (2017) [arxiv:1608.07648]
@@ -39,31 +51,45 @@ The experimental results implemented in DDCalc at this time are:
   * PandaX 2017: 361.5*77.1 kg-days (Xe)  
     X. Cui et al., PRL 119, 181302 (2017) [arxiv:1708.06917]
 
-  * LUX 2015: 118*85.3 kg-days (Xe)  
-    D.S. Akerib et al., PRL 116, 161301 (2016) [arXiv:1512.03506]
-
-  * LUX 2013: 118*85.3 kg-days (Xe)  
-    D.S. Akerib et al., PRL 112, 091303 (2014) [arxiv:1310.8214]
-
-  * XENON100 2012: 34*224.6 kg-days (Xe)  
-    E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
-
-  * PICO: 60 (CF3), 2L (C3F8) and 60 (C3F8)
-    C. Amole et al., PRD 93, 052014 (2016) [arXiv:1510.07754]  
+  * PICO 2L: 104 kg-days (C3F8)
     C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729] 
-    C. Amole et al., arXiv:1702.07666 
 
-  * SuperCDMS 2014: 577 kg-days (Ge)  
-    R. Agnese et al., PRL 112, 241302 (2014) [arxiv:1402.7137]
+  * PICO 60: 741 kg-days (CF3)
+    C. Amole et al., PRD 93, 052014 (2016) [arXiv:1510.07754]  
 
-  * CDMSlite: 70.1 kg-days (Ge)  
-    R. Agnese et al., PRL 116, 071301 (2016) [arxiv:1509.02448]
+  * PICO 60 2017: (C3F8)
+    C. Amole et al., PRL 118, 251301 (2017) [arXiv:1702.07666]
 
   * SIMPLE 2014: 18.24 kg-days (C2ClF5)  
     M. Felizardo et al., PRD 89, 072013 (2014) [arXiv:1404.4309]
 
-NEEDS UPDATING!
+  * SuperCDMS 2014: 577 kg-days (Ge)  
+    R. Agnese et al., PRL 112, 241302 (2014) [arxiv:1402.7137]
 
+  * XENON100 2012: 34*224.6 kg-days (Xe)  
+    E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
+
+  * Xenon1T 2017: 1042*34.2 kg-days (Xe)  
+    E. Aprile et al., [arxiv:1705.06655]
+
+Moreover, projections for a number of future facilities have been implemented.
+
+Near future:
+
+* LZ (Xe)
+  D.S. Akerib et al., arXiv:1509.02910
+
+* PICO-500 (F)
+  S. Fallows, https://indico.cern.ch/event/606690/contributions/2623446/attachments/1497228/2330240/Fallows_2017_07_24__TAUP__PICO-40L_v1.2.pdf
+
+Far future:
+
+* DARWIN (Xe)
+  J. Aalbers et al., JCAP 1611 (2016) 017 [arXiv:1606.07001]
+  M. Schumann et al., JCAP 1510 (2015) 016 [arXiv:1506.08309]
+
+* DarkSide-20k (Ar)
+  C.E. Aalseth et al., Eur.Phys.J.Plus 133 (2018) 131 [arXiv:1707.08145]
 
 Citation Policy
 --
