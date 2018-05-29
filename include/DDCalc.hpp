@@ -161,6 +161,18 @@ namespace DDCalc
     C_DDCalc_ddcalc_setwimp_msigma(WIMPIndex,m,sigmaSIp,sigmaSIn,sigmaSDp,sigmaSDn);
   }
 
+
+  // Sets a WIMP with type 'NREffectiveTheory'. 
+  // SetWIMP_NREffectiveTheory simply initializes a WIMP within the 
+  // non-relativistic effective theory setup, setting all coefficients to zero.
+  //
+  // DDCalc_SetNRCoefficient sets the value of a single operator to a given value
+  //   in units GeV^(-2).
+  // Here, OpIndex is an integer specifying the operator, e.g. 6 for O_6.
+  // In addition, OpIndex = -1 stands for q^2*O_1, and 
+  //   OpIndex = -4 stands for q^2*O_4 
+  // tau is the isospin index of the operator (0 for isoscalar, 1 for isovector)
+  //
   void SetWIMP_NREffectiveTheory(const int WIMPIndex, const double m, const double spin)
   {
     C_DDCalc_ddcalc_setwimp_nreffectivetheory(WIMPIndex,m,spin);
@@ -200,7 +212,8 @@ namespace DDCalc
     C_DDCalc_ddcalc_getwimp_msigma(WIMPIndex,m,sigmaSIp,sigmaSIn,sigmaSDp,sigmaSDn);
   }
 
-
+  // This function provides the values of the isoscalar and isovector part of a given operator
+  // labeled by OpIndex, in units GeV^(-2).
   void GetNRCoefficient(const int WIMPIndex, const int OpIndex,
                   double& value_isoscalar, double& value_isovector)
   {

@@ -3,6 +3,15 @@
  * This program shows how to use the DDCalc module from C++, making
  * use of the interface defined in the DDCalc.hpp header file.
  * 
+ * For various types of DM-nucleon interactions, as well as for various 
+ * direct detection experiments, it computes the expected signal rates,
+ * any by comparing to the observed number of events, also the 
+ * log(likelihood) value for each of the examples.
+ * In order to convert those likelihood values into an upper bound on
+ * e.g. the scattering cross section, please have a look at
+ * DDCalc_exclusionC.cpp.
+ * 
+ * 
  * Run:
  *   ./DDCalc_exampleC 
  * 
@@ -53,8 +62,8 @@ int main()
   /* Initialise a DM Halo object to default values.*/
   Halo = DDCalc::InitHalo();
     
-  /* Initialise a WIMP object to default values.*/
-  WIMP = DDCalc::InitWIMP();
+  /* Initialise a WIMP objects to default values.*/
+  WIMP = DDCalc::InitWIMP();	
 
   /* Optionally set the Standard Halo Model parameters to values different from the default choices:
        rho     Local dark matter density [GeV/cm^3]
@@ -62,9 +71,6 @@ int main()
        v0      Maxwell-Boltzmann most probable speed [km/s]
        vesc    Galactic escape speed [km/s] */
   DDCalc::SetSHM(Halo, 0.3, 235.0, 235.0, 550.0);
-
-
-
 
 
 
@@ -79,6 +85,7 @@ int main()
   sigman_SD = 8.0e-5;				// SD WIMP-neutron cross section in pb.
   DDCalc::SetWIMP_msigma(WIMP, mDM, sigmap_SI, sigman_SI, sigmap_SD, sigman_SD); 
   DDCalc::CalcRates(Detector,WIMP,Halo); 	// This performs the actual calculation of the rates.
+
 
   printf("********************************************************************************\n");
   printf("Example 1: Mixed SI and SD interactions at XENON1T (2017),\n");
