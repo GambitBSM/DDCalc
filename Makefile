@@ -161,7 +161,7 @@ fprograms := DDCalc_test
 
 # Example/test programs
 ftestprograms := DDCalc_exampleF DDCalc_exclusionF
-ctestprograms := DDCalc_exampleC
+ctestprograms := DDCalc_exampleC DDCalc_exclusionC
 
 # Fortran sources
 fsrc := DDConstants.f90 DDTypes.f90 DDNuclear.f90 \

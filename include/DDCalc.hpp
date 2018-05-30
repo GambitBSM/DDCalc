@@ -71,6 +71,8 @@ extern "C"
   double C_DDStats_ddcalc_loglikelihood(const int&); // Log-likelihood
   double C_DDStats_ddcalc_scaletopvalue(const int&, const double&);
    // Factor x by which sigma -> x*sigma would yield given p-value (given as log(p))
+  double C_DDStats_ddcalc_feldmancousinsupper(const double&, const int&, const double&);
+  double C_DDStats_ddcalc_feldmancousinslower(const double&, const int&, const double&);
   int C_DDRates_ddcalc_bins(const int&);          // Number of bins
   int C_DDRates_ddcalc_binevents(const int&, const int&);          // Number of events in each bin
   double C_DDRates_ddcalc_binbackground(const int&, const int&);   // Number of expected backgrounds in each bin
@@ -301,6 +303,16 @@ namespace DDCalc
   double ScaleToPValue(const int DetectorIndex, const double logp=-2.302585)
   {
     return C_DDStats_ddcalc_scaletopvalue(DetectorIndex, logp);
+  }
+
+  double FeldmanCousinsUpper(const double LnP, const int N, const double B)
+  {
+    return C_DDStats_ddcalc_feldmancousinsupper(LnP, N, B);
+  }
+
+  double FeldmanCousinsLower(const double LnP, const int N, const double B)
+  {
+    return C_DDStats_ddcalc_feldmancousinslower(LnP, N, B);
   }
 
   //########## Do memory cleanup #######################################

@@ -18,7 +18,7 @@
 !   Chris Savage    Nordita/Utah/SavageArchitectures
 !   Pat Scott       Imperial College
 !   Martin White    Adelaide
-!   Felix Kahlhoefer   DESY
+!   Felix Kahlhoefer   RWTH Aachen
 !   Sebastian Wild     DESY
 !   ddcalc@projects.hepforge.org
 ! 

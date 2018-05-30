@@ -70,7 +70,7 @@ PROGRAM DDCalc_exclusionF
     mDM = mDMmin * (mDMmax/mDMmin)**(REAL(mDMi)/mDMsteps)
     CALL DDCalc_SetWIMP_msigma(WIMP, mDM, sigmatest, sigmatest, 0d0, 0d0)
     CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-    WRITE (*,'(3(10X,F10.4))') log(mDM)/log(10d0),log(DDCalc_ScaleToPValue(Detector,logLlimit)*sigmatest)/log(10d0)
+    WRITE (*,'(2(10X,F10.4))') log(mDM)/log(10d0),log(DDCalc_ScaleToPValue(Detector,logLlimit)*sigmatest)/log(10d0)
   END DO
 
 ! Step 4: Calculate spin-dependent exclusion limit (assuming couplings only to protons)
@@ -85,7 +85,7 @@ PROGRAM DDCalc_exclusionF
     mDM = mDMmin * (mDMmax/mDMmin)**(REAL(mDMi)/mDMsteps)
     CALL DDCalc_SetWIMP_msigma(WIMP, mDM, 0d0, 0d0, sigmatest, 0d0)
     CALL DDCalc_CalcRates(Detector, WIMP, Halo)
-    WRITE (*,'(3(10X,F10.4))') log(mDM)/log(10d0),log(DDCalc_ScaleToPValue(Detector,logLlimit)*sigmatest)/log(10d0)
+    WRITE (*,'(2(10X,F10.4))') log(mDM)/log(10d0),log(DDCalc_ScaleToPValue(Detector,logLlimit)*sigmatest)/log(10d0)
   END DO
 
 ! *************************************************
@@ -111,10 +111,12 @@ PROGRAM DDCalc_exclusionF
   WRITE (*,*) ''
   IF (s1 .GT. 0) THEN
     WRITE (*,*) '      log_10(m_DM/GeV)  log_10(sigma_min/pb)  log_10(sigma_max/pb)'
+    WRITE (*,*) ''
   ELSE
     WRITE (*,*) 'Lower bound corresponds to zero cross section. Quoting upper bound only.'
     WRITE (*,*) ''
     WRITE (*,*) '      log_10(m_DM/GeV)  log_10(sigma_max/pb)'
+    WRITE (*,*) ''
   END IF
 
   DO mDMi = 0,mDMsteps
@@ -160,7 +162,7 @@ PROGRAM DDCalc_exclusionF
   WRITE (*,'(A,F7.1,A,G10.3,A,F7.3)') ' Best fit point is m_DM = ',mDM,' GeV, sigma_p = ',sigbest,&
   ' pb with log L = ',logLbest
   WRITE (*,*) ''
-  WRITE (*,*) '   log_10(m_DM/GeV)  log_10(sigma_p/pb)               log L      -2 Delta log L'
+  WRITE (*,*) '    log_10(m_DM/GeV)  log_10(sigma_p/pb)               log L      -2 Delta log L'
   WRITE (*,*) ''
   DO mDMi = 0,mDMsteps
     DO sigi = 0,sigsteps

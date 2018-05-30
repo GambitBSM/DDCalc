@@ -19,7 +19,7 @@
  *       A. Scaffidi     U of Adelaide    2015    
  *       C. Savage       Nordita          2015
  *       P. Scott        Imperial Collge  2016
- *       F. Kahlhoefer   DESY		  2017
+ *       F. Kahlhoefer   RWTH Aachen      2018
  *       S. Wild     	 DESY		  2017-2018
  *       ddcalc@projects.hepforge.org
  * 

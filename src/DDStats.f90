@@ -16,7 +16,7 @@ IMPLICIT NONE
 PRIVATE
 
 PUBLIC :: DDCalc_LogLikelihood,DDCalc_ScaleToPValue
-PUBLIC :: C_DDCalc_LogLikelihood,C_DDCalc_ScaleToPValue
+PUBLIC :: C_DDCalc_LogLikelihood,C_DDCalc_ScaleToPValue,C_DDCalc_FeldmanCousinsUpper,C_DDCalc_FeldmanCousinsLower
 PUBLIC :: FeldmanCousinsPoissonCI,LogPoissonP
 
 INTERFACE DDCalc_LogLikelihood
@@ -200,13 +200,14 @@ END FUNCTION
 !-----------------------------------------------------------------------
 ! C/C++ wrapper for DDCalc_ScaleToPValue
 !
-REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_ScaleToPValue(DetectorIndex) &
+REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_ScaleToPValue(DetectorIndex,LogP) &
  BIND(C,NAME='C_DDStats_ddcalc_scaletopvalue')
   USE ISO_C_BINDING, only: C_DOUBLE, C_INT
   IMPLICIT NONE
   INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: LogP
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_ScaleToPValue'
-  C_DDCalc_ScaleToPValue = REAL(ScaleToPValue(Detectors(DetectorIndex)%p),KIND=C_DOUBLE)
+  C_DDCalc_ScaleToPValue = REAL(ScaleToPValue(Detectors(DetectorIndex)%p,LogP),KIND=C_DOUBLE)
 END FUNCTION
 
 ! ----------------------------------------------------------------------
@@ -511,6 +512,36 @@ PURE SUBROUTINE FeldmanCousinsPoissonCI(lnp,N,b,s1,s2)
   END FUNCTION
   
 END SUBROUTINE
+
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_FeldmanCousinsUpper
+!
+REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_FeldmanCousinsUpper(LnP,N,B) &
+ BIND(C,NAME='C_DDStats_ddcalc_feldmancousinsupper')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: N
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: LnP, B
+  REAL*8 :: s1, s2
+  CALL FeldmanCousinsPoissonCI(LnP,N,B,s1,s2)
+  C_DDCalc_FeldmanCousinsUpper = REAL(s2,KIND=C_DOUBLE)
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_FeldmanCousinsLower
+!
+REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_FeldmanCousinsLower(LnP,N,B) &
+ BIND(C,NAME='C_DDStats_ddcalc_feldmancousinslower')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: N
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: LnP, B
+  REAL*8 :: s1, s2
+  CALL FeldmanCousinsPoissonCI(LnP,N,B,s1,s2)
+  C_DDCalc_FeldmanCousinsLower = REAL(s1,KIND=C_DOUBLE)
+END FUNCTION
+
 
 
 ! ----------------------------------------------------------------------
