@@ -159,7 +159,7 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   END IF
 
   ! Starting point
-  x1   = 1d0 / mu
+  x1   = 0.1d0 / mu
   lnp1 = LogLikelihood(D,0.d0)
 
   ! Bracket
@@ -180,7 +180,7 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
       lnp1 = LogLikelihood(D,x1)
     END DO
   END IF
-  
+
   ! Bisection (geometric)
   DO WHILE ((ABS(lnp2-lnp1) .GT. 1d-5) .AND. (ABS(LOG(x2/x1)) .GT. 1d-5))
     xm   = SQRT(x1*x2)
