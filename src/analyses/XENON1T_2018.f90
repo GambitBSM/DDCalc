@@ -2,7 +2,7 @@ MODULE XENON1T_2018
 
 !=======================================================================
 ! XENON1T 2018 ANALYSIS ROUTINES
-! Based upon powerpoint physics.  
+! Based upon arXiv:1805.12562.  
 !=======================================================================
 
 USE DDTypes
@@ -46,6 +46,10 @@ FUNCTION XENON1T_2018_Init() RESULT(D)
       48.08700d0, 49.89400d0, 51.76890d0, 53.71420d0, 55.73270d0, &
       57.82700d0, 60.00000d0 /)
 
+  ! The efficiency is based on Fig. 1 of arXiv:1805.12562 with two additional correction factors:
+  ! 1. A factor of 0.475 accounts for the fraction of nuclear recoil events that fall into the reference region.
+  ! 2. A factor of 0.5 accounts for the fraction of WIMP events that fall into the inner 0.65 t of the fiducial volume.
+
   ! Efficiency (total)
   REAL*8, PARAMETER :: EFF0(NE)                                         &
       =       (/ 0.00000d0, 0.00000d0, 0.00000d0, 0.00010d0, 0.00023d0, 0.00036d0, &
@@ -65,6 +69,8 @@ FUNCTION XENON1T_2018_Init() RESULT(D)
       0.20099d0, 0.19814d0, 0.19368d0, 0.18726d0, 0.17826d0, 0.16540d0, &
       0.14854d0, 0.12729d0, 0.10362d0, 0.07914d0, 0.05637d0, 0.03763d0, &
       0.02364d0, 0.01386d0, 0.00744d0, 0.00346d0, 0.00135d0 /)
+
+  ! The energy range is divided into two bins: [3, 35] and [35, 70]
 
   REAL*8, PARAMETER :: EFF1(NE)                                         &
       =       (/ 0.00000d0, 0.00000d0, 0.00000d0, 0.00010d0, 0.00023d0, 0.00036d0, &
@@ -89,13 +95,18 @@ FUNCTION XENON1T_2018_Init() RESULT(D)
   REAL*8, PARAMETER :: EFF(NE,0:NBINS)                                   &
       = RESHAPE( (/ EFF0(:), EFF1(:), EFF0(:) - EFF1(:) /), SHAPE(EFF))
 
-  CALL SetDetector(D,mass=1300.0d0,time=278.8d0,Nevents_bin=[0,2],     &
-                   Backgr_bin=[0.46d0,0.34d0],Nelem=1,Zelem=(/54/),       &
-                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
+! The background distributions are estimates based on arXiv:1512.07501
+! Zero events were observed in the first bin, 2 events in the second bin
+
+  CALL SetDetector(D,mass=1300.0d0,time=278.8d0,Nevents_bin=[0,2],  &
+                   Backgr_bin=[0.46d0,0.34d0],Nelem=1,Zelem=(/54/), &
+                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,               &
                    Emin=EMIN)
-!  CALL SetDetector(D,mass=1300.0d0,time=278.8d0,Nevents_tot=11,     &
-!                   Backgr_tot=8.4d0,Nelem=1,Zelem=(/54/),       &
-!                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,                   &
+
+!  Uncomment the lines below for an unbinned analysis of XENON1T
+!  CALL SetDetector(D,mass=1300.0d0,time=278.8d0,Nevents_tot=2,     &
+!                   Backgr_tot=0.8d0,Nelem=1,Zelem=(/54/),          &
+!                   NE=NE,E=E,Nbins=NBINS,eff_all=EFF,              &
 !                   Emin=EMIN)
    D%eff_file = '[XENON1T 2018]'
   

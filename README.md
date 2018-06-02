@@ -69,8 +69,18 @@ The experimental results implemented in DDCalc at this time are (in alphabetical
   * XENON100 2012: 34*224.6 kg-days (Xe)  
     E. Aprile et al., PRL 109, 181301 (2012) [arxiv:1207.5988]
 
-  * Xenon1T 2017: 1042*34.2 kg-days (Xe)  
-    E. Aprile et al., [arxiv:1705.06655]
+  * XENON1T 2017: 1042*34.2 kg-days (Xe)  
+    E. Aprile et al., PRL 119 181301 (2017) [arxiv:1705.06655]
+
+  * XENON1T 2018: 1300*279 kg-days (Xe)  
+    E. Aprile et al., arxiv:1805.12562
+
+Note that the following data sets are not statistically independent and should therefore not be combined:
+  * LUX 2013, LUX 2015 and LUX 2016
+  * XENON1T 2017 and XENON1T 2018
+In contrast, the following data sets are independent and can be combined:
+  * PICO 60 and PICO 60 2017
+  * PandaX 2016 and PandaX 2017 (these correspond to Run 9 and Run 10, respectively, as described in arXiv:1708.06917)
 
 Moreover, projections for a number of future facilities have been implemented.
 
