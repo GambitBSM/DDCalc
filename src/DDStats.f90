@@ -135,7 +135,7 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
   TYPE(DetectorStruct), INTENT(IN) :: D
   REAL*8, INTENT(IN), OPTIONAL :: lnp
   INTEGER :: N
-  REAL*8 :: lnp0,mu,x1,lnp1,x2,lnp2,xm,lnpm
+  REAL*8 :: lnp0,mu,lnpbg,x1,lnp1,x2,lnp2,xm,lnpm
   
   ! logarithm of p-value to use
   IF (PRESENT(lnp)) THEN
@@ -158,27 +158,37 @@ FUNCTION ScaleToPValue(D,lnp) RESULT(x)
     RETURN
   END IF
 
-  ! Starting point
-  x1   = 0.1d0 / mu
-  lnp1 = LogLikelihood(D,0.d0)
+  lnpbg = LogLikelihood(D,0.d0)
+  IF (lnpbg .LE. lnp0) THEN
 
-  ! Bracket
-  IF (lnp1 .GT. lnp0) THEN
-    x2   = 2d0*x1
-    lnp2 = LogLikelihood(D,0.d0)
-    DO WHILE (lnp2 .GE. lnp0)
-      x1   = x2
-      lnp1 = lnp2
-      x2   = 2d0*x2
-      lnp2 = LogLikelihood(D,x2)
-    END DO
+    WRITE (*,*) 'Warning! ScaleToPValue requires a likelihood smaller than the background-only likelihood'
+    WRITE (*,*) 'to ensure that a unique solution exists. Returning zero.'
+    x = 0d0
+    RETURN
+
   ELSE
-    DO WHILE (lnp1 .LE. lnp0)
-      x2   = x1
-      lnp2 = lnp1
-      x1   = 0.5d0*x1
-      lnp1 = LogLikelihood(D,x1)
-    END DO
+
+    x1   = 1.d0 / mu
+    lnp1 = LogLikelihood(D,x1)
+
+    ! Bracket
+    IF (lnp1 .GT. lnp0) THEN
+      x2   = 2d0*x1
+      lnp2 = LogLikelihood(D,x2)
+      DO WHILE (lnp2 .GE. lnp0)
+        x1   = x2
+        lnp1 = lnp2
+        x2   = 2d0*x2
+        lnp2 = LogLikelihood(D,x2)
+      END DO
+    ELSE
+      DO WHILE (lnp1 .LE. lnp0)
+        x2   = x1
+        lnp2 = lnp1
+        x1   = 0.5d0*x1
+        lnp1 = LogLikelihood(D,x1)
+      END DO
+    END IF
   END IF
 
   ! Bisection (geometric)
