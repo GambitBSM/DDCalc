@@ -362,7 +362,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! Notice that the form factors from Haxton are used for this WIMPType. For using instead the Helm form factor for SI scattering,
    !   or the Klos form factor for SD scattering, use the types SIonly, SDonly or SISD, together with the switch PreferNewFF = .FALSE.
      
-     IF (WIMP%params(1).LE.0) THEN
+     IF (WIMP%params(1).LT.0) THEN
         WRITE (*,*) 'Error in using WIMP type NREffectiveTheory: the dark matter spin is not set correctly.'
         STOP
      END IF 

@@ -227,6 +227,9 @@ END FUNCTION
 ! given p-value (p = 1-CL).  Uses the Feldman-Cousins method as
 ! described in:
 !    G. Feldman & R. Cousins, Phys. Rev. D 57, 3873 (1998) [physics/9711021]
+! Note: The algorithm implemented below does not consider variations in the
+! background estimate and therefore does not include any measure to ensure
+! that the confidence interval is a uniform function of the background estimate
 ! 
 ! Input arguments:
 !   lnp         The logarithm of the p-value (CL = 1-p)
