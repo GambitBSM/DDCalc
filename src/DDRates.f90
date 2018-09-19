@@ -363,11 +363,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! Notice that the form factors from Haxton are used for this WIMPType. For using instead the Helm form factor for SI scattering,
    !   or the Klos form factor for SD scattering, use the types SIonly, SDonly or SISD, together with the switch PreferNewFF = .FALSE.
      
-     IF (WIMP%params(1).LT.0) THEN
-        WRITE (*,*) 'Error in using WIMP type NREffectiveTheory: the dark matter spin is not set correctly.'
-        STOP
-     END IF 
-
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso 
          D%dRdEiso(KE,Kiso) = 0.0
@@ -377,6 +372,11 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
          ELSE
            params = param_conversion(D, WIMP%params, KE, Kiso)
          END IF
+
+         IF (params(1).LT.0) THEN
+           WRITE (*,*) 'Error in using WIMP type NREffectiveTheory: the dark matter spin is not set correctly.'
+           STOP
+         END IF 
 
          DO alpha = 1,8
             IF (abs(params(37 + alpha))>0) THEN ! only calculate and add those terms in alpha for which the corresponding param entry is non-zero

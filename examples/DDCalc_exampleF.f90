@@ -33,12 +33,14 @@ PROGRAM DDCalc_exampleF
   USE DDCalc
   USE DDExperiments
   USE DDRates
+  USE DDConstants
 
 
   IMPLICIT NONE
   INTEGER :: i_bin,KE,type
   REAL*8 :: mDM, sigmap_SI, sigman_SI, sigmap_SD, sigman_SD
   REAL*8 :: DM_spin, fp, fn, ap, an
+  REAL*8 :: prms(51)
 
   ! These three sets of indices refer to instance of the three types that
   ! are the bedrock of DDCalc.  (Almost) every calculation needs to be
@@ -161,9 +163,9 @@ PROGRAM DDCalc_exampleF
   !    tau is an integer, with 0 corresponding to the isoscalar part of the operator,
   !       and 1 to the isovector part.
   !    value specifies the operator coefficient corresponding to OpIndex and tau, in units [GeV^(-2)].
-  CALL DDCalc_SetNRCoefficient(WIMP, 11, 0, 5.0d-4)
+  CALL DDCalc_SetNRCoefficient(WIMP, -1, 0, 5.0d-2)
 	! This sets the isoscalar part of O_11 to 5.0e-4 GeV^(-2).
-  CALL DDCalc_SetNRCoefficient(WIMP, 11, 1, -2.0d-4)
+!  CALL DDCalc_SetNRCoefficient(WIMP, 11, 1, -2.0d-4)
 	! This sets the isovector part of O_11 to -2.0e-4 GeV^(-2).
   CALL DDCalc_CalcRates(Detector,WIMP,Halo)	! This performs the actual calculation of the rates.
 
@@ -195,7 +197,41 @@ PROGRAM DDCalc_exampleF
   WRITE (*,*)
   ! ****************************************************************************************************************
 
+  prms(:) = 0
+  prms(24) = 2.5d-2/PROTON_MASS**2
+  prms(49) = 2.5d-2/PROTON_MASS**2
+  prms(51) = 0.5
+  CALL DDCalc_SetWIMP(WIMP,m=mDM,DMtype='NREFT_CPT',params=prms)
 
+  CALL DDCalc_CalcRates(Detector,WIMP,Halo)	! This performs the actual calculation of the rates.
+
+  WRITE (*,*) '******************************************************************'
+  WRITE (*,*) 'Example 3: Non-standard scattering operators at CRESST-II'
+  WRITE (*,*) '           This is also an example for an experiment with'
+  WRITE (*,*) '           several bins.'
+  WRITE (*,*) 'mDM       = ', mDM, ' GeV'
+  WRITE (*,*) 'DM spin   = ', DM_spin
+  WRITE (*,*) '               Expected signal    Observed    Expected background'
+  WRITE (*,'(A, E15.5, A, I5, A, E15.5)') 'All bins    ', DDCalc_Signal(Detector), &
+		'      ', &
+		DDCalc_Events(Detector), '     ', DDCalc_Background(Detector)
+
+  !WRITE (*,*) DDCalc_Bins(Detector) 
+  DO i_bin = 1, DDCalc_Bins(Detector)  
+    WRITE (*,'(A, I5, A, E15.5, A, I5, A, E15.5)') 'Bin', i_bin, '    ', &
+	DDCalc_BinSignal(Detector, i_bin), '      ', &
+	DDCalc_BinEvents(Detector, i_bin), '     ', &
+        DDCalc_BinBackground(Detector, i_bin)
+  END DO
+  !for( int i_bin = 1; i_bin <= DDCalc::Bins(Detector); i_bin = i_bin + 1 ) {
+  !   printf("Bin %d\t\t%.5e\t\t%d\t\t%.5e\n", i_bin, DDCalc::BinSignal(Detector, i_bin), DDCalc::BinEvents(Detector, i_bin), DDCalc::BinBackground(Detector, i_bin));
+  !   }
+
+  WRITE (*,*)
+  WRITE (*,*) 'Log(likelihood):                       ', DDCalc_LogLikelihood(Detector)
+  WRITE (*,*) '******************************************************************'
+  WRITE (*,*)
+  ! ****************************************************************************************************************
   
 END PROGRAM
 

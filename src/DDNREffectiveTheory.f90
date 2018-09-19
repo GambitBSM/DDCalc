@@ -17,10 +17,14 @@ PRIVATE
 
 
 PUBLIC :: NRET_SFunctions, NRET_CreateCoeffList, NRET_SetDMSpin, NRET_GetParamIndex,&
-   NRET_SetNRCoefficient, NRET_UpdateNRCoefficients
+   NRET_SetNRCoefficient, NRET_UpdateNRCoefficients, param_conversion
 
 INTERFACE NRET_SFunctions
   MODULE PROCEDURE NRET_SFunctions_fct
+END INTERFACE
+
+INTERFACE param_conversion
+  MODULE PROCEDURE param_conversion_fct
 END INTERFACE
 
 INTERFACE NRET_CreateCoeffList
@@ -257,13 +261,13 @@ FUNCTION NRET_SFunctions_fct(D, m, p, alpha, KE, Kiso)   &
 
   !WRITE (*,*) 'a = ', a, ', b = ', b, ', S1S2 = ', S1S2
 
-
 END FUNCTION
 
 ! Auxiliary function to convert parameters from the WIMP type 'NREFT_CPT' to the WIMP type 'NREffectiveTheory'. 
 
-FUNCTION param_conversion(D, pin, KE, Kiso)   &
-    RESULT pout
+
+FUNCTION param_conversion_fct(D, pin, KE, Kiso)   &
+    RESULT (pout)
   IMPLICIT NONE
 
   REAL*8 :: pout(45)
@@ -273,8 +277,10 @@ FUNCTION param_conversion(D, pin, KE, Kiso)   &
   INTEGER, INTENT(IN) :: KE, Kiso
 
   REAL*8 :: qsq, meta, mpi
-  REAL*8 :: pp(12)
-  REAL*8 :: pn(12)
+  REAL*8 :: pp(13)
+  REAL*8 :: pn(13)
+
+  INTEGER :: i
 
   qsq = (2*D%Miso(Kiso)*D%E(KE)*1d-6)
   meta = 0.548d0
@@ -289,11 +295,13 @@ FUNCTION param_conversion(D, pin, KE, Kiso)   &
   pp(5)= 0
 ! All operators from here on are shifted by one
   pp(6)= pin(5) + 1/qsq * pin(21)
-  pp(7)= pin(6) + 1/(mpi**2 + qsq) * pin(13) + 1/(meta**2 + qsq) * pin(14) + qsq/(mpi**2 + qsq) * pin(15) + qsq/(meta**2 + qsq) * pin(16) + 1/qsq * pin(22)
+  pp(7)= pin(6) + 1/(mpi**2 + qsq) * pin(13) + 1/(meta**2 + qsq) * pin(14) + qsq/(mpi**2 + qsq) * pin(15) &
+         + qsq/(meta**2 + qsq) * pin(16) + 1/qsq * pin(22)
   pp(8)= pin(7)
   pp(9)= pin(8)
   pp(10)= pin(9)
-  pp(11)= pin(10) + 1/(mpi**2 + qsq) * pin(17) + 1/(meta**2 + qsq) * pin(18) + qsq/(mpi**2 + qsq) * pin(19) + qsq/(meta**2 + qsq) * pin(20)
+  pp(11)= pin(10) + 1/(mpi**2 + qsq) * pin(17) + 1/(meta**2 + qsq) * pin(18) + qsq/(mpi**2 + qsq) * pin(19) &
++ qsq/(meta**2 + qsq) * pin(20)
   pp(12)= pin(11) + 1/qsq * pin(23)
   pp(13)= pin(12)
 
@@ -303,11 +311,13 @@ FUNCTION param_conversion(D, pin, KE, Kiso)   &
   pn(4)= pin(29) + qsq * pin(50)
   pn(5)= 0
   pn(6)= pin(30) + 1/qsq * pin(46)
-  pn(7)= pin(31) + 1/(mpi**2 + qsq) * pin(38) + 1/(meta**2 + qsq) * pin(39) + qsq/(mpi**2 + qsq) * pin(40) + qsq/(meta**2 + qsq) * pin(41) + 1/qsq * pin(47)
+  pn(7)= pin(31) + 1/(mpi**2 + qsq) * pin(38) + 1/(meta**2 + qsq) * pin(39) + qsq/(mpi**2 + qsq) * pin(40) &
+         + qsq/(meta**2 + qsq) * pin(41) + 1/qsq * pin(47)
   pn(8)= pin(32)
   pn(9)= pin(33)
   pn(10)= pin(34)
-  pn(11)= pin(35) + 1/(mpi**2 + qsq) * pin(42) + 1/(meta**2 + qsq) * pin(43) + qsq/(mpi**2 + qsq) * pin(44) + qsq/(meta**2 + qsq) * pin(45)
+  pn(11)= pin(35) + 1/(mpi**2 + qsq) * pin(42) + 1/(meta**2 + qsq) * pin(43) + qsq/(mpi**2 + qsq) * pin(44) &
+          + qsq/(meta**2 + qsq) * pin(45)
   pn(12)= pin(36) + 1/qsq * pin(48)
   pn(13)= pin(37)
 
@@ -320,7 +330,7 @@ FUNCTION param_conversion(D, pin, KE, Kiso)   &
     pout(i*2+1) = pp(i) - pn(i)
   END DO
 
-  NRET_UpdateNRCoefficients_fct(pout)
+  CALL NRET_UpdateNRCoefficients(pout)
 
 END FUNCTION
 
