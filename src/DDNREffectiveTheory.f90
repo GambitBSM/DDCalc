@@ -143,6 +143,7 @@ END SUBROUTINE
 ! KE and Kiso are the indices of the energy and isotope array.
 ! The return value is a list [S1_00, S1_01, S1_10, S1_11, S2_00, S2_01, S2_10, S2_11] in units GeV^(-4).
 ! The notation follows appendix A of 1607.04418 . 
+
 FUNCTION NRET_SFunctions_fct(D, m, p, alpha, KE, Kiso)   &
     RESULT (S1S2)
   IMPLICIT NONE
@@ -256,6 +257,70 @@ FUNCTION NRET_SFunctions_fct(D, m, p, alpha, KE, Kiso)   &
 
   !WRITE (*,*) 'a = ', a, ', b = ', b, ', S1S2 = ', S1S2
 
+
+END FUNCTION
+
+! Auxiliary function to convert parameters from the WIMP type 'NREFT_CPT' to the WIMP type 'NREffectiveTheory'. 
+
+FUNCTION param_conversion(D, pin, KE, Kiso)   &
+    RESULT pout
+  IMPLICIT NONE
+
+  REAL*8 :: pout(45)
+
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  REAL*8, INTENT(IN) :: pin(51)
+  INTEGER, INTENT(IN) :: KE, Kiso
+
+  REAL*8 :: qsq, meta, mpi
+  REAL*8 :: pp(12)
+  REAL*8 :: pn(12)
+
+  qsq = (2*D%Miso(Kiso)*D%E(KE)*1d-6)
+  meta = 0.548d0
+  mpi = 0.135d0
+  
+  pp(1)= pin(1) + qsq * pin(24)
+! Operator pp(2) would correspond to q^2 O_1, which is not needed. Note that Operator O_2 does not exist. 
+  pp(2)= 0
+  pp(3)= pin(3)
+  pp(4)= pin(4) + qsq * pin(25)
+! Operator pp(5) would correspond to q^2 O_4, which is not needed. 
+  pp(5)= 0
+! All operators from here on are shifted by one
+  pp(6)= pin(5) + 1/qsq * pin(21)
+  pp(7)= pin(6) + 1/(mpi**2 + qsq) * pin(13) + 1/(meta**2 + qsq) * pin(14) + qsq/(mpi**2 + qsq) * pin(15) + qsq/(meta**2 + qsq) * pin(16) + 1/qsq * pin(22)
+  pp(8)= pin(7)
+  pp(9)= pin(8)
+  pp(10)= pin(9)
+  pp(11)= pin(10) + 1/(mpi**2 + qsq) * pin(17) + 1/(meta**2 + qsq) * pin(18) + qsq/(mpi**2 + qsq) * pin(19) + qsq/(meta**2 + qsq) * pin(20)
+  pp(12)= pin(11) + 1/qsq * pin(23)
+  pp(13)= pin(12)
+
+  pn(1)= pin(26) + qsq * pin(49)
+  pn(2)= 0
+  pn(3)= pin(28)
+  pn(4)= pin(29) + qsq * pin(50)
+  pn(5)= 0
+  pn(6)= pin(30) + 1/qsq * pin(46)
+  pn(7)= pin(31) + 1/(mpi**2 + qsq) * pin(38) + 1/(meta**2 + qsq) * pin(39) + qsq/(mpi**2 + qsq) * pin(40) + qsq/(meta**2 + qsq) * pin(41) + 1/qsq * pin(47)
+  pn(8)= pin(32)
+  pn(9)= pin(33)
+  pn(10)= pin(34)
+  pn(11)= pin(35) + 1/(mpi**2 + qsq) * pin(42) + 1/(meta**2 + qsq) * pin(43) + qsq/(mpi**2 + qsq) * pin(44) + qsq/(meta**2 + qsq) * pin(45)
+  pn(12)= pin(36) + 1/qsq * pin(48)
+  pn(13)= pin(37)
+
+  pout(:) = 0
+
+  pout(1) = pin(51)
+
+  DO i = 1,12
+    pout(i*2) = pp(i) + pn(i)
+    pout(i*2+1) = pp(i) - pn(i)
+  END DO
+
+  NRET_UpdateNRCoefficients_fct(pout)
 
 END FUNCTION
 

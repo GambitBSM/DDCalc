@@ -36,7 +36,7 @@ PROGRAM DDCalc_exampleF
 
 
   IMPLICIT NONE
-  INTEGER :: i_bin,type
+  INTEGER :: i_bin,KE,type
   REAL*8 :: mDM, sigmap_SI, sigman_SI, sigmap_SD, sigman_SD
   REAL*8 :: DM_spin, fp, fn, ap, an
 
@@ -75,16 +75,20 @@ PROGRAM DDCalc_exampleF
   ! ****************************************************************************************************************
   ! Example 1: XENON1T (2017) analysis, with standard SI/SD interactions specified
   !            by WIMP-nucleon cross sections. 
-  Detector = XENON1T_2017_Init()		! Initalize the XENON1T_2017 detector.
-  mDM = 100.0d0                           	! DM Mass in GeV.
-  sigmap_SI = 4.0d-9				! SI WIMP-proton cross section in pb.
-  sigman_SI = -0.3d-9				! SI WIMP-neutron cross section in pb.
+  Detector = XENON1T_2018_Init()		! Initalize the XENON1T_2017 detector.
+  mDM = 6.0d0                           	! DM Mass in GeV.
+  sigmap_SI = 2.d-8				! SI WIMP-proton cross section in pb.
+  sigman_SI = 2.d-8				! SI WIMP-neutron cross section in pb.
 						!   The negative value indicates that the corresponding WIMP-nucleon coupling is negative.
-  sigmap_SD = 2.0d-5				! SD WIMP-proton cross section in pb.
-  sigman_SD = 8.0d-5				! SD WIMP-neutron cross section in pb.
+  sigmap_SD = 0.0d-5				! SD WIMP-proton cross section in pb.
+  sigman_SD = 0.0d-5				! SD WIMP-neutron cross section in pb.
   CALL DDCalc_SetWIMP_msigma(WIMP, mDM, &
 	sigmap_SI, sigman_SI, sigmap_SD, sigman_SD)
   CALL DDCalc_CalcRates(Detector,WIMP,Halo)	! This performs the actual calculation of the rates.
+
+  DO KE = 1,Detector%NE
+     WRITE (*,*) Detector%E(KE), sum(Detector%dRdEiso(KE,:))
+  END DO
 
   WRITE (*,*) '******************************************************************'
   WRITE (*,*) 'Example 1: Mixed SI and SD interactions at XENON1T (2017)'

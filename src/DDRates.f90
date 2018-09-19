@@ -226,6 +226,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   TYPE(HaloStruct), INTENT(IN) :: Halo
   INTEGER :: Kiso, KE, Keff, Neff, alpha
   REAL*8 :: S1S2(8)
+  REAL*8 :: params(45)
 
   IF ( .NOT. D%InitSuccess ) THEN
     WRITE(*,*) 'ERROR: Cannot calculate rates for a detector that has not been correctly initialized.'
@@ -353,7 +354,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    END IF
 
 
-  ELSE IF (WIMP%DMtype .EQ. 'NREffectiveTheory') THEN
+  ELSE IF ((WIMP%DMtype .EQ. 'NREffectiveTheory').OR.(WIMP%DMtype .EQ. 'NREFT_CPT')) THEN
 
    ! WIMP%params has to be a 45-element list, interpreted as coefficients in units GeV^(-2) of the non-relativistic operators
    ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1, alpha_1, ..., alpha_8)
@@ -370,9 +371,16 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      DO KE = 1,D%NE
        DO Kiso = 1,D%Niso 
          D%dRdEiso(KE,Kiso) = 0.0
+
+         IF (WIMP%DMtype .EQ. 'NREffectiveTheory') THEN
+           params = WIMP%params
+         ELSE
+           params = param_conversion(D, WIMP%params, KE, Kiso)
+         END IF
+
          DO alpha = 1,8
-            IF (abs(WIMP%params(37 + alpha))>0) THEN ! only calculate and add those terms in alpha for which the corresponding param entry is non-zero
-              S1S2 = NRET_SFunctions(D, WIMP%m, WIMP%params, alpha, KE, Kiso)
+            IF (abs(params(37 + alpha))>0) THEN ! only calculate and add those terms in alpha for which the corresponding param entry is non-zero
+              S1S2 = NRET_SFunctions(D, WIMP%m, params, alpha, KE, Kiso)
               D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + &
                   1.6961e14 * dot_product(S1S2(:4), D%WTilde(alpha,:,KE,Kiso)) * D%g_vmin(KE,Kiso)
               D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) + &

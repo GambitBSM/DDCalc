@@ -42,6 +42,10 @@ TYPE, PUBLIC :: WIMPStruct
   ! The final 8 coefficients (alpha_1, ..., alpha_8) indicate which nuclear response functions must be calculated
   ! If alpha_i = 0, the corresponding nuclear response function will be skipped to save computation time
   ! Ideally, the user should not edit the alpha_i directly, but only via NRET_UpdateNRCoefficients.
+  ! 'NREFT_CPT': 
+  ! (O1_p, O2_p, ..., O23_p, O100_p, O104_p, O1_n, O2_n, ..., O23_n, O100_n, O104_n, DM spin)
+  ! The coefficients of each operator has to be given in units GeV^(-2).
+  ! The definition of these operators follows DirectDM. For example, O13 = O6/(mpi^2+q^2).
   REAL*8, ALLOCATABLE  :: params(:)
   ! Number of parameters
   INTEGER :: Nparams = 1

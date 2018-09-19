@@ -98,7 +98,7 @@ FUNCTION XENON1T_2018_Init() RESULT(D)
 ! The background distributions are estimates based on arXiv:1512.07501
 ! Zero events were observed in the first bin, 2 events in the second bin
 
-  CALL SetDetector(D,mass=1300.0d0,time=278.8d0,Nevents_bin=[0,2],  &
+  CALL SetDetector(D,mass=1300.0d0,time=278.8d0,Nevents_bin=[0,0],  &
                    Backgr_bin=[0.46d0,0.34d0],Nelem=1,Zelem=(/54/), &
                    NE=NE,E=E,Nbins=NBINS,eff_all=EFF,               &
                    Emin=EMIN)
