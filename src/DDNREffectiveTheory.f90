@@ -298,7 +298,7 @@ FUNCTION NRET_Param_Conversion_fct(D, pin, KE, Kiso)   &
 
   pout(1) = pin(51)
 
-  DO i = 1,12
+  DO i = 1,13
     pout(i*2) = pp(i) + pn(i)
     pout(i*2+1) = pp(i) - pn(i)
   END DO
