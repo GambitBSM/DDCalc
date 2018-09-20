@@ -48,14 +48,9 @@ MODULE DDCalc
 !   Negative cross-sections indicate the corresponding coupling should
 !   be negative.  In all cases, 'p' refers to proton and 'n' to neutron.
 !
-!     SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
-!   where m is the WIMP mass [GeV], fs are scalar Higgs couplings [GeV^-2]
-!   and ap are pseudoscalar Higgs couplings [GeV^-2]
-!
 ! WIMP parameter retrieval:
 !     SUBROUTINE DDCalc_GetWIMP_mfa(WIMP,m,fp,fn,ap,an)
 !     SUBROUTINE DDCalc_GetWIMP_mG(WIMP,m,fsp,fsn,app,apn)
-!     SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
 !     SUBROUTINE DDCalc_GetWIMP_msigma(WIMP,m,sigmaSIp,sigmaSIn,sigmaSDp,sigmaSDn)
 !   Same as SetWIMP above, but retrieves current WIMP parameters.
 !
@@ -210,11 +205,10 @@ PUBLIC :: DDCalc_SetWIMP_mfa
 PUBLIC :: DDCalc_GetWIMP_mfa
 PUBLIC :: DDCalc_SetWIMP_mG
 PUBLIC :: DDCalc_GetWIMP_mG
-PUBLIC :: DDCalc_SetWIMP_Higgsportal
-PUBLIC :: DDCalc_GetWIMP_Higgsportal
 PUBLIC :: DDCalc_SetWIMP_msigma
 PUBLIC :: DDCalc_GetWIMP_msigma
 PUBLIC :: DDCalc_SetWIMP_NREffectiveTheory
+PUBLIC :: DDCalc_SetWIMP_NREFT_CPT
 PUBLIC :: DDCalc_SetNRCoefficient
 PUBLIC :: DDCalc_GetNRCoefficient
 PUBLIC :: DDCalc_SetDetectorEmin
@@ -224,11 +218,10 @@ PUBLIC :: C_DDCalc_SetWIMP_mfa
 PUBLIC :: C_DDCalc_GetWIMP_mfa
 PUBLIC :: C_DDCalc_SetWIMP_mG
 PUBLIC :: C_DDCalc_GetWIMP_mG
-PUBLIC :: C_DDCalc_SetWIMP_Higgsportal
-PUBLIC :: C_DDCalc_GetWIMP_Higgsportal
 PUBLIC :: C_DDCalc_SetWIMP_msigma
 PUBLIC :: C_DDCalc_GetWIMP_msigma
 PUBLIC :: C_DDCalc_SetWIMP_NREffectiveTheory
+PUBLIC :: C_DDCalc_SetWIMP_NREFT_CPT
 PUBLIC :: C_DDCalc_SetNRCoefficient
 PUBLIC :: C_DDCalc_GetNRCoefficient
 PUBLIC :: C_DDCalc_SetDetectorEmin
@@ -482,95 +475,6 @@ SUBROUTINE C_DDCalc_GetWIMP_mG(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD) &
   GnSD = GnSD0
 END SUBROUTINE
 
-!-----------------------------------------------------------------------
-! Sets/gets the WIMP mass and and its Higgs couplings. These couplings  
-! can be of scalar or pseudoscalar nature.
-! 
-! For more detailed WIMP settings, see:
-!   SetWIMP() [interface name: DDCalc_SetWIMP]
-!   GetWIMP() [interface name: DDCalc_GetWIMP]
-! 
-! Input/output arguments:
-!   m           WIMP mass [GeV].
-!   fsp         Scalar WIMP-proton coupling [GeV^-2].
-!   fsn         Scalar WIMP-neutron coupling [GeV^-2].
-!   app         Pseudoscalar WIMP-proton coupling [GeV^-2].
-!   apn         Pseudoscalar WIMP-neutron coupling [GeV^-2].
-! 
-SUBROUTINE DDCalc_SetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
-  IMPLICIT NONE
-  REAL*8, INTENT(IN) :: m,fsp,fsn,app,apn
-  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
-  CHARACTER(LEN=24) :: DMtype = 'NREffectiveTheory'
-  REAL*8 :: params_HiggsPortal(45)
-
-  ! Set operator coefficients for the HiggsPortal model scenario
-  params_HiggsPortal = NRET_CreateCoeffList()
-  CALL NRET_SetDMSpin(params_HiggsPortal, 0.5d0)
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 1, 0, 2d0*(fsp+fsn)) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 1, 1, 2d0*(fsp-fsn)) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 11, 0, 2d0*(app+apn)*PROTON_MASS/m) 
-  CALL NRET_SetNRCoefficient(params_HiggsPortal, 11, 1, 2d0*(app-apn)*PROTON_MASS/m) 
-  CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params_HiggsPortal)
-END SUBROUTINE
-
-SUBROUTINE DDCalc_GetWIMP_Higgsportal(WIMP,m,fsp,fsn,app,apn)
-  IMPLICIT NONE
-  REAL*8, INTENT(OUT) :: m,fsp,fsn,app,apn
-  TYPE(WIMPStruct), INTENT(IN) :: WIMP
-  CHARACTER(LEN=24) :: DMtype
-  REAL*8, ALLOCATABLE :: params(:)
-  LOGICAL :: found = .FALSE.
-
-  ALLOCATE(params(WIMP%Nparams))
-
-  CALL DDCalc_GetWIMP(WIMP,m=m,DMtype=DMtype,params=params)
-
-  IF ( DMtype .EQ. 'NREffectiveTheory' ) THEN
-    fsp = 0.25*(params(2) + params(3))
-    fsn = 0.25*(params(2) - params(3))
-    app = 0.25*(params(24) + params(25)) * m/PROTON_MASS
-    apn = 0.25*(params(24) - params(25)) * m/PROTON_MASS
-    found = .TRUE.
-  END IF
-
-  IF ( .NOT. found ) stop 'Invalid WIMP type given to DDCalc_GetWIMP_Higgsportal' 
-
-END SUBROUTINE
-
-! C++ interface wrappers
-SUBROUTINE C_DDCalc_SetWIMP_higgsportal(WIMPIndex,m,fsp,fsn,app,apn) &
-           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_higgsportal')
-  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
-  IMPLICIT NONE
-  REAL(KIND=C_DOUBLE), INTENT(IN) :: m,fsp,fsn,app,apn
-  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
-  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_higgsportal' 
-  CALL DDCalc_SetWIMP_higgsportal(WIMPs(WIMPIndex)%p,m=REAL(m,KIND=8),           &
-               fsp=REAL(fsp,KIND=8),fsn=REAL(fsn,KIND=8),                  &
-               app=REAL(app,KIND=8),apn=REAL(apn,KIND=8))
-END SUBROUTINE
-
-SUBROUTINE C_DDCalc_GetWIMP_higgsportal(WIMPIndex,m,fsp,fsn,app,apn) &
-           BIND(C,NAME='C_DDCalc_ddcalc_getwimp_higgsportal')
-  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
-  IMPLICIT NONE
-  REAL(KIND=C_DOUBLE), INTENT(OUT) :: m,fsp,fsn,app,apn
-  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
-  REAL*8 :: m0,fsp0,fsn0,app0,apn0
-  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetWIMP_higgsportal' 
-  CALL DDCalc_GetWIMP_higgsportal(WIMPs(WIMPIndex)%p,m=m0,fsp=fsp0,fsn=fsn0,app=app0,apn=apn0)
-  ! Automatic type conversions here
-  m  = m0
-  fsp = fsp0
-  fsn = fsn0
-  app = app0
-  apn = apn0
-END SUBROUTINE
-
-
-
-
 
 !-----------------------------------------------------------------------
 ! Sets/gets the WIMP mass and couplings for standard spin-independent
@@ -671,19 +575,40 @@ END SUBROUTINE
 
 
 !-----------------------------------------------------------------------
-! Sets/gets a WIMP with type 'NREffectiveTheory'. 
-! DDCalc_SetWIMP_NREffectiveTheory simply initializes a WIMP within the 
-! non-relativistic effective theory setup, setting all coefficients to zero.
+! Functions for handling WIMPs in the non-relativistic effective theory
+!-----------------------------------------------------------------------
+!
+! There are two non-equivalent ways to describe the interactions of WIMPs in the non-relativistic limit.
+!
+! WIMP type 'NREffectiveTheory' corresponds to the operators first defined in arXiv:1203.3542 and subsequently
+! extended in arXiv:1308.6288 and arXiv:1505.03117. These operators give the most general interactions of
+! DM particles with spin 0, 1/2 or 1 up to first order in velocity and second order in momentum transfer.
+! 
+! WIMP type 'NREFT_CPT' is also based on the operators defined in arXiv:1203.3542 for DM particles with
+! spin 0 and spin 1/2 but in addition contains operators with a non-trivial momentum dependence, such as 
+! 1/(m_pi^2 + q^2), which arise from chiral perturbation theory. See arXiv:1708.02678 for details.
+!
+! While the two sets of effective operators agree for O_1 to O_12, the definition of operators with higher index differs.
+! This makes it necessary to first define the WIMP type and then pass individual operator coefficients.
+! 
+! DDCalc_SetWIMP_NREffectiveTheory initializes a WIMP of type 'NREffectiveTheory" and sets all coefficients to zero.
+! The function requires specification of the WIMP spin and mass.
+!
+! DDCalc_SetWIMP_NREFT_CPT initializes a WIMP of type 'NREFT_CPT" and sets all coefficients to zero.
+! The function requires specification of the WIMP spin and mass.
 !
 ! DDCalc_SetNRCoefficient sets the value of a single operator to a given value
 !   in units GeV^(-2).
 ! Here, OpIndex is an integer specifying the operator, e.g. 6 for O_6.
-! In addition, OpIndex = -1 stands for q^2*O_1, and 
-!   OpIndex = -4 stands for q^2*O_4 
-! tau is the isospin index of the operator (0 for isoscalar, 1 for isovector)
+! 
+! For WIMP type 'NREffectiveTheory', OpIndex = -1 stands for q^2*O_1, and 
+! OpIndex = -4 stands for q^2*O_4
+! 
+! Furthermore, the function requires an index tau, which is interpreted differently depending on the WIMP type
+! For WIMP type 'NREffectiveTheory' tau=0 for isoscalar and tau=1 for isovector
+! For WIMP type 'NREFT_CPT' tau=0 for proton and tau=1 for neutron.
 !
-! DDCalc_GetNRCoefficient gets the values of the isoscalar and isovector 
-! coefficients of a given operator.
+! DDCalc_GetNRCoefficient gets the values for tau=0 and tau=1 of a given operator.
 ! 
 SUBROUTINE DDCalc_SetWIMP_NREffectiveTheory(WIMP,m,spin)
   IMPLICIT NONE
@@ -692,8 +617,20 @@ SUBROUTINE DDCalc_SetWIMP_NREffectiveTheory(WIMP,m,spin)
   CHARACTER(LEN=24) :: DMtype = 'NREffectiveTheory'
   REAL*8 :: params(45)
 
-  params = NRET_CreateCoeffList()
-  CALL NRET_SetDMSpin(params, spin) 
+  params(:) = 0
+  params(1) = spin
+  CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params)
+END SUBROUTINE
+
+SUBROUTINE DDCalc_SetWIMP_NREFT_CPT(WIMP,m,spin)
+  IMPLICIT NONE
+  REAL*8, INTENT(IN) :: m,spin
+  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
+  CHARACTER(LEN=24) :: DMtype = 'NREFT_CPT'
+  REAL*8 :: params(51)
+
+  params(:) = 0
+  params(51) = spin
   CALL DDCalc_SetWIMP(WIMP,m=m,DMtype=DMtype,params=params)
 END SUBROUTINE
 
@@ -702,29 +639,36 @@ SUBROUTINE DDCalc_SetNRCoefficient(WIMP, OpIndex, tau, value)
   INTEGER, INTENT(IN) :: OpIndex, tau
   REAL*8, INTENT(IN) :: value
   TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
+  INTEGER :: i
 
-  IF ( WIMP%DMtype .NE. 'NREffectiveTheory' ) THEN 
-   stop 'Error in DDCalc_SetNRCoefficient: WIMP is not of type NREffectiveTheory.'
+  IF (( WIMP%DMtype .NE. 'NREffectiveTheory' ) .AND. ( WIMP%DMtype .NE. 'NREFT_CPT' )) THEN 
+   stop 'Error in DDCalc_SetNRCoefficient: WIMP is not of type NREffectiveTheory or NREFT_CPT.'
   END IF
 
-  CALL NRET_SetNRCoefficient(WIMP%params, OpIndex, tau, value) 
+  CALL NRET_GetParamIndex(WIMP%DMtype, OpIndex, tau, i)
+  WIMP%params(i) = value
+
+  IF ( WIMP%DMtype .EQ. 'NREffectiveTheory' ) THEN 
+    CALL NRET_UpdateNRCoefficients(WIMP%params)
+  END IF
+
 END SUBROUTINE
 
-SUBROUTINE DDCalc_GetNRCoefficient(WIMP, OpIndex, value_isoscalar, value_isovector)
+SUBROUTINE DDCalc_GetNRCoefficient(WIMP, OpIndex, value_0, value_1)
   IMPLICIT NONE
-  REAL*8, INTENT(OUT) :: value_isoscalar, value_isovector
+  REAL*8, INTENT(OUT) :: value_0, value_1
   TYPE(WIMPStruct), INTENT(IN) :: WIMP
   INTEGER, INTENT(IN) :: OpIndex
-  INTEGER :: index_isoscalar, index_isovector
+  INTEGER :: index_0, index_1
 
-  IF ( WIMP%DMtype .NE. 'NREffectiveTheory' ) THEN 
-   stop 'Error in DDCalc_GetNRCoefficient: WIMP is not of type NREffectiveTheory.'
+  IF (( WIMP%DMtype .NE. 'NREffectiveTheory' ) .AND. ( WIMP%DMtype .NE. 'NREFT_CPT' )) THEN 
+   stop 'Error in DDCalc_GetNRCoefficient: WIMP is not of type NREffectiveTheory or NREFT_CPT.'
   END IF
 
-  CALL NRET_GetParamIndex(OpIndex, 0, index_isoscalar)
-  CALL NRET_GetParamIndex(OpIndex, 1, index_isovector)
-  value_isoscalar = WIMP%params(index_isoscalar)
-  value_isovector = WIMP%params(index_isovector)
+  CALL NRET_GetParamIndex(WIMP%DMtype, OpIndex, 0, index_0)
+  CALL NRET_GetParamIndex(WIMP%DMtype, OpIndex, 1, index_1)
+  value_0 = WIMP%params(index_0)
+  value_1 = WIMP%params(index_1)
 
 END SUBROUTINE
 
@@ -741,6 +685,18 @@ SUBROUTINE C_DDCalc_SetWIMP_NREffectiveTheory(WIMPIndex,m,spin) &
                m=REAL(m,KIND=8),spin=REAL(spin,KIND=8))
 END SUBROUTINE
 
+SUBROUTINE C_DDCalc_SetWIMP_NREFT_CPT(WIMPIndex,m,spin) &
+           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_nreft_cpt')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: m,spin
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) &
+    stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_NREFT_CPT' 
+  CALL DDCalc_SetWIMP_NREFT_CPT(WIMPs(WIMPIndex)%p,&
+               m=REAL(m,KIND=8),spin=REAL(spin,KIND=8))
+END SUBROUTINE
+
 SUBROUTINE C_DDCalc_SetNRCoefficient(WIMPIndex, OpIndex, tau, value) &
            BIND(C,NAME='C_DDCalc_ddcalc_setnrcoefficient')
   USE ISO_C_BINDING, only: C_DOUBLE, C_INT
@@ -754,20 +710,21 @@ SUBROUTINE C_DDCalc_SetNRCoefficient(WIMPIndex, OpIndex, tau, value) &
 END SUBROUTINE
 
 
-SUBROUTINE C_DDCalc_GetNRCoefficient(WIMPIndex,OpIndex, value_isoscalar, value_isovector) &
+SUBROUTINE C_DDCalc_GetNRCoefficient(WIMPIndex,OpIndex, value_0, value_1) &
            BIND(C,NAME='C_DDCalc_ddcalc_getnrcoefficient')
   USE ISO_C_BINDING, only: C_DOUBLE, C_INT
   IMPLICIT NONE
-  REAL(KIND=C_DOUBLE), INTENT(OUT) :: value_isoscalar, value_isovector
+  REAL(KIND=C_DOUBLE), INTENT(OUT) :: value_0, value_1
   INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex, OpIndex
-  REAL*8 :: value_isoscalar0, value_isovector0
+  REAL*8 :: value_0_internal, value_1_internal
   IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetNRCoefficient' 
   CALL DDCalc_GetNRCoefficient(WIMPs(WIMPIndex)%p,OpIndex,&
-    value_isoscalar=value_isoscalar0,value_isovector=value_isovector0)
+    value_0=value_0_internal,value_1=value_1_internal)
   ! Automatic type conversions here
-  value_isoscalar = value_isoscalar0
-  value_isovector = value_isovector0
+  value_0 = value_0_internal
+  value_1 = value_1_internal
 END SUBROUTINE
+
 
 
 
