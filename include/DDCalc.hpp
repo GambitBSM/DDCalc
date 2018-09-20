@@ -43,15 +43,13 @@ extern "C"
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_mg(const int&, double&,
                   double&, double&, double&, double&);
-  void C_DDCalc_ddcalc_setwimp_higgsportal(const int&, const double&,
-                  const double&, const double&, const double&, const double&);
-  void C_DDCalc_ddcalc_getwimp_higgsportal(const int&, double&,
-                  double&, double&, double&, double&);
   void C_DDCalc_ddcalc_setwimp_msigma(const int&, const double&,
                   const double&, const double&, const double&, const double&);
   void C_DDCalc_ddcalc_getwimp_msigma(const int&, double&,
                   double&, double&, double&, double&);
   void C_DDCalc_ddcalc_setwimp_nreffectivetheory(const int&, const double&,
+                  const double&);
+  void C_DDCalc_ddcalc_setwimp_nreft_cpt(const int&, const double&,
                   const double&);
   void C_DDCalc_ddcalc_setnrcoefficient(const int&, const int&,
                   const int&, const double&);
@@ -151,12 +149,6 @@ namespace DDCalc
     C_DDCalc_ddcalc_setwimp_mg(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
   }
 
-  void SetWIMP_Higgsportal(const int WIMPIndex, const double m, const double fsp, const double fsn,
-                   const double app, const double apn)
-  {
-    C_DDCalc_ddcalc_setwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
-  }
-
   void SetWIMP_msigma(const int WIMPIndex, const double m, const double sigmaSIp, const double sigmaSIn,
                    const double sigmaSDp, const double sigmaSDn)
   {
@@ -164,20 +156,26 @@ namespace DDCalc
   }
 
 
-  // Sets a WIMP with type 'NREffectiveTheory'. 
-  // SetWIMP_NREffectiveTheory simply initializes a WIMP within the 
-  // non-relativistic effective theory setup, setting all coefficients to zero.
+  // Sets a WIMP with type 'NREffectiveTheory' or 'NREFT_CPT' (see DDCalc.f90 for details). 
   //
-  // DDCalc_SetNRCoefficient sets the value of a single operator to a given value
-  //   in units GeV^(-2).
+  // SetWIMP_NREffectiveTheory initializes a WIMP of type 'NREffectiveTheory" and sets all coefficients to zero.
+  // The function requires specification of the WIMP spin and mass.
+  //
+  // NREFT_CPT initializes a WIMP of type 'NREFT_CPT" and sets all coefficients to zero.
+  // The function requires specification of the WIMP spin and mass.
+  //
+  // DDCalc_SetNRCoefficient sets the value of a single operator to a given value in units GeV^(-2).
   // Here, OpIndex is an integer specifying the operator, e.g. 6 for O_6.
-  // In addition, OpIndex = -1 stands for q^2*O_1, and 
-  //   OpIndex = -4 stands for q^2*O_4 
-  // tau is the isospin index of the operator (0 for isoscalar, 1 for isovector)
+  // The index tau allows to distingish between isoscalar and isovector coupling.
   //
   void SetWIMP_NREffectiveTheory(const int WIMPIndex, const double m, const double spin)
   {
     C_DDCalc_ddcalc_setwimp_nreffectivetheory(WIMPIndex,m,spin);
+  }
+
+  void SetWIMP_NREFT_CPT(const int WIMPIndex, const double m, const double spin)
+  {
+    C_DDCalc_ddcalc_setwimp_nreft_cpt(WIMPIndex,m,spin);
   }
 
   void SetNRCoefficient(const int WIMPIndex, const int OpIndex, const int tau,
@@ -200,12 +198,6 @@ namespace DDCalc
                           double& GpSD, double& GnSD)
   {
     C_DDCalc_ddcalc_getwimp_mg(WIMPIndex,m,GpSI,GnSI,GpSD,GnSD);
-  }
-
-  void GetWIMP_Higgsportal(const int WIMPIndex, double& m, double& fsp, double& fsn,
-                          double& app, double& apn)
-  {
-    C_DDCalc_ddcalc_getwimp_higgsportal(WIMPIndex,m,fsp,fsn,app,apn);
   }
 
   void GetWIMP_msigma(const int WIMPIndex, double& m, double& sigmaSIp, double& sigmaSIn,

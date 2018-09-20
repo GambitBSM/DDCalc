@@ -370,7 +370,7 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
          IF (WIMP%DMtype .EQ. 'NREffectiveTheory') THEN
            params = WIMP%params
          ELSE
-           params = param_conversion(D, WIMP%params, KE, Kiso)
+           params = NRET_Param_Conversion(D, WIMP%params, KE, Kiso)
          END IF
 
          IF (params(1).LT.0) THEN

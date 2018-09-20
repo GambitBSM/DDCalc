@@ -16,31 +16,18 @@ IMPLICIT NONE
 PRIVATE
 
 
-PUBLIC :: NRET_SFunctions, NRET_CreateCoeffList, NRET_SetDMSpin, NRET_GetParamIndex,&
-   NRET_SetNRCoefficient, NRET_UpdateNRCoefficients, param_conversion
+PUBLIC :: NRET_SFunctions, NRET_GetParamIndex, NRET_UpdateNRCoefficients, NRET_Param_Conversion
 
 INTERFACE NRET_SFunctions
   MODULE PROCEDURE NRET_SFunctions_fct
 END INTERFACE
 
-INTERFACE param_conversion
-  MODULE PROCEDURE param_conversion_fct
-END INTERFACE
-
-INTERFACE NRET_CreateCoeffList
-  MODULE PROCEDURE NRET_CreateCoeffList_fct
-END INTERFACE
-
-INTERFACE NRET_SetDMSpin
-  MODULE PROCEDURE NRET_SetDMSpin_fct
+INTERFACE NRET_Param_Conversion
+  MODULE PROCEDURE NRET_Param_Conversion_fct
 END INTERFACE
 
 INTERFACE NRET_GetParamIndex
   MODULE PROCEDURE NRET_GetParamIndex_fct
-END INTERFACE
-
-INTERFACE NRET_SetNRCoefficient
-  MODULE PROCEDURE NRET_SetNRCoefficient_fct
 END INTERFACE
 
 INTERFACE NRET_UpdateNRCoefficients
@@ -49,31 +36,19 @@ END INTERFACE
 
 CONTAINS
 
-! This function creates a list for the coefficients of the non-relativistic operators.
-! All coefficients are set to zero, and the DM spin is set to -1.
-FUNCTION NRET_CreateCoeffList_fct() &
-     RESULT (par)
-  IMPLICIT NONE
-  REAL*8 :: par(45)
-  par(:) = 0.0d0
-  par(1) = -1.0d0
-END FUNCTION
-
-
-! This function sets the spin of the DM particle
-SUBROUTINE NRET_SetDMSpin_fct(par, DMSpin)
-  IMPLICIT NONE
-  REAL*8, INTENT(INOUT) :: par(45)
-  REAL*8, INTENT(IN) :: DMSpin
-  par(1) = DMSpin
-END SUBROUTINE
-
-
 ! This function finds the index of the parameter array corresponding to a given operator index and isospin index
-SUBROUTINE NRET_GetParamIndex_fct(OpIndex, tau, i)
+SUBROUTINE NRET_GetParamIndex_fct(DMtype, OpIndex, tau, i)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: OpIndex, tau
+  CHARACTER(LEN=24), INTENT(IN) :: DMtype 
   INTEGER, INTENT(OUT) :: i
+
+  IF ((tau.NE.0) .AND. (tau.NE.1)) THEN
+    WRITE (*,*) 'Error in NRET_GetParamIndex_fct: invalid value of tau.'
+    STOP
+  END IF
+
+ IF (DMtype .EQ. 'NREffectiveTheory') THEN
 
   IF (OpIndex.EQ.1) THEN
     i = 2
@@ -112,33 +87,31 @@ SUBROUTINE NRET_GetParamIndex_fct(OpIndex, tau, i)
   ELSE IF (OpIndex.EQ.18) THEN
     i = 36
   ELSE
-    WRITE (*,*) 'Error in NRET_SetNRCoefficient_fct: invalid operator index.'
-    STOP
-  END IF
-
-  IF ((tau.NE.0) .AND. (tau.NE.1)) THEN
-    WRITE (*,*) 'Error in NRET_SetNRCoefficient_fct: invalid value of tau.'
+    WRITE (*,*) 'Error in NRET_GetParamIndex_fct: invalid operator index.'
     STOP
   END IF
 
   i=i+tau
 
-END SUBROUTINE
+ ELSE IF (DMtype .EQ. 'NREFT_CPT') THEN
 
+  IF ((OpIndex.GE.1).AND.(OpIndex.LE.23)) THEN
+    i = OpIndex + 25*tau
+  ELSE IF (OpIndex.EQ.100) THEN
+    i = 24 + 25*tau
+  ELSE IF (OpIndex.EQ.104) THEN
+    i = 25 + 25*tau
+  ELSE
+    WRITE (*,*) 'Error in NRET_GetParamIndex_fct: invalid operator index.'
+    STOP
+  END IF
 
-! this function sets a single coefficient to a non-zero value (in units GeV^(-2))
-! OpIndex is the index of the non-relativistic operator, e.g. 6 for O_6.
-! Additionally, OpIndex = -1 corresponds to q^2*O_1, and OpIndex = -4 corresponds to q^2*O_4
-SUBROUTINE NRET_SetNRCoefficient_fct(par, OpIndex, tau, value)
-  IMPLICIT NONE
-  REAL*8, INTENT(INOUT) :: par(45)
-  REAL*8, INTENT(IN) :: value
-  INTEGER, INTENT(IN) :: OpIndex, tau
-  INTEGER :: i
+ ELSE
 
-  CALL NRET_GetParamIndex(OpIndex, tau, i)
-  par(i) = value
-  CALL NRET_UpdateNRCoefficients(par)
+  WRITE (*,*) 'Error in NRET_GetParamIndex_fct: WIMP type not recognized.'
+  STOP  
+
+ END IF
 
 END SUBROUTINE
 
@@ -266,7 +239,7 @@ END FUNCTION
 ! Auxiliary function to convert parameters from the WIMP type 'NREFT_CPT' to the WIMP type 'NREffectiveTheory'. 
 
 
-FUNCTION param_conversion_fct(D, pin, KE, Kiso)   &
+FUNCTION NRET_Param_Conversion_fct(D, pin, KE, Kiso)   &
     RESULT (pout)
   IMPLICIT NONE
 

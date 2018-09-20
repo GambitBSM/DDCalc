@@ -26,13 +26,17 @@ TYPE, PUBLIC :: WIMPStruct
   CHARACTER(LEN=24) :: DMtype = ''
   ! List of WIMP parameters. 
   ! The length and meaning of this list depends on the WIMP type:
+  !
   ! 'SIonly':      (fp, fn)
   ! fp: SI DM-proton coupling, fn: SI DM-neutron coupling
+  !
   ! 'SDonly':      (ap, an)
   ! ap: SD DM-proton coupling, an: SD DM-neutron coupling
+  !
   ! 'SISD':        (fp, fn, ap, an)
   ! fp: SI DM-proton coupling, fn: SI DM-neutron coupling
   ! ap: SD DM-proton coupling, an: SD DM-neutron coupling
+  !
   ! 'NREffectiveTheory': 
   ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1, alpha_1, ..., alpha_8)
   ! The coefficients of each operator has to be given in units GeV^(-2).
@@ -42,10 +46,15 @@ TYPE, PUBLIC :: WIMPStruct
   ! The final 8 coefficients (alpha_1, ..., alpha_8) indicate which nuclear response functions must be calculated
   ! If alpha_i = 0, the corresponding nuclear response function will be skipped to save computation time
   ! Ideally, the user should not edit the alpha_i directly, but only via NRET_UpdateNRCoefficients.
+  !
   ! 'NREFT_CPT': 
   ! (O1_p, O2_p, ..., O23_p, O100_p, O104_p, O1_n, O2_n, ..., O23_n, O100_n, O104_n, DM spin)
   ! The coefficients of each operator has to be given in units GeV^(-2).
   ! The definition of these operators follows DirectDM. For example, O13 = O6/(mpi^2+q^2).
+  !
+  ! Note that the two bases for NR effective operators are not equivalent.
+  ! WIMP type 'NREffectiveTheory' contains a number of additional operators that are relevant only for spin-1 DM.
+  ! WIMP type 'NREFT_CPT' includes a number of long-distance (dipole) operators and operators with meson poles.
   REAL*8, ALLOCATABLE  :: params(:)
   ! Number of parameters
   INTEGER :: Nparams = 1
