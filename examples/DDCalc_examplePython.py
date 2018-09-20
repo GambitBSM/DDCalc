@@ -56,7 +56,7 @@ sigman_SI = -0.3e-9											# SI WIMP-neutron cross section in pb.
 																#   The negative value indicates that the corresponding WIMP-nucleon coupling is negative.
 sigmap_SD = 2.0e-5											# SD WIMP-proton cross section in pb.
 sigman_SD = 8.0e-5											# SD WIMP-neutron cross section in pb.
-	
+
 DDCalc.SetWIMP_msigma(wimp, mDM, sigmap_SI, sigman_SI, sigmap_SD, sigman_SD)
 DDCalc.CalcRates(detector, wimp, halo) 	             # This performs the actual calculation of the rates.
 
