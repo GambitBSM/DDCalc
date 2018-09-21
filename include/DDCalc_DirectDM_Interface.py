@@ -16,8 +16,8 @@ Alternatively, one can specify the location of the directdm folder below
 import DDCalcInclude
 import sys
 import os
-#directdm_path = DDCalcInclude.ddcalc_dir + 'directdm'
-#sys.path.append(directdm_path)
+directdm_path = DDCalcInclude.ddcalc_dir + 'directdm'
+sys.path.append(directdm_path)
 import DDCalc
 import directdm as ddm
 
