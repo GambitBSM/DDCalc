@@ -12,12 +12,17 @@ it can be found in the [GAMBIT DarkBit paper](DarkBitPaper.pdf):
 T Bringmann, J Conrad, JM Cornell, LA Dal, J Edsjö, B Farmer,
 F Kahlhoefer, A Kvellestad, A Putze, C Savage, P Scott, C Weniger,
 M White & S Wild, DarkBit: A GAMBIT module for computing dark matter
-observables and likelihoods, EPJC submitted (2017), arXiv:1705.07920.
+observables and likelihoods, Eur.Phys.J. C77 (2017) no.12, 831, arXiv:1705.07920.
 
 The new features in DDCalc_v2 (in particular momentum and velocity
-dependent interactions and binned likelihoods) are described in:
+dependent interactions and binned likelihoods) are described in the 
+[Higgs Portal paper](HiggsPortalPaper.pdf)
 
-XXX
+Peter Athron, Csaba Balázs, Ankit Beniwal, Sanjay Bloor, José Eliel Camargo-Molina, 
+Jonathan M. Cornell, Ben Farmer, Andrew Fowlie, Tomás E. Gonzalo, Felix Kahlhoefer, 
+Anders Kvellestad, Gregory D. Martinez, Pat Scott, Aaron C. Vincent, Sebastian Wild, 
+Martin White, Anthony G. Williams, Global analyses of Higgs portal singlet dark 
+matter models using GAMBIT, EPJC submitted (2018), arXiv:1808.10465.
 
 If you write a paper that uses DDCalc, please cite both papers. 
 
@@ -112,11 +117,15 @@ The DDCalc software itself is presented in the GAMBIT DarkBit paper:
 T Bringmann, J Conrad, JM Cornell, LA Dal, J Edsjö, B Farmer,
 F Kahlhoefer, A Kvellestad, A Putze, C Savage, P Scott, C Weniger,
 M White & S Wild, DarkBit: A GAMBIT module for computing dark matter
-observables and likelihoods, EPJC submitted (2017), arXiv:1705.07920.
+observables and likelihoods, Eur.Phys.J. C77 (2017) no.12, 831, arXiv:1705.07920.
 
 The new features in DDCalc_v2 are described in:
 
-XXX
+Peter Athron, Csaba Balázs, Ankit Beniwal, Sanjay Bloor, José Eliel Camargo-Molina, 
+Jonathan M. Cornell, Ben Farmer, Andrew Fowlie, Tomás E. Gonzalo, Felix Kahlhoefer, 
+Anders Kvellestad, Gregory D. Martinez, Pat Scott, Aaron C. Vincent, Sebastian Wild, 
+Martin White, Anthony G. Williams, Global analyses of Higgs portal singlet dark 
+matter models using GAMBIT, EPJC submitted (2018), arXiv:1808.10465.
 
 If you use the Yellin maximum gap method, please cite:
 
@@ -125,6 +134,15 @@ If you use the Yellin maximum gap method, please cite:
 If you use the tabulated velocity integrals, please cite:
 
   M. Kuhlen et al., JCAP 1002 (2010) 030 [arXiv:0912.2358]
+
+If you use the interface with DirectDM, please cite:
+
+  Bishara, Brod, Grinstein, and Zupan, JCAP 1702 (2017) 009 [arXiv:1611.00368]
+  Bishara, Brod, Grinstein, and Zupan, JHEP 1711 (2017) 059 [arXiv:1707.06998]
+  Bishara, Brod, Grinstein, and Zupan [arXiv:1708.02678]
+  Brod, Grinstein, and Zupan [arXiv:1710.10218]
+  Brod, Gootjes-Dreesbach, Tammaro, and Zupan, JHEP 1802 (2018) 174 [arXiv:1801.04240]
+  Bishara, Brod, Grinstein, and Zupan [arXiv:1809.03506]
 
 If using DDCalc for calculations involving experimental results,
 please cite the appropriate experimental papers listed above.

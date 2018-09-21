@@ -3,8 +3,11 @@ DDCalc Revision History
 Full details can be found in the git log.  Only a summary of the
 changes in each new version is given here.
 
-v2.0.0 - XXX 2018
-Added momentum and velocity dependent interactions as well as binned Poisson likelihoods
+v2.1.0 - September 2018
+Added python support and interface with DirectDM.
+
+v2.0.0 - June 2018
+Added momentum and velocity dependent interactions as well as binned Poisson likelihoods.
 
 v1.2.0 - January 2018
 Added implementation of PandaX (2017).
