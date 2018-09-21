@@ -172,9 +172,5 @@ PROGRAM DDCalc_exclusionF
     END DO
   END DO
 
-  CALL FeldmanCousinsPoissonCI(-2.3d0,0,0.8d0,s1,s2)
-
-  WRITE (*,*) s1, s2
-
 END PROGRAM
 
