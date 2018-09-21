@@ -11,19 +11,19 @@ See DDCalc.hpp for more explanations regarding the meaning of each function.
 Created by Sebastian Wild, Sep 2018
 """
 
+import DDCalcInclude
 import os
 import ctypes
 import sys
 
-
-DDCalc_library_path = os.path.dirname(os.path.abspath(__file__)) + '/../lib/libDDCalc.so'
+DDCalc_library = DDCalcInclude.lib_dir + '/libDDCalc.so'
 
 ##### Load the DDCalc library #################################################
 try:
-	ddcalc_lib = ctypes.CDLL(DDCalc_library_path) 
-	#print("Successfully loaded DDCalc library " + DDCalc_library_path)
+	ddcalc_lib = ctypes.CDLL(DDCalc_library) 
+	#print("Successfully loaded DDCalc library " + DDCalc_library)
 except OSError:
-	print("DDCalc library " + DDCalc_library_path + " does not exist. Stop.")
+	print("DDCalc library " + DDCalc_library + " does not exist. Stop.")
 	sys.exit()
 ###############################################################################
 

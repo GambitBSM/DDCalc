@@ -49,7 +49,7 @@ REAL*8, PUBLIC, PARAMETER :: NEUTRON_MASS   = 0.9395654d0
 ! CODE CONSTANTS -------------------------------------------------------
 
 ! Version of this software
-CHARACTER*(*), PUBLIC, PARAMETER :: VERSION_STRING = '2.0.0'
+CHARACTER*(*), PUBLIC, PARAMETER :: VERSION_STRING = '2.1.0'
 
 ! Verbosity
 ! Affects the level of output.  Generally, higher magnitude

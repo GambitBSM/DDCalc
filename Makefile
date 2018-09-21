@@ -212,8 +212,9 @@ DIST_DIR := DDCalc-$(DDDCALC_VERSION)
 # Note some compilers leave .dSYM files/directories for debugging.
 cleanfiles := $(BUILD)/* \
               $(fprograms) $(fprograms:=.dSYM) \
-							$(ftestprograms) $(ftestprograms:=.dSYM) \
-							$(ctestprograms) $(pytestprograms)
+		$(ftestprograms) $(ftestprograms:=.dSYM) \
+		$(ctestprograms) $(pytestprograms) \
+		$(EXAMPLES)/DDCalcInclude.py $(INCLUDE)/DDCalcInclude.py
 # ...also tar file and libs
 distcleanfiles := $(cleanfiles) $(LIB)/* $(distfile)
 
@@ -299,7 +300,7 @@ bin: $(fprograms)
 lib: $(libraries)
 
 # Example/test binaries (programs)
-examples: $(ftestprograms) $(ctestprograms) $(pytestprograms)
+examples: $(ftestprograms) $(ctestprograms) $(pytestprograms) ddcalcinclude
 
 # Define a do-nothing rule for dummy targets
 # (avoids "nothing to be done" messages)
@@ -322,7 +323,13 @@ $(ctestprograms): % : $(EXAMPLES)/%.cpp
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE) -o $@ $< $(LIB)/$(statlib) $(CXX_FLIBS)
 
 $(pytestprograms): % : $(EXAMPLES)/%
-	cp $< $(DDCALC_DIR)
+	ln -sf $< $(DDCALC_DIR)$@
+
+ddcalcinclude:
+	echo "ddcalc_dir = '$(DDCALC_DIR)'" > $(EXAMPLES)/DDCalcInclude.py
+	echo "include_dir = '$(INCLUDE)'" >> $(EXAMPLES)/DDCalcInclude.py
+	echo "lib_dir = '$(LIB)'" >> $(EXAMPLES)/DDCalcInclude.py
+	ln -sf $(EXAMPLES)/DDCalcInclude.py $(INCLUDE)/DDCalcInclude.py
 
 # Rules for building objects
 $(BUILD)/%.o : $(SRC)/%.f90

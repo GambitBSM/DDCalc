@@ -6,17 +6,18 @@ Only works with python3.
 
 This requires DirectDM to be installed, e.g. by
    pip3 install directdm
-Alternatively, one can manually put all the directdm source files in a
-directory called 'directdm' within the main DDCalc directory
+Alternatively, one can specify the location of the directdm folder below
 
        F. Kahlhoefer   RWTH Aachen   2018
        S. Wild     	  DESY          2018
        ddcalc@projects.hepforge.org
 """
+
+import DDCalcInclude
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../directdm')
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
+#directdm_path = DDCalcInclude.ddcalc_dir + 'directdm'
+#sys.path.append(directdm_path)
 import DDCalc
 import directdm as ddm
 
