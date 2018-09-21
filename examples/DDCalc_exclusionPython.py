@@ -23,9 +23,10 @@
  **********************************************************************/
 """
 
+import DDCalcInclude
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../include')
+sys.path.append(DDCalcInclude.include_dir)
 import DDCalc
 import math
 import numpy as np

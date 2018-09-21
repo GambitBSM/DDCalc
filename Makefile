@@ -163,7 +163,7 @@ fprograms := DDCalc_test
 ftestprograms := DDCalc_exampleF DDCalc_exclusionF
 ctestprograms := DDCalc_exampleC DDCalc_exclusionC
 pytestprograms := DDCalc_DirectDM_InterfaceExample.py \
-	DDCalc_examplePython.py
+	DDCalc_examplePython.py DDCalc_exclusionPython.py
 
 # Fortran sources
 fsrc := DDConstants.f90 DDTypes.f90 DDNuclear.f90 \

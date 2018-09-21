@@ -167,15 +167,20 @@ This will generate the following:
     Object, static library, and shared object files for linking
     with other software.
 
-  * DDCalc_exampleF, DDCalc_exampleC
+  * DDCalc_exampleF, DDCalc_exampleC, DDCalc_examplePython.py
     Simple example programs with source code showing how to use
-    the DDCalc routines externally from either Fortran or C++ to 
-    calculate observables and likelihoods.
+    the DDCalc routines externally from either Fortran, C++ or
+    Python to calculate observables and likelihoods.
 
-  * DDCalc_exclusionF, DDCalc_exclusionC
+  * DDCalc_exclusionF, DDCalc_exclusionC, DDCalc_exclusionPython.py
     Simple example programs with source code showing how to use
-    the DDCalc routines externally from either Fortran or C++ to
-    calculate exclusion limits.
+    the DDCalc routines externally from either Fortran, C++ or
+    Python to calculate exclusion limits.
+
+  * DDCalc_DirectDM_InterfaceExample.py
+    Simple example programs with source code showing how to use
+    the DDCalc-DirectDM interface in Python to calculate observables
+    based on effective operators defined at some high scale.
 
 Usage as a library
 ---------------

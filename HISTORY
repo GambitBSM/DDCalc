@@ -4,7 +4,7 @@ Full details can be found in the git log.  Only a summary of the
 changes in each new version is given here.
 
 v2.1.0 - September 2018
-Added python support and interface with DirectDM.
+Added python support and interface with DirectDM for automated RGE evolution and matching of effective operators.
 
 v2.0.0 - June 2018
 Added momentum and velocity dependent interactions as well as binned Poisson likelihoods.
