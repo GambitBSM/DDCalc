@@ -48,7 +48,7 @@ def Set_NREFT_CPT_couplings(wimp, cNR_coeffs):
 	return
 
 
-# Define a WIMP at the scale Lambda.
+# Define a WIMP by specifying its interactions above the EW scale, at the scale Lambda.
 # coupling_dict has to be a dictionary containing the non-zero coefficients
 # of the relativistic operators above the EW scale, following 1809.03506.
 def SetWIMP_EW(coupling_dict, mDM, DM_type, DM_hypercharge, dim_SU2_repr, Lambda):
@@ -58,3 +58,24 @@ def SetWIMP_EW(coupling_dict, mDM, DM_type, DM_hypercharge, dim_SU2_repr, Lambda
 	DDCalc.SetWIMP_NREFT_CPT(wimp, mDM, DM_Spin(DM_type)) # Set the WIMP to be of type 'NREFT_CPT', with given mass and spin
 	Set_NREFT_CPT_couplings(wimp, cNR_coeffs)    # Set all non-relativistic coefficients according to cNR_coeffs
 	return wimp
+
+
+# Define a WIMP by specifying its interactions within the 3-, 4- or 5-flavor scheme.
+# coupling_dict has to be a dictionary containing the non-zero coefficients
+# of the corresponding relativistic operators, following 1809.03506.
+def SetWIMP_Nf(coupling_dict, mDM, DM_type, Nf = 5):
+	if(Nf == 5):
+		wc = ddm.WC_5f(coupling_dict, DM_type=DM_type)
+	elif(Nf == 4):
+		wc = ddm.WC_4f(coupling_dict, DM_type=DM_type)
+	elif(Nf == 3):
+		wc = ddm.WC_3f(coupling_dict, DM_type=DM_type)
+	else:
+		print("Error in SetWIMP_Nf: Invalid value of Nf. Stop.")
+		sys.exit()
+	cNR_coeffs = wc._my_cNR(mDM)
+	wimp = DDCalc.InitWIMP()		# Initialise a WIMP objects to default values.
+	DDCalc.SetWIMP_NREFT_CPT(wimp, mDM, DM_Spin(DM_type)) # Set the WIMP to be of type 'NREFT_CPT', with given mass and spin
+	Set_NREFT_CPT_couplings(wimp, cNR_coeffs)    # Set all non-relativistic coefficients according to cNR_coeffs
+	return wimp
+
