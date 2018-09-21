@@ -99,4 +99,58 @@ print("**********************************************************************")
 
 
 
+
+
+###############################################################################
+### Example 2 : Specifying the Lagrangian below the electroweak scale, 
+###             i.e. in terms of its couplings to the photon, gluon,
+###	             and to a given number of quarks
+
+mDM = 20.0	 		# DM Mass in GeV 
+DM_type = "C"       # DM type. Can be "D" for Dirac, "M" for Majorana,
+						# "R" for a real scalar and "C" for a complex scalar
+Nf = 5					# Flavor scheme, specifying which quark flavors
+						# are already considered to be integrated out.
+						# This can be 3,4 or 5.
+						# See 1708.02678 and 1809.03506 for more details.
+
+# Definition of the non-zero couplings. This follows the convention of 
+# relativistic operators given in 1809.03506 and the manual of DirectDM.
+# In this example, we use the five-flavor scheme, and consider the operator
+# Q^(6)_4, corresponding to a CP-violating coupling of a complex scalar 
+# to the pseudoscalar quark current, together with Q^(6)_6 for the
+# effective coupling to gluons.
+coupling_value = 3.0e-5
+coupling_dict = {'C64u' : coupling_value, 'C64d' : coupling_value, \
+				    'C64s' : coupling_value, 'C64c' : coupling_value, \
+					 'C64b' : coupling_value, 'C66' : 0.5*coupling_value}
+
+# This function defines a WIMP object with the properties given as arguments,
+# runs the couplings down to the hadronic scale, matches onto non-relativistic
+# operators, and defines a corresponding WIMP in DDCalc.
+# It returns the WIMP index to be used later on for rate calculations.
+wimp = DDCalc_DirectDM_Interface.SetWIMP_Nf(coupling_dict, \
+									mDM, DM_type, Nf = Nf)
+
+# This performs the actual calculation of the rates.
+DDCalc.CalcRates(detector, wimp, halo)
+
+print("**********************************************************************")
+print("Example 2: Specify the Lagrangian within the five-flavor scheme:")
+print("           Complex scalar with CP-violating couplings to quarks")
+print("           and gluons.")
+print("           mDM =", mDM, "GeV")
+print("           Experiment: Xenon1T_2018")
+print("Expected number of signal events:      %.5e" % DDCalc.Signal(detector))
+print("Observed number of events:             %d" % DDCalc.Events(detector))
+print("Expected number of background events:  %.5e" \
+				  % DDCalc.Background(detector))
+print("Log(likelihood):                       %.5e" \
+				  % DDCalc.LogLikelihood(detector))
+print("**********************************************************************")
+###############################################################################
+
+
+
+
 DDCalc.FreeAll() # Clean up all the objects
