@@ -32,9 +32,11 @@
  **********************************************************************/
 """
 
-import DDCalcInclude
 import sys
-import os
+#sys.path.append('/your/path/to/DDCalc/include') 
+   ### specify the path to DDCalc/include in case this python 
+   ### script is placed outsides the DDCalc directory
+import DDCalcInclude
 sys.path.append(DDCalcInclude.include_dir)
 import DDCalc
 import DDCalc_DirectDM_Interface
