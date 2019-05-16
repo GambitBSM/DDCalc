@@ -72,7 +72,114 @@ Detector = DDCalc.InitExperiment('Xenon1T_2018')
 # Here we assume that the experiment sees no excess, such that the best-fit
 # point is identical to the background-only hypothesis.
 # See below for the case of experiments seeing an excess.
-z
+
+# Step 1: Calculate the log likelihood for the background-only hypothesis
+# This can be achieved by setting the DM couplings equal to zero
+# (in which case the DM mass is irrelevant)
+DDCalc.SetWIMP_msigma(WIMP, mDMmin, 0., 0., 0., 0.)
+DDCalc.CalcRates(Detector,WIMP,Halo)
+BGlogL = DDCalc.LogLikelihood(Detector)
+
+# Step 2: Calculate the critical value of the log likelihood that corresponds
+# to the exclusion limit. Here we assume the asymptotic limit, such that
+# -2 delta log L follows a 1/2 chi^2 distribution with 1 degree of freedom
+# The one-sided upper bound at 90% confidence level is then given by 
+# -2 delta log L = 1.64
+limit = 1.64
+logLlimit = BGlogL - limit/2.0
+print("logLlimit = %.5e" % logLlimit)
+
+# Step 3: Calculate the spin-independent exclusion limit
+# (assuming equal couplings to protons and neutrons)
+print("")
+print("***************************** Spin-independent limit *****************************")
+print("")
+print("Assuming spin-independent scattering with equal couplings to protons and neutrons.")
+print("")
+print("    log_10(m_DM/GeV)  log_10(sigma_p/pb)")
+print("")
+
+for mDMi in range(mDMsteps+1):
+	mDM = mDMmin * (mDMmax/mDMmin)**(mDMi/(1.0*mDMsteps))
+	DDCalc.SetWIMP_msigma(WIMP, mDM, sigmatest, sigmatest, 0., 0.)
+	DDCalc.CalcRates(Detector,WIMP,Halo)
+	print("          %.5f          %.5f" % \
+	   (math.log(mDM)/math.log(10.0),\
+	   math.log(DDCalc.ScaleToPValue(Detector,logLlimit)*sigmatest)/math.log(10.0)))
+
+
+# Step 3: Calculate spin-dependent exclusion limit
+# (assuming couplings only to protons)
+print("")
+print("***************************** Spin-dependent limit *******************************")
+print("")
+print("Assuming spin-dependent scattering with couplings to protons only.")
+print("")
+print("    log_10(m_DM/GeV)  log_10(sigma_p/pb)")
+print("")
+
+for mDMi in range(mDMsteps+1):
+	mDM = mDMmin * (mDMmax/mDMmin)**(mDMi/(1.0*mDMsteps))
+	DDCalc.SetWIMP_msigma(WIMP, mDM, 0., 0., sigmatest, 0.)
+	DDCalc.CalcRates(Detector,WIMP,Halo)
+	print("          %.5f          %.5f" % \
+	   (math.log(mDM)/math.log(10.0),\
+	   math.log(DDCalc.ScaleToPValue(Detector,logLlimit)*sigmatest)/math.log(10.0)))
+
+
+
+
+
+###############################################################################
+################# Routines for calculating best-fit regions ###################
+###############################################################################
+
+
+# Now we consider a more general case of an experiment seeing an excess,
+# i.e. we are interested in constructing confidence intervals / regions.
+# See arXiv:1407.6617 for details.
+
+# Step 5: Feldman-Cousins
+# If we consider only the total number of expected and observed events,
+# we can employ the Feldman-Cousins method to construct a lower and an upper
+# bound on the spin-independent scattering cross section as a function of DM mass
+
+s2 = DDCalc.FeldmanCousinsUpper(-2.3,DDCalc.Events(Detector),\
+							DDCalc.Background(Detector))
+s1 = DDCalc.FeldmanCousinsLower(-2.3,DDCalc.Events(Detector),\
+							DDCalc.Background(Detector))
+
+print("")
+print("**************************** Feldmann-Cousins bound ****************************")
+print("")
+print("Assuming spin-independent scattering with equal couplings to protons and neutrons.")
+print("")
+if(s1 > 0):
+	print("      log_10(m_DM/GeV)  log_10(sigma_min/pb)  log_10(sigma_max/pb)")
+	print()
+else:
+	print("Lower bound corresponds to zero cross section. Quoting upper bound only.")
+	print("")
+	print("      log_10(m_DM/GeV)  log_10(sigma_max/pb)")
+	print("")
+
+
+for mDMi in range(mDMsteps+1):
+	mDM = mDMmin * (mDMmax/mDMmin)**(mDMi/(1.0*mDMsteps))
+	DDCalc.SetWIMP_msigma(WIMP, mDM, sigmatest, sigmatest, 0., 0.)
+	DDCalc.CalcRates(Detector,WIMP,Halo)
+	s = DDCalc.Signal(Detector)
+	if(s > 0):
+		if(s1 > 0):
+			print("            %10.4f            %10.4f            %10.4f" % \
+				 (math.log(mDM)/math.log(10.),\
+				  math.log(s1/s*sigmatest)/math.log(10.),\
+				  math.log(s2/s*sigmatest)/math.log(10.)))
+		else:
+			print("            %10.4f            %10.4f" % \
+				 (math.log(mDM)/math.log(10.),\
+				 math.log(s2/s*sigmatest)/math.log(10.)))
+
 # Step 6: 2d likelihood scan
 # To include spectral information, we need to perform a full scan over the
 # 2d parameter space. We can then determine the combination of mass and

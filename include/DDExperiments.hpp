@@ -30,6 +30,7 @@ extern "C"
   int C_DDCalc_pico_2l_init();
   int C_DDCalc_pico_60_init();
   int C_DDCalc_pico_60_2017_init();
+  int C_DDCalc_pico_60_2019_init();
   int C_DDCalc_supercdms_2014_init();
   int C_DDCalc_cdmslite_init();
   int C_DDCalc_simple_2014_init();
@@ -109,7 +110,12 @@ namespace DDCalc
   {
     C_DDCalc_pico_60_2017_init();
   }
-  
+ 
+  int PICO_60_2019_Init()
+  {
+    C_DDCalc_pico_60_2019_init();
+  }
+ 
   int SuperCDMS_2014_Init()
   {
     C_DDCalc_supercdms_2014_init();
