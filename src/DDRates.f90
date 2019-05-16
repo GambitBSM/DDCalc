@@ -240,14 +240,17 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
   D%dRdEiso = 0.0d0
 
   ! ...................... CALCULATE DIFFERENTIAL RATES ............................
-  IF (WIMP%DMtype .EQ. 'SIonly') THEN
-    ! fp = WIMP%params(1), fn = WIMP%params(2)
+  IF ((WIMP%DMtype .EQ. 'SIonly') .OR. (WIMP%DMtype .EQ. 'SILR')) THEN
+    ! For WIMP type 'SIonly': fp = WIMP%params(1), fn = WIMP%params(2)
     ! In the DDCalc/DarkBit convention, fp and fn are the coefficients
     ! of the DM DM N N term in the Lagrangian, assuming a Majorana DM
     ! particle. In particular, one has sigma_p = 4 mu^2 fp^2 / pi.
     ! Notice: WTilde1_00 corresponds to D%WTilde(1,1,KE,Kiso) 
     ! Notice: WTilde1_01 corresponds to D%WTilde(1,2,KE,Kiso) 
     ! Notice: WTilde1_11 corresponds to D%WTilde(1,4,KE,Kiso) 
+    ! For WIMP type 'SILR': gp = WIMP%params(1), gn = WIMP%params(2)
+    ! which are defined through the requirement that for a heavy mediator 
+    ! gp = fp*mmed^2 and gn = fn*mmed^2
 
     ! If the parameter PreferNewFF is set to .TRUE., use the Haxton form factor for SI scattering
     IF (PreferNewFF) THEN
@@ -276,6 +279,15 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
 
    END IF
 
+   IF (WIMP%DMtype .EQ. 'SILR') THEN
+
+     DO KE = 1,D%NE
+       DO Kiso = 1,D%Niso
+         D%dRdEiso(KE,Kiso) = D%dRdEiso(KE,Kiso) * 1 / (2*1d-6*D%Miso(Kiso)*D%E(KE) + WIMP%params(3)**2)**2
+       END DO
+     END DO    
+
+   END IF
 
   ELSE IF (WIMP%DMtype .EQ. 'SDonly') THEN
    ! ap = WIMP%params(1), an = WIMP%params(2)
@@ -315,7 +327,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
    ! combination of SIonly and SD only, see above.
    ! fp = WIMP%params(1), fn = WIMP%params(2), ap = WIMP%params(3), an = WIMP%params(4)
 
-
    ! If the parameter PreferNewFF is set to .TRUE., use the Haxton form factor for SI and SD scattering
    IF(PreferNewFF) THEN
 
@@ -352,7 +363,6 @@ SUBROUTINE CalcRates(D, WIMP, Halo)
      END DO
 
    END IF
-
 
   ELSE IF ((WIMP%DMtype .EQ. 'NREffectiveTheory').OR.(WIMP%DMtype .EQ. 'NREFT_CPT')) THEN
 

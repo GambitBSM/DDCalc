@@ -22,7 +22,9 @@ TYPE, PUBLIC :: WIMPStruct
   ! 'SDonly':      WIMP with only spin-dependent interactions
   ! 'SISD':        WIMP with spin-independent and spin-dependent 
   !                interactions
+  ! 'SILR':        WIMP with long-range interactions via a light mediator
   ! 'NREffectiveTheory': Effective WIMP defined via the non-relativistic DM-nucleon operators
+  ! 'NREFT_CPT':   Effective WIMP defined via non-relativistic operators in chiral perturbation theory
   CHARACTER(LEN=24) :: DMtype = ''
   ! List of WIMP parameters. 
   ! The length and meaning of this list depends on the WIMP type:
@@ -36,6 +38,12 @@ TYPE, PUBLIC :: WIMPStruct
   ! 'SISD':        (fp, fn, ap, an)
   ! fp: SI DM-proton coupling, fn: SI DM-neutron coupling
   ! ap: SD DM-proton coupling, an: SD DM-neutron coupling
+  !
+  ! 'SILR':        (gp, gn, mmed)
+  ! gp: SI DM-proton coupling, gn: SI DM-neutron coupling
+  ! mmed: mediator mass
+  ! In contrast to WIMP type 'SIonly' the couplings here are assumed to be dimensionless
+  ! The correct mass dimension then results from the propagator factor 1/(q^2 + mmed^2)^2
   !
   ! 'NREffectiveTheory': 
   ! (DM spin, O1_0, O1_1, O1q2_0, O1q2_1, O3_0, O3_1, O4_0, O4_1, O4q2_0, O4q2_1, O5_0, O5_1, O6_0, O6_1, ..., O15_0, O15_1, O17_0, O17_1, O18_0, O18_1, alpha_1, ..., alpha_8)

@@ -207,6 +207,8 @@ PUBLIC :: DDCalc_SetWIMP_mG
 PUBLIC :: DDCalc_GetWIMP_mG
 PUBLIC :: DDCalc_SetWIMP_msigma
 PUBLIC :: DDCalc_GetWIMP_msigma
+PUBLIC :: DDCalc_SetWIMP_longrange
+PUBLIC :: DDCalc_GetWIMP_longrange
 PUBLIC :: DDCalc_SetWIMP_NREffectiveTheory
 PUBLIC :: DDCalc_SetWIMP_NREFT_CPT
 PUBLIC :: DDCalc_SetNRCoefficient
@@ -220,6 +222,8 @@ PUBLIC :: C_DDCalc_SetWIMP_mG
 PUBLIC :: C_DDCalc_GetWIMP_mG
 PUBLIC :: C_DDCalc_SetWIMP_msigma
 PUBLIC :: C_DDCalc_GetWIMP_msigma
+PUBLIC :: C_DDCalc_SetWIMP_longrange
+PUBLIC :: C_DDCalc_GetWIMP_longrange
 PUBLIC :: C_DDCalc_SetWIMP_NREffectiveTheory
 PUBLIC :: C_DDCalc_SetWIMP_NREFT_CPT
 PUBLIC :: C_DDCalc_SetNRCoefficient
@@ -405,6 +409,71 @@ SUBROUTINE C_DDCalc_GetWIMP_mfa(WIMPIndex,m,fp,fn,ap,an) &
   fn = fn0
   ap = ap0
   an = an0
+END SUBROUTINE
+
+!-----------------------------------------------------------------------
+! Sets/gets the WIMP mass and couplings for spin-independent and spin-dependent 
+! interactions with a light mediator.
+!
+! Input/output arguments:
+!   mdm         WIMP mass [GeV].
+!   gp          Spin-independent WIMP-proton coupling [unitless].
+!   gn          Spin-independent WIMP-neutron coupling [unitless].
+!   mmed        Mediator mass [GeV].
+! 
+SUBROUTINE DDCalc_SetWIMP_longrange(WIMP,mdm,gp,gn,mmed)
+  IMPLICIT NONE
+  REAL*8, INTENT(IN) :: mdm,gp,gn,mmed
+  TYPE(WIMPStruct), INTENT(INOUT) :: WIMP
+  CHARACTER(LEN=24) :: DMtype = 'SILR'
+  CALL DDCalc_SetWIMP(WIMP,m=mdm,DMtype=DMtype,params=[gp,gn,mmed])
+END SUBROUTINE
+
+SUBROUTINE DDCalc_GetWIMP_longrange(WIMP,mdm,gp,gn,mmed)
+  IMPLICIT NONE
+  REAL*8, INTENT(OUT) :: mdm,gp,gn,mmed
+  TYPE(WIMPStruct), INTENT(IN) :: WIMP
+  CHARACTER(LEN=24) :: DMtype
+  REAL*8, ALLOCATABLE :: params(:)
+  LOGICAL :: found = .FALSE.
+
+  IF ( WIMP%DMtype .EQ. 'SILR' ) THEN
+    gp = params(1)
+    gn = params(2)
+    mmed = params(3)
+  ELSE
+    stop 'Invalid WIMP type given to DDCalc_GetWIMP_longrange' 
+  END IF
+
+END SUBROUTINE
+
+! C++ interface wrappers
+SUBROUTINE C_DDCalc_SetWIMP_longrange(WIMPIndex,mdm,gp,gn,mmed) &
+           BIND(C,NAME='C_DDCalc_ddcalc_setwimp_longrange')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: mdm,gp,gn,mmed
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_SetWIMP_longrange' 
+  CALL DDCalc_SetWIMP_longrange(WIMPs(WIMPIndex)%p,mdm=REAL(mdm,KIND=8),&
+               gp=REAL(gp,KIND=8),gn=REAL(gn,KIND=8),                   &
+               mmed=REAL(mmed,KIND=8))
+END SUBROUTINE
+
+SUBROUTINE C_DDCalc_GetWIMP_longrange(WIMPIndex,mdm,gp,gn,mmed) &
+           BIND(C,NAME='C_DDCalc_ddcalc_getwimp_longrange')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(OUT) :: mdm,gp,gn,mmed
+  INTEGER(KIND=C_INT), INTENT(IN) :: WIMPIndex
+  REAL*8 :: mdm0,gp0,gn0,mmed0
+  IF (.NOT. ASSOCIATED(WIMPs(WIMPIndex)%p)) stop 'Invalid WIMP index given to C_DDCalc_GetWIMP_longrange' 
+  CALL DDCalc_GetWIMP_longrange(WIMPs(WIMPIndex)%p,mdm=mdm0,gp=gp0,gn=gn0,mmed=mmed0)
+  ! Automatic type conversions here
+  mdm  = mdm0
+  gp = gp0
+  gn = gn0
+  mmed = mmed0
 END SUBROUTINE
 
 !-----------------------------------------------------------------------
