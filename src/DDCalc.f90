@@ -201,6 +201,7 @@ PUBLIC :: C_DDCalc_InitDetector
 
 ! Simple setter and getter interfaces
 PUBLIC :: DDCalc_SetSHM
+PUBLIC :: DDCalc_HaloFromFile
 PUBLIC :: DDCalc_SetWIMP_mfa
 PUBLIC :: DDCalc_GetWIMP_mfa
 PUBLIC :: DDCalc_SetWIMP_mG
@@ -214,6 +215,7 @@ PUBLIC :: DDCalc_GetNRCoefficient
 PUBLIC :: DDCalc_SetDetectorEmin
 ! C/C++ Wrappers
 PUBLIC :: C_DDCalc_SetSHM
+PUBLIC :: C_DDCalc_HaloFromFile
 PUBLIC :: C_DDCalc_SetWIMP_mfa
 PUBLIC :: C_DDCalc_GetWIMP_mfa
 PUBLIC :: C_DDCalc_SetWIMP_mG
@@ -311,6 +313,38 @@ SUBROUTINE C_DDCalc_SetSHM(HaloIndex,rho,vrot,v0,vesc) &
   IF (.NOT. ASSOCIATED(Halos(HaloIndex)%p)) stop 'Invalid halo index given to C_DDCalc_SetSHM'
   CALL DDCalc_SetSHM(Halos(HaloIndex)%p,rho=REAL(rho,KIND=8),vrot=REAL(vrot,KIND=8), &
                      v0=REAL(v0,KIND=8),vesc=REAL(vesc,KIND=8))
+END SUBROUTINE
+
+
+!-----------------------------------------------------------------------
+! Tells DDCalc to read halo model from file
+! 
+! For more detailed halo settings, see:
+!   SetHalo() [interface name: DDCalc_SetHalo]
+! 
+! Input arguments:
+!   rho         Local dark matter density [GeV/cm^3].
+!   Nvmin       Number of entries in external file.
+!   gcol        Column to use for velocity integral.
+! 
+SUBROUTINE DDCalc_HaloFromFile(Halo,rho,Nvmin,gcol)
+  IMPLICIT NONE
+  TYPE(HaloStruct), INTENT(INOUT) :: Halo
+  REAL*8, INTENT(IN) :: rho
+  INTEGER, INTENT(IN) :: Nvmin,gcol
+  CALL DDCalc_SetHalo(Halo,rho=rho,g_file='halo.txt',g_column=gcol,Nvmin=Nvmin)
+END SUBROUTINE
+
+! C++ interface wrapper
+SUBROUTINE C_DDCalc_HaloFromFile(HaloIndex,rho,Nvmin,gcol) &
+           BIND(C,NAME='C_DDCalc_ddcalc_halofromfile')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  REAL(KIND=C_DOUBLE), INTENT(IN) :: rho
+  INTEGER(KIND=C_INT), INTENT(IN) :: HaloIndex, Nvmin, gcol
+  IF (.NOT. ASSOCIATED(Halos(HaloIndex)%p)) stop 'Invalid halo index given to C_DDCalc_HaloFromFile'
+  CALL DDCalc_HaloFromFile(Halos(HaloIndex)%p,rho=REAL(rho,KIND=8),Nvmin=INT(Nvmin,KIND=C_INT),&
+                       gcol=INT(gcol,KIND=C_INT))
 END SUBROUTINE
 
 

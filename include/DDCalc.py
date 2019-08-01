@@ -120,6 +120,11 @@ def SetSHM(halo, rho, vrot, v0, vesc):
 	ddcalc_lib.C_DDCalc_ddcalc_setshm(int_byref(halo), \
 				   double_byref(rho), double_byref(vrot), \
 				   double_byref(v0), double_byref(vesc))
+
+def HaloFromFile(halo, rho, Nvmin, gcol):
+	ddcalc_lib.C_DDCalc_ddcalc_halofromfile(int_byref(halo), \
+				   double_byref(rho), int_byref(Nvmin), \
+				   int_byref(gcol))
 ###############################################################################
 
 

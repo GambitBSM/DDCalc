@@ -33,6 +33,7 @@ extern "C"
   // Halo setter
   void C_DDCalc_ddcalc_setshm(const int&, const double&, const double&, const double&,
                               const double&);
+  void C_DDCalc_ddcalc_halofromfile(const int&, const double&, const int&, const int&);
   
   // WIMP parameter setters and getters
   void C_DDCalc_ddcalc_setwimp_mfa(const int&, const double&,
@@ -117,6 +118,16 @@ namespace DDCalc
               const double v0=235.0, const double vesc=550.0)
   {
     C_DDCalc_ddcalc_setshm(HaloIndex,rho,vrot,v0,vesc);
+  }
+
+
+  // Tells DDCalc to load the velocity integral from file.
+  //   rho         Local dark matter density [GeV/cm^3].
+  //   Nvmin       Number of entries in external file.
+  //   gcol        Column to use for velocity integral.
+  void HaloFromFile(const int HaloIndex, const double rho, const double Nvmin, const double gcol)
+  {
+    C_DDCalc_ddcalc_halofromfile(HaloIndex,rho,Nvmin,gcol);
   }
 
   //########## WIMP parameter setters and getters ######################

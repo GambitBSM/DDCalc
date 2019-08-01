@@ -43,8 +43,15 @@ wimp = DDCalc.InitWIMP()
 #       vrot    Local disk rotation speed [km/s]
 #       v0      Maxwell-Boltzmann most probable speed [km/s]
 #       vesc    Galactic escape speed [km/s]
-DDCalc.SetSHM(halo, 0.3, 235.0, 235.0, 550.0)
+# DDCalc.SetSHM(halo, 0.3, 235.0, 235.0, 550.0)
 
+# Optionally tell DDCalc to load the velocity integral from file.
+# The file must be named halo.txt and must be located in the DDCalc main folder
+# The first column of the file contains the values of vmin (in km/s) for which the velocity integral is provided
+# The argument Nvmin specifies the number of rows in the file
+# The column from which the actual velocity integral should be read can be provided via the argument gcol 
+# Finally, the assumed local DM density can be provided as a separate argument
+DDCalc.HaloFromFile(halo, 0.3, 1000, 8)
 
 
 
