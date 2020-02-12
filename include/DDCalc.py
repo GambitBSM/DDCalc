@@ -51,6 +51,7 @@ def InitExperiment(ExperimentName):
 'PICO_2L' : ddcalc_lib.C_DDCalc_pico_2l_init(),
 'PIC0_60' : ddcalc_lib.C_DDCalc_pico_60_init(),
 'PICO_60_2017' : ddcalc_lib.C_DDCalc_pico_60_2017_init(),
+'PICO_60_2019' : ddcalc_lib.C_DDCalc_pico_60_2019_init(),
 'SuperCDMS_2014' : ddcalc_lib.C_DDCalc_supercdms_2014_init(),
 'CDMSlite' : ddcalc_lib.C_DDCalc_cdmslite_init(),
 'Simple_2014' : ddcalc_lib.C_DDCalc_simple_2014_init(),
@@ -100,6 +101,11 @@ def SetWIMP_msigma(wimp, m, sigmap_SI, sigman_SI, sigmap_SD, sigman_SD):
 				   double_byref(m),double_byref(sigmap_SI),\
 				   double_byref(sigman_SI),double_byref(sigmap_SD),\
 				   double_byref(sigman_SD))
+
+def SetWIMP_longrange(wimp, m, gp, gn, mmed):
+	ddcalc_lib.C_DDCalc_ddcalc_setwimp_longrange(int_byref(wimp),\
+				   double_byref(m),double_byref(gp),\
+				   double_byref(gn),double_byref(mmed))
 	
 def SetWIMP_NREffectiveTheory(wimp, m, spin):
 	ddcalc_lib.C_DDCalc_ddcalc_setwimp_nreffectivetheory(int_byref(wimp), \

@@ -179,7 +179,7 @@ for mDMi in range(mDMsteps+1):
 			print("            %10.4f            %10.4f" % \
 				 (math.log(mDM)/math.log(10.),\
 				 math.log(s2/s*sigmatest)/math.log(10.)))
-     
+
 # Step 6: 2d likelihood scan
 # To include spectral information, we need to perform a full scan over the
 # 2d parameter space. We can then determine the combination of mass and
