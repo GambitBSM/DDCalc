@@ -61,6 +61,7 @@ def InitExperiment(ExperimentName):
 'Darwin' : ddcalc_lib.C_DDCalc_darwin_init(),
 'Darkside_20k' : ddcalc_lib.C_DDCalc_darkside_20k_init(),
 'Darkside_50' : ddcalc_lib.C_DDCalc_darkside_50_init(),
+'Darkside_50_S2' : ddcalc_lib.C_DDCalc_darkside_50_s2_init(),
 'PICO_500' : ddcalc_lib.C_DDCalc_pico_500_init()
 			}
 	if not ExperimentName in list(experiments.keys()):
