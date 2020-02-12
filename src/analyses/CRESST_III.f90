@@ -2,7 +2,7 @@ MODULE CRESST_III
 
 !=======================================================================
 ! CRESST_III ANALYSIS ROUTINES
-! Based upon arXiv:1509.01515 and arXiv:1701.08157 .
+! Based upon arXiv:1904.00498 and arXiv:1905.07335.
 !=======================================================================
 
 USE DDTypes
@@ -23,6 +23,8 @@ FUNCTION CRESST_III_Init() RESULT(D)
   INTEGER, PARAMETER :: NBINS = 10
   INTEGER, PARAMETER :: NELEM = 3
 
+! We bin the data in 10 bins of uniform size in log space between 30 eV and 1 keV.
+! No background subtraction is performed.
   INTEGER, PARAMETER :: Nev_bin(Nbins) = (/355, 219, 103, 57, 21, 7, 9, 11, 18, 74/)
   REAL*8, PARAMETER :: Bg_bin(Nbins) = (/0,0,0,0,0,0,0,0,0,0/)
 

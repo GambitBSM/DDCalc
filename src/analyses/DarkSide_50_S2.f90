@@ -2,7 +2,8 @@ MODULE DarkSide_50_S2
 
 !=======================================================================
 ! DarkSide-50 S2-ONLY ANALYSIS ROUTINES
-! Based upon arXiv:1802.06994.  
+! Based upon arXiv:1802.06994.
+! See also appendix B of arXiv:1907.04346
 !=======================================================================
 
 USE DDTypes

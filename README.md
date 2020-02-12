@@ -38,8 +38,14 @@ The experimental results implemented in DDCalc at this time are (in alphabetical
   * CRESST-II: 52 kg-days (CaWO4)  
     G. Angloher et al., Eur.Phys.J. C76, 25 (2016) [arXiv:1509.01515]
 
+  * CRESST-III: 3.64 kg-days (CaWO4)  
+    G. Angloher et al., PRD 100, 102002 (2019) [arXiv:1904.00498]
+
+  * DarkSide-50: S2-only (Ar)  
+    P. Agnes et al., PRL 121, 081307 (2018) [arXiv:1802.06994]
+
   * DarkSide-50: 19600 kg-days (Ar)  
-    P. Agnes et al., arXiv:1802.07198
+    P. Agnes et al., PRD 98, 102006 (2018) [arXiv:1802.07198]
 
   * LUX 2013: 118*85.3 kg-days (Xe)  
     D.S. Akerib et al., PRL 112, 091303 (2014) [arxiv:1310.8214]
@@ -65,6 +71,9 @@ The experimental results implemented in DDCalc at this time are (in alphabetical
   * PICO 60 2017: (C3F8)
     C. Amole et al., PRL 118, 251301 (2017) [arXiv:1702.07666]
 
+  * PICO 60 2019: (C3F8)
+    C. Amole et al., PRD 100, 022001 (2019) [arXiv:1902.04031]
+
   * SIMPLE 2014: 18.24 kg-days (C2ClF5)  
     M. Felizardo et al., PRD 89, 072013 (2014) [arXiv:1404.4309]
 
@@ -78,13 +87,13 @@ The experimental results implemented in DDCalc at this time are (in alphabetical
     E. Aprile et al., PRL 119 181301 (2017) [arxiv:1705.06655]
 
   * XENON1T 2018: 1300*279 kg-days (Xe)  
-    E. Aprile et al., arxiv:1805.12562
+    E. Aprile et al., PRL 121, 111302 (2018) [arxiv:1805.12562]
 
 Note that the following data sets are not statistically independent and should therefore not be combined:
   * LUX 2013, LUX 2015 and LUX 2016
   * XENON1T 2017 and XENON1T 2018
 In contrast, the following data sets are independent and can be combined:
-  * PICO 60 and PICO 60 2017
+  * PICO 60, PICO 60 2017, PICO 60 2019
   * PandaX 2016 and PandaX 2017 (these correspond to Run 9 and Run 10, respectively, as described in arXiv:1708.06917)
 
 Moreover, projections for a number of future facilities have been implemented.
@@ -233,3 +242,5 @@ testing of the DDCalc package:
   * Miguel Pato
     Calibration/tuning of LUX parameters.
 
+  * Gonzalo Herrera
+    CRESST-III.
