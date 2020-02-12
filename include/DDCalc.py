@@ -55,6 +55,7 @@ def InitExperiment(ExperimentName):
 'CDMSlite' : ddcalc_lib.C_DDCalc_cdmslite_init(),
 'Simple_2014' : ddcalc_lib.C_DDCalc_simple_2014_init(),
 'CRESST_II' : ddcalc_lib.C_DDCalc_cresst_ii_init(),
+'CRESST_III' : ddcalc_lib.C_DDCalc_cresst_iii_init(),
 'LZ' : ddcalc_lib.C_DDCalc_lz_init(),
 'Darwin' : ddcalc_lib.C_DDCalc_darwin_init(),
 'Darkside_20k' : ddcalc_lib.C_DDCalc_darkside_20k_init(),
