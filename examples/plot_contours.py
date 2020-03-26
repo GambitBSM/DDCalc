@@ -65,8 +65,16 @@ for experiment in args.experiments:
         DDCalc.CalcRates(Detector, WIMP, Halo)
         si_limit.append(DDCalc.ScaleToPValue(Detector, logLlimit) * sigma_reference)
 
-    l = plt.loglog(mDM, si_limit, ls="-", label="SI {}".format(experiment))
-    plt.loglog(mDM, sd_limit, ls="--", label="SD {}".format(experiment), color=l[0].get_color())
+    if args.si:
+        l = plt.loglog(mDM, si_limit, ls="-", label="SI {}".format(experiment))
+        c = l[0].get_color()
+        ls = "--"
+    else:
+        c = None
+        ls = None
+
+    if args.sd:
+        plt.loglog(mDM, sd_limit, ls=ls, label="SD {}".format(experiment), color=c)
 
 plt.ylim(1e-10, 1e2)
 plt.xlabel("$m$ (GeV)")
