@@ -22,8 +22,8 @@ parser.add_argument('--si', dest='si', action='store_true', help='Plot SI scatte
 parser.add_argument('--no-si', dest='si', action='store_false', help='Do not plot SI scattering cross sections')
 parser.set_defaults(si=True)
 
-parser.add_argument('--sd', dest='sd', action='store_true', help='Plot sd scattering cross sections')
-parser.add_argument('--no-sd', dest='sd', action='store_false', help='Do not plot sd scattering cross sections')
+parser.add_argument('--sd', dest='sd', action='store_true', help='Plot SD scattering cross sections')
+parser.add_argument('--no-sd', dest='sd', action='store_false', help='Do not plot SD scattering cross sections')
 parser.set_defaults(sd=True)
 
 parser.add_argument('experiments', type=str, default=["PICO_60_2017"], nargs='*', help='List of experiments to plot')
