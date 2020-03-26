@@ -49,7 +49,7 @@ def InitExperiment(ExperimentName):
 'Xenon1T_2018' : ddcalc_lib.C_DDCalc_xenon1t_2018_init(),
 'LUX_2015' : ddcalc_lib.C_DDCalc_lux_2015_init(),
 'PICO_2L' : ddcalc_lib.C_DDCalc_pico_2l_init(),
-'PIC0_60' : ddcalc_lib.C_DDCalc_pico_60_init(),
+'PICO_60' : ddcalc_lib.C_DDCalc_pico_60_init(),
 'PICO_60_2017' : ddcalc_lib.C_DDCalc_pico_60_2017_init(),
 'PICO_60_2019' : ddcalc_lib.C_DDCalc_pico_60_2019_init(),
 'SuperCDMS_2014' : ddcalc_lib.C_DDCalc_supercdms_2014_init(),
