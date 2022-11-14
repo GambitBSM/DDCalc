@@ -59,6 +59,7 @@ def InitExperiment(ExperimentName):
 'CRESST_III' : ddcalc_lib.C_DDCalc_cresst_iii_init(),
 'LZ' : ddcalc_lib.C_DDCalc_lz_init(),
 'LZ_2022' : ddcalc_lib.C_DDCalc_lz_2022_init(),
+'PandaX_4T' : ddcalc_lib.C_DDCalc_pandax_4t_init(),
 'Darwin' : ddcalc_lib.C_DDCalc_darwin_init(),
 'Darkside_20k' : ddcalc_lib.C_DDCalc_darkside_20k_init(),
 'Darkside_50' : ddcalc_lib.C_DDCalc_darkside_50_init(),

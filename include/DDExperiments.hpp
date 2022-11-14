@@ -38,6 +38,7 @@ extern "C"
   int C_DDCalc_dummyexp_init();
   int C_DDCalc_lz_init();
   int C_DDCalc_lz_2022_init();
+  int C_DDCalc_pandax_4t_init();
   int C_DDCalc_darwin_init();
   int C_DDCalc_darkside_20k_init();
   int C_DDCalc_darkside_50_init();
@@ -141,6 +142,11 @@ namespace DDCalc
   int LZ_2022_Init()
   {
     C_DDCalc_lz_2022_init();
+  }
+
+  int PandaX_4T_Init()
+  {
+    C_DDCalc_pandax_4t_init();
   }
 
   int DARWIN_Init()
