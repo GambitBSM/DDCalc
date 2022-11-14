@@ -34,7 +34,7 @@ WIMP = DDCalc.InitWIMP()
 #       vrot    Local disk rotation speed [km/s]
 #       v0      Maxwell-Boltzmann most probable speed [km/s]
 #       vesc    Galactic escape speed [km/s]
-DDCalc.SetSHM(Halo, 0.3, 220.0, 220.0, 550.0)
+DDCalc.SetSHM(Halo, 0.3, 238.0, 238.0, 544.0)
 
 # Initialize the Xenon1T_2018 experiment.
 Detector = DDCalc.InitExperiment('LZ_2022') 
@@ -43,7 +43,7 @@ DDCalc.SetWIMP_msigma(WIMP, mDMmin, 0., 0., 0., 0.)
 DDCalc.CalcRates(Detector,WIMP,Halo)
 BGlogL = DDCalc.LogLikelihood(Detector)
 
-limit = 4.6
+limit = 1.64
 logLlimit = BGlogL - limit/2.0
 print("logLlimit = %.5e" % logLlimit)
 
@@ -73,6 +73,7 @@ plt.ylabel(r'$\sigma_p [\mathrm{pb}]$', fontsize=16)
 plt.tight_layout()
 plt.plot(x,y)
 plt.plot(data[:,0],data[:,1]*1e36)
+
 plt.savefig('LZ.pdf')  
 plt.show()
 
