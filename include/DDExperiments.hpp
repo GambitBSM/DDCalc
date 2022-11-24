@@ -133,11 +133,6 @@ namespace DDCalc
   {
     C_DDCalc_cresst_ii_init();
   }
-  
-  int LZ_Init()
-  {
-    C_DDCalc_lz_init();
-  }
 
   int LZ_2022_Init()
   {
