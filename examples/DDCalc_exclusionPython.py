@@ -61,8 +61,8 @@ WIMP = DDCalc.InitWIMP()
 #       vesc    Galactic escape speed [km/s]
 DDCalc.SetSHM(Halo, 0.3, 220.0, 220.0, 550.0)
 
-# Initialize the Xenon1T_2018 experiment.
-Detector = DDCalc.InitExperiment('Xenon1T_2018') 
+# Initialize the LZ experiment.
+Detector = DDCalc.InitExperiment('LZ_2022') 
 
 
 ###############################################################################
@@ -187,6 +187,10 @@ for mDMi in range(mDMsteps+1):
 # confidence regions around this point.
 logLbest = 1.0*BGlogL
 logL = np.zeros((mDMsteps+1, sigsteps+1))
+
+mDMbest = mDMmin
+sigbest = 0
+			
 for mDMi in range(mDMsteps+1):
 	mDM = mDMmin * (mDMmax/mDMmin)**(mDMi/(1.0*mDMsteps))
 	for sigi in range(sigsteps+1):
