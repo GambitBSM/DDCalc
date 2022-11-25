@@ -55,12 +55,18 @@ The experimental results implemented in DDCalc at this time are (in alphabetical
 
   * LUX 2016: 33500 kg-days (Xe)  
     D.S. Akerib et al., PRL 118, 021303 (2017) [arxiv:1608.07648]
+    
+  * LZ 2022: 5500*60 kg-days (Xe)
+    J. Aalbers et al., arXiv:2207.03764
 
   * PandaX 2016: 334.3*98.7 kg-days (Xe)  
     A. Tan et al., PRL 117, 121303 (2016) [arxiv:1607.07400]
 
   * PandaX 2017: 361.5*77.1 kg-days (Xe)  
     X. Cui et al., PRL 119, 181302 (2017) [arxiv:1708.06917]
+    
+  * PandaX-4T 2021: 0.63 tonne-year (Xe)
+    Y. Meng et al., PRL 127 (2021) 26, 261802 [arXiv:2107.13438]
 
   * PICO 2L: 104 kg-days (C3F8)
     C. Amole et al., PRD 93, 061101 (2016) [arXiv:1601.03729] 
@@ -99,9 +105,6 @@ In contrast, the following data sets are independent and can be combined:
 Moreover, projections for a number of future facilities have been implemented.
 
 Near future:
-
-* LZ (Xe)
-  D.S. Akerib et al., arXiv:1509.02910
 
 * PICO-500 (F)
   S. Fallows, https://indico.cern.ch/event/606690/contributions/2623446/attachments/1497228/2330240/Fallows_2017_07_24__TAUP__PICO-40L_v1.2.pdf

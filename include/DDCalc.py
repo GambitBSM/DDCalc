@@ -20,17 +20,17 @@ DDCalc_library = DDCalcInclude.lib_dir + '/libDDCalc.so'
 
 ##### Load the DDCalc library #################################################
 try:
-	ddcalc_lib = ctypes.CDLL(DDCalc_library) 
-	#print("Successfully loaded DDCalc library " + DDCalc_library)
+  ddcalc_lib = ctypes.CDLL(DDCalc_library)
+  #print("Successfully loaded DDCalc library " + DDCalc_library)
 except OSError:
-	print("DDCalc library " + DDCalc_library + " does not exist. Stop.")
-	sys.exit()
+  print("DDCalc library " + DDCalc_library + " does not exist. Stop.")
+  sys.exit()
 ###############################################################################
 
 
 
 
-##### Auxiliary functions #####################################################	
+##### Auxiliary functions #####################################################
 int_byref = lambda x : ctypes.byref(ctypes.c_int(x))
 double_byref = lambda x : ctypes.byref(ctypes.c_double(x))
 ###############################################################################
@@ -39,7 +39,7 @@ double_byref = lambda x : ctypes.byref(ctypes.c_double(x))
 
 ##### Initializing experiments ################################################
 def InitExperiment(ExperimentName):
-	experiments = {
+  experiments = {
 'Xenon100_2012' : ddcalc_lib.C_DDCalc_xenon100_2012_init(),
 'LUX_2013' : ddcalc_lib.C_DDCalc_lux_2013_init(),
 'LUX_2016' : ddcalc_lib.C_DDCalc_lux_2016_init(),
@@ -57,28 +57,29 @@ def InitExperiment(ExperimentName):
 'Simple_2014' : ddcalc_lib.C_DDCalc_simple_2014_init(),
 'CRESST_II' : ddcalc_lib.C_DDCalc_cresst_ii_init(),
 'CRESST_III' : ddcalc_lib.C_DDCalc_cresst_iii_init(),
-'LZ' : ddcalc_lib.C_DDCalc_lz_init(),
+'LZ_2022' : ddcalc_lib.C_DDCalc_lz_2022_init(),
+'PandaX_4T' : ddcalc_lib.C_DDCalc_pandax_4t_init(),
 'Darwin' : ddcalc_lib.C_DDCalc_darwin_init(),
 'Darkside_20k' : ddcalc_lib.C_DDCalc_darkside_20k_init(),
 'Darkside_50' : ddcalc_lib.C_DDCalc_darkside_50_init(),
 'Darkside_50_S2' : ddcalc_lib.C_DDCalc_darkside_50_s2_init(),
 'PICO_500' : ddcalc_lib.C_DDCalc_pico_500_init()
-			}
-	if not ExperimentName in list(experiments.keys()):
-		print("InitExperiment: Invalid experiment name " + ExperimentName + \
-			". Available experiments are:")
-		print(list(experiments.keys()))
-		sys.exit()
-	return experiments[ExperimentName]
+      }
+  if not ExperimentName in list(experiments.keys()):
+    print("InitExperiment: Invalid experiment name " + ExperimentName + \
+      ". Available experiments are:")
+    print(list(experiments.keys()))
+    sys.exit()
+  return experiments[ExperimentName]
 ###############################################################################
 
 
 ##### Initializing WIMP/Halo ##################################################
 def InitWIMP():
-	return ddcalc_lib.C_DDWIMP_ddcalc_initwimp()
+  return ddcalc_lib.C_DDWIMP_ddcalc_initwimp()
 
 def InitHalo():
-	return ddcalc_lib.C_DDHalo_ddcalc_inithalo()
+  return ddcalc_lib.C_DDHalo_ddcalc_inithalo()
 ###############################################################################
 
 
@@ -86,134 +87,134 @@ def InitHalo():
 
 ##### Setting WIMP properties #################################################
 def SetWIMP_mfa(wimp,m,fp,fn,ap,an):
-	ddcalc_lib.C_DDCalc_ddcalc_setwimp_mfa(int_byref(wimp),\
-								double_byref(m),double_byref(fp),\
-								double_byref(fn),double_byref(ap),\
-								double_byref(an))
+  ddcalc_lib.C_DDCalc_ddcalc_setwimp_mfa(int_byref(wimp),\
+                double_byref(m),double_byref(fp),\
+                double_byref(fn),double_byref(ap),\
+                double_byref(an))
 
 def SetWIMP_mG(wimp,m,GpSI,GnSI,GpSD,GnSD):
-	ddcalc_lib.C_DDCalc_ddcalc_setwimp_mg(int_byref(wimp),\
-								double_byref(m),double_byref(GpSI),\
-								double_byref(GnSI),double_byref(GpSD),\
-								double_byref(GnSD))
+  ddcalc_lib.C_DDCalc_ddcalc_setwimp_mg(int_byref(wimp),\
+                double_byref(m),double_byref(GpSI),\
+                double_byref(GnSI),double_byref(GpSD),\
+                double_byref(GnSD))
 
 def SetWIMP_msigma(wimp, m, sigmap_SI, sigman_SI, sigmap_SD, sigman_SD):
-	ddcalc_lib.C_DDCalc_ddcalc_setwimp_msigma(int_byref(wimp),\
-				   double_byref(m),double_byref(sigmap_SI),\
-				   double_byref(sigman_SI),double_byref(sigmap_SD),\
-				   double_byref(sigman_SD))
+  ddcalc_lib.C_DDCalc_ddcalc_setwimp_msigma(int_byref(wimp),\
+           double_byref(m),double_byref(sigmap_SI),\
+           double_byref(sigman_SI),double_byref(sigmap_SD),\
+           double_byref(sigman_SD))
 
 def SetWIMP_longrange(wimp, m, gp, gn, mmed):
-	ddcalc_lib.C_DDCalc_ddcalc_setwimp_longrange(int_byref(wimp),\
-				   double_byref(m),double_byref(gp),\
-				   double_byref(gn),double_byref(mmed))
-	
+  ddcalc_lib.C_DDCalc_ddcalc_setwimp_longrange(int_byref(wimp),\
+           double_byref(m),double_byref(gp),\
+           double_byref(gn),double_byref(mmed))
+
 def SetWIMP_NREffectiveTheory(wimp, m, spin):
-	ddcalc_lib.C_DDCalc_ddcalc_setwimp_nreffectivetheory(int_byref(wimp), \
-					double_byref(m), double_byref(spin))
-	
+  ddcalc_lib.C_DDCalc_ddcalc_setwimp_nreffectivetheory(int_byref(wimp), \
+          double_byref(m), double_byref(spin))
+
 def SetWIMP_NREFT_CPT(wimp, m, spin):
-	ddcalc_lib.C_DDCalc_ddcalc_setwimp_nreft_cpt(int_byref(wimp),\
-					  double_byref(m), double_byref(spin))
-	
+  ddcalc_lib.C_DDCalc_ddcalc_setwimp_nreft_cpt(int_byref(wimp),\
+            double_byref(m), double_byref(spin))
+
 def SetNRCoefficient(wimp, OpIndex, tau, value):
-	ddcalc_lib.C_DDCalc_ddcalc_setnrcoefficient(int_byref(wimp), \
-					 int_byref(OpIndex), int_byref(tau), double_byref(value))
+  ddcalc_lib.C_DDCalc_ddcalc_setnrcoefficient(int_byref(wimp), \
+           int_byref(OpIndex), int_byref(tau), double_byref(value))
 ###############################################################################
 
 
 
 ##### Set Halo properties #####################################################
 def SetSHM(halo, rho, vrot, v0, vesc):
-	ddcalc_lib.C_DDCalc_ddcalc_setshm(int_byref(halo), \
-				   double_byref(rho), double_byref(vrot), \
-				   double_byref(v0), double_byref(vesc))
+  ddcalc_lib.C_DDCalc_ddcalc_setshm(int_byref(halo), \
+           double_byref(rho), double_byref(vrot), \
+           double_byref(v0), double_byref(vesc))
 
 def HaloFromFile(halo, rho, Nvmin, gcol):
-	ddcalc_lib.C_DDCalc_ddcalc_halofromfile(int_byref(halo), \
-				   double_byref(rho), int_byref(Nvmin), \
-				   int_byref(gcol))
+  ddcalc_lib.C_DDCalc_ddcalc_halofromfile(int_byref(halo), \
+           double_byref(rho), int_byref(Nvmin), \
+           int_byref(gcol))
 ###############################################################################
 
 
 ##### Set or retrieve detector properties #####################################
 def SetDetectorEmin(detector, Emin):
-	ddcalc_lib.C_DDCalc_ddcalc_setdetectoremin(int_byref(detector),\
-					double_byref(Emin))
+  ddcalc_lib.C_DDCalc_ddcalc_setdetectoremin(int_byref(detector),\
+          double_byref(Emin))
 
 def Bins(detector):
-	return ddcalc_lib.C_DDRates_ddcalc_bins(int_byref(detector))
+  return ddcalc_lib.C_DDRates_ddcalc_bins(int_byref(detector))
 
 def BinEvents(detector, BinIndex):
-	return ddcalc_lib.C_DDRates_ddcalc_binevents(int_byref(detector), \
-						  int_byref(BinIndex))
-	
-def BinBackground(detector, BinIndex):
-	ddcalc_lib.C_DDRates_ddcalc_binbackground.restype = ctypes.c_double
-	return ddcalc_lib.C_DDRates_ddcalc_binbackground(int_byref(detector), \
-						  int_byref(BinIndex))
-	
-def BinSignal(detector, BinIndex):
-	ddcalc_lib.C_DDRates_ddcalc_binsignal.restype = ctypes.c_double
-	return ddcalc_lib.C_DDRates_ddcalc_binsignal(int_byref(detector), \
-						  int_byref(BinIndex))
+  return ddcalc_lib.C_DDRates_ddcalc_binevents(int_byref(detector), \
+              int_byref(BinIndex))
 
-	
+def BinBackground(detector, BinIndex):
+  ddcalc_lib.C_DDRates_ddcalc_binbackground.restype = ctypes.c_double
+  return ddcalc_lib.C_DDRates_ddcalc_binbackground(int_byref(detector), \
+              int_byref(BinIndex))
+
+def BinSignal(detector, BinIndex):
+  ddcalc_lib.C_DDRates_ddcalc_binsignal.restype = ctypes.c_double
+  return ddcalc_lib.C_DDRates_ddcalc_binsignal(int_byref(detector), \
+              int_byref(BinIndex))
+
+
 ###############################################################################
-	
-	
-	
-##### Calculate rates #########################################################	
+
+
+
+##### Calculate rates #########################################################
 def CalcRates(detector, wimp, halo):
-	ddcalc_lib.C_DDRates_ddcalc_calcrates(int_byref(detector),\
-								   int_byref(wimp), int_byref(halo))
-###############################################################################	
+  ddcalc_lib.C_DDRates_ddcalc_calcrates(int_byref(detector),\
+                   int_byref(wimp), int_byref(halo))
+###############################################################################
 
 
 ##### Inspect results of calculations #########################################
 def Events(detector):
-	return ddcalc_lib.C_DDRates_ddcalc_events(int_byref(detector))		
-	
+  return ddcalc_lib.C_DDRates_ddcalc_events(int_byref(detector))
+
 def Background(detector):
-	ddcalc_lib.C_DDRates_ddcalc_background.restype = ctypes.c_double
-	return ddcalc_lib.C_DDRates_ddcalc_background(int_byref(detector))	
-	
+  ddcalc_lib.C_DDRates_ddcalc_background.restype = ctypes.c_double
+  return ddcalc_lib.C_DDRates_ddcalc_background(int_byref(detector))
+
 def Signal(detector):
-	ddcalc_lib.C_DDRates_ddcalc_signal.restype = ctypes.c_double
-	return ddcalc_lib.C_DDRates_ddcalc_signal(int_byref(detector))
+  ddcalc_lib.C_DDRates_ddcalc_signal.restype = ctypes.c_double
+  return ddcalc_lib.C_DDRates_ddcalc_signal(int_byref(detector))
 
 def LogLikelihood(detector):
-	ddcalc_lib.C_DDStats_ddcalc_loglikelihood.restype = ctypes.c_double
-	return ddcalc_lib.C_DDStats_ddcalc_loglikelihood(int_byref(detector))
+  ddcalc_lib.C_DDStats_ddcalc_loglikelihood.restype = ctypes.c_double
+  return ddcalc_lib.C_DDStats_ddcalc_loglikelihood(int_byref(detector))
 
 def ScaleToPValue(detector, logp=-2.302585):
-	ddcalc_lib.C_DDStats_ddcalc_scaletopvalue.restype = ctypes.c_double
-	return ddcalc_lib.C_DDStats_ddcalc_scaletopvalue(int_byref(detector), \
-					  double_byref(logp))
-	
+  ddcalc_lib.C_DDStats_ddcalc_scaletopvalue.restype = ctypes.c_double
+  return ddcalc_lib.C_DDStats_ddcalc_scaletopvalue(int_byref(detector), \
+            double_byref(logp))
+
 def FeldmanCousinsUpper(LnP, N, B):
-	ddcalc_lib.C_DDStats_ddcalc_feldmancousinsupper.restype = ctypes.c_double
-	return ddcalc_lib.C_DDStats_ddcalc_feldmancousinsupper(double_byref(LnP), \
-				int_byref(N), double_byref(B))
-	
+  ddcalc_lib.C_DDStats_ddcalc_feldmancousinsupper.restype = ctypes.c_double
+  return ddcalc_lib.C_DDStats_ddcalc_feldmancousinsupper(double_byref(LnP), \
+        int_byref(N), double_byref(B))
+
 def FeldmanCousinsLower(LnP, N, B):
-	ddcalc_lib.C_DDStats_ddcalc_feldmancousinslower.restype = ctypes.c_double
-	return ddcalc_lib.C_DDStats_ddcalc_feldmancousinslower(double_byref(LnP), \
-				int_byref(N), double_byref(B))
-###############################################################################	
+  ddcalc_lib.C_DDStats_ddcalc_feldmancousinslower.restype = ctypes.c_double
+  return ddcalc_lib.C_DDStats_ddcalc_feldmancousinslower(double_byref(LnP), \
+        int_byref(N), double_byref(B))
+###############################################################################
 
 
 
 ##### Memory cleanup ##########################################################
 def FreeWIMPs():
-	ddcalc_lib.C_DDUtils_ddcalc_freewimps()
-	
+  ddcalc_lib.C_DDUtils_ddcalc_freewimps()
+
 def FreeHalos():
-	ddcalc_lib.C_DDUtils_ddcalc_freehalos()
-	
+  ddcalc_lib.C_DDUtils_ddcalc_freehalos()
+
 def FreeDetectors():
-	ddcalc_lib.C_DDUtils_ddcalc_freedetectors()
-	
+  ddcalc_lib.C_DDUtils_ddcalc_freedetectors()
+
 def FreeAll():
-	ddcalc_lib.C_DDUtils_ddcalc_freeall()
-###############################################################################	
+  ddcalc_lib.C_DDUtils_ddcalc_freeall()
+###############################################################################
