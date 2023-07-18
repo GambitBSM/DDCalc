@@ -129,6 +129,7 @@ TYPE, PUBLIC :: DetectorStruct
   ! 0: TotalPoisson
   ! 1: BinnedPoisson
   ! 2: MaxGap
+  ! 3: Tabulated likelihood
   INTEGER :: StatisticFlag = -1
 
   ! Label --------------------------------------
@@ -190,10 +191,19 @@ TYPE, PUBLIC :: DetectorStruct
   ! Number of bins with efficiencies.
   ! Will calculate rates for each bin plus total.
   INTEGER :: Nbins = -1
+
+  ! number of binwise expectation values the likelihood is tabulated for
+  INTEGER :: Nbmus = -1
   
   ! Array of size [1:Niso,1:NE,0:Nbins] with the third index for the
   ! bin (zero for full range)
   REAL*8, ALLOCATABLE :: eff(:,:,:)  
+
+  ! Array of size [Nbmus] containing the binwise expectation values
+  REAL*8, ALLOCATABLE :: binmus(:)  
+
+  ! Array of size [NBins, NBmus] containing the likelihood table
+  REAL*8, ALLOCATABLE :: lltable(:,:)
   
   ! Form factors -------------------------------
   ! Tabulated form factors combined with prefactors.
