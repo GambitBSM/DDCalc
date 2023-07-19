@@ -676,7 +676,7 @@ FUNCTION BinwiseLikelihood(D, x) RESULT(lnlike)
   lnlike = 0.0
   DeltaMu = D%MUMAX / (D%NBMus -1) !size of mu step 
   ! Fill with a maximum likelihood value if the rate is out of scope
-  IF (D%MUMAX /x < MAXVAL(D%MuSignal) ) THEN
+  IF (D%MUMAX /x < MAXVAL(D%MuSignal(1:D%NBMus:1)) ) THEN
     lnlike = HUGE(1.0d0)
   ELSE
     DO ibin = 1, D%Nbins
@@ -685,7 +685,7 @@ FUNCTION BinwiseLikelihood(D, x) RESULT(lnlike)
       LbinLeft  = D%lltable(ibin, jbin)
       LbinRight = D%lltable(ibin, jbin+1)
       MuLeft = (jbin - 1) * D%MUMAX / (D%NBMus -1) !location of left bin
-      lnlike = lnlike + LbinLeft + (LbinRight - LbinLeft) *(muSignalBin - MuLeft) / DeltaMu
+      lnlike = lnlike + LbinLeft + (LbinRight - LbinLeft) *(muSignalBin - MuLeft) / DeltaMu !interpolated likelihood in this bin
     END DO
   END IF
 END FUNCTION
