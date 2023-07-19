@@ -683,5 +683,20 @@ SUBROUTINE CPUTimeElapsedRoutine(t,reset)
   t = t2 - t1
 END SUBROUTINE
 
+SUBROUTINE INTERP1D(X, Y, Npoints, Xvals, Yvals, Nvals)
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: Npoints   ! number of points defining the interpolation
+  REAL*8, INTENT(IN) :: X(Npoints) ! X-values to interpolate between 
+  REAL*8, INTENT(IN) :: Y(Npoints) ! Y-values to interpolate between 
+  INTEGER, INTENT(IN) :: Nvals ! number of points to evaluate at
+  REAL*8, INTENT(IN) :: Xvals(Nvals) ! X-values to interpolate at
+  REAL*8, INTENT(OUT) :: Yvals(Nvals) !interpolated Y-vals for each of the Xvals
+
+  REAL*8 :: Xmin
+  REAL*8 :: Xmax 
+  Xmin = MINVAL(X)
+  Xmax = MAXVAL(X)
+END SUBROUTINE
+
 
 END MODULE

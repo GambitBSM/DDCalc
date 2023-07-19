@@ -100,6 +100,8 @@ FUNCTION LogLikelihood(D, x) RESULT(lnlike)
     END DO
   ELSE IF (D%StatisticFlag .EQ. 2) THEN !MaxGap
       lnlike = LogMaximumGapP(mu,MAXVAL(D%MuSignal(1:D%Nbins))*x0) 
+  ELSE IF (D%StatisticFlag .EQ. 3) THEN !Binwise Tabulated Likelihood
+      lnlike = BinwiseLikelihood(D, x0) 
   END IF
 END FUNCTION
 
@@ -657,6 +659,36 @@ PURE SUBROUTINE LogPoissonSums(N,mu,lnlesum,lngesum)
   END IF
   
 END SUBROUTINE
+
+FUNCTION BinwiseLikelihood(D, x) RESULT(lnlike)
+  IMPLICIT NONE
+  REAL*8 :: lnlike 
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  REAL*8, INTENT(IN) :: x
+  INTEGER :: ibin
+  REAL*8 :: muSignalBin 
+  INTEGER :: jbin
+  REAL*8 :: LBinLeft
+  REAL*8 :: LBinRight
+  REAL*8 :: MuLeft
+  REAL*8 :: DeltaMu
+  ! REAL*8, OPTIONAL:: TotalLikelihood(NBins) ! likelihood summed over bins
+  lnlike = 0.0
+  DeltaMu = D%MUMAX / (D%NBMus -1) !size of mu step 
+  ! Fill with a maximum likelihood value if the rate is out of scope
+  IF (D%MUMAX /x < MAXVAL(D%MuSignal) ) THEN
+    lnlike = HUGE(1.0d0)
+  ELSE
+    DO ibin = 1, D%Nbins
+      muSignalBin = x*D%MuSignal(ibin) !expectation in bin, guaranteed lower than MUMAX
+      jbin = 1 + FLOOR((muSignalBin/D%MUMAX)*(D%NBMus-1)) 
+      LbinLeft  = D%lltable(ibin, jbin)
+      LbinRight = D%lltable(ibin, jbin+1)
+      MuLeft = (jbin - 1) * D%MUMAX / (D%NBMus -1) !location of left bin
+      lnlike = lnlike + LbinLeft + (LbinRight - LbinLeft) *(muSignalBin - MuLeft) / DeltaMu
+    END DO
+  END IF
+END FUNCTION
 
 
 ! ----------------------------------------------------------------------

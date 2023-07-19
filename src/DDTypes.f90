@@ -199,8 +199,8 @@ TYPE, PUBLIC :: DetectorStruct
   ! bin (zero for full range)
   REAL*8, ALLOCATABLE :: eff(:,:,:)  
 
-  ! Array of size [Nbmus] containing the binwise expectation values
-  REAL*8, ALLOCATABLE :: binmus(:)  
+  ! Maximum expectation value in each likelihood bin for tabulated likelihoods
+  REAL*8 :: MUMAX = 0.0 
 
   ! Array of size [NBins, NBmus] containing the likelihood table
   REAL*8, ALLOCATABLE :: lltable(:,:)

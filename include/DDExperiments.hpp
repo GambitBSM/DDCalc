@@ -26,6 +26,7 @@ extern "C"
   int C_DDCalc_pandax_2017_init();
   int C_DDCalc_xenon1t_2017_init();
   int C_DDCalc_xenon1t_2018_init();
+  int C_DDCalc_xenon1t_2022_init();
   int C_DDCalc_lux_2015_init();
   int C_DDCalc_pico_2l_init();
   int C_DDCalc_pico_60_init();
@@ -92,6 +93,11 @@ namespace DDCalc
   int XENON1T_2018_Init()
   {
     C_DDCalc_xenon1t_2018_init();
+  }
+
+  int XENON1T_2022_Init()
+  {
+    C_DDCalc_xenon1t_2022_init();
   }
 
   int LUX_2015_Init()

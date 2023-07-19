@@ -47,6 +47,7 @@ def InitExperiment(ExperimentName):
 'PandaX_2017' : ddcalc_lib.C_DDCalc_pandax_2017_init(),
 'Xenon1T_2017' : ddcalc_lib.C_DDCalc_xenon1t_2017_init(),
 'Xenon1T_2018' : ddcalc_lib.C_DDCalc_xenon1t_2018_init(),
+'Xenon1T_2022' : ddcalc_lib.C_DDCalc_xenon1t_2022_init(),
 'LUX_2015' : ddcalc_lib.C_DDCalc_lux_2015_init(),
 'PICO_2L' : ddcalc_lib.C_DDCalc_pico_2l_init(),
 'PICO_60' : ddcalc_lib.C_DDCalc_pico_60_init(),
