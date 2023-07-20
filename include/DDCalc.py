@@ -160,6 +160,11 @@ def BinSignal(detector, BinIndex):
   return ddcalc_lib.C_DDRates_ddcalc_binsignal(int_byref(detector), \
               int_byref(BinIndex))
 
+def BindRdE(detector, BinIndex):
+  ddcalc_lib.C_DDRates_ddcalc_bindrde.restype = ctypes.c_double
+  return ddcalc_lib.C_DDRates_ddcalc_bindrde(int_byref(detector), \
+              int_byref(BinIndex))
+
 
 ###############################################################################
 
