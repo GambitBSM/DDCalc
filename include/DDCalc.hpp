@@ -76,6 +76,7 @@ extern "C"
   int C_DDRates_ddcalc_binevents(const int&, const int&);          // Number of events in each bin
   double C_DDRates_ddcalc_binbackground(const int&, const int&);   // Number of expected backgrounds in each bin
   double C_DDRates_ddcalc_binsignal(const int&, const int&);   // Number of expected signal in each bin
+  double C_DDRates_ddcalc_bindrde(const int&, const int&);   // total dRdE in an energy bin for a detector
 
   // Do memory cleanup
   void C_DDUtils_ddcalc_freewimps();
@@ -285,6 +286,11 @@ namespace DDCalc
   double BinSignal(const int DetectorIndex, const int BinIndex)
   {
     return C_DDRates_ddcalc_binsignal(DetectorIndex, BinIndex);
+  }
+  // Read off the recoil spectrum  for the specified analysis, for a given energy bin
+  double BindRdE(const int DetectorIndex, const int BinIndex)
+  {
+    return C_DDRates_ddcalc_bindrde(DetectorIndex, BinIndex);
   }
   
   // Read off the log-likelihoods for the specificed analysis; note these
