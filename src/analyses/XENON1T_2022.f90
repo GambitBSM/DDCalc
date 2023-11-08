@@ -2,7 +2,8 @@ MODULE XENON1T_2022
 
 !=======================================================================
 ! XENON1T 2022 ANALYSIS ROUTINES
-! Based upon arXiv:1805.12562.  
+! Based upon https://arxiv.org/abs/2210.07231
+! which gives an approximate likelihood for arXiv:1805.12562.
 !=======================================================================
 
 USE DDTypes
