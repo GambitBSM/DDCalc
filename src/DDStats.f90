@@ -688,6 +688,7 @@ FUNCTION BinwiseLikelihood(D, x) RESULT(lnlike)
       lnlike = lnlike + LbinLeft + (LbinRight - LbinLeft) *(muSignalBin - MuLeft) / DeltaMu !interpolated likelihood in this bin
     END DO
   END IF
+  lnlike = -0.5 * lnlike !table is +2*log-likelihood ratio
 END FUNCTION
 
 
