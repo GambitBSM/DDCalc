@@ -30,11 +30,13 @@ PUBLIC :: DDCalc_Events,DDCalc_Background
 PUBLIC :: DDCalc_Signal,DDCalc_Bins
 PUBLIC :: DDCalc_BinEvents,DDCalc_BinBackground
 PUBLIC :: DDCalc_BinSignal
+PUBLIC :: DDCalc_BindRdE
 
 PUBLIC :: C_DDCalc_Events,C_DDCalc_Background
 PUBLIC :: C_DDCalc_Signal, C_DDCalc_Bins
 PUBLIC :: C_DDCalc_BinEvents,C_DDCalc_BinBackground
 PUBLIC :: C_DDCalc_BinSignal
+PUBLIC :: C_DDCalc_BindRdE
 
 INTERFACE DDCalc_Events
   MODULE PROCEDURE GetEvents
@@ -56,6 +58,9 @@ INTERFACE DDCalc_BinBackground
 END INTERFACE
 INTERFACE DDCalc_BinSignal
   MODULE PROCEDURE GetBinSignal
+END INTERFACE
+INTERFACE DDCalc_BindRdE
+  MODULE PROCEDURE GetBindRdE
 END INTERFACE
 
 CONTAINS
@@ -666,6 +671,44 @@ REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BinSignal(DetectorIndex, BinIndex) &
   INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
   IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
   C_DDCalc_BinSignal = REAL(GetBinSignal(Detectors(DetectorIndex)%p, BinIndex),KIND=C_DOUBLE)
+END FUNCTION
+
+! ----------------------------------------------------------------------
+! Returns the recoil spectrum for a certain energy index, 
+! summed over the isotopes of the detector
+! 
+! Required input argument:
+!   D           A DetectorStruct containing detector info.
+!   ibin        Index of the energy bin to be returned.
+! 
+FUNCTION GetBindRdE(D, ibin) RESULT(ret)
+  IMPLICIT NONE
+  REAL*8 :: ret
+  TYPE(DetectorStruct), INTENT(IN) :: D
+  INTEGER, INTENT(IN) :: ibin
+  INTEGER :: iiso
+  ret = 0.
+
+  IF ((ibin >= 0) .AND. (ibin <= D%NE)) THEN
+    DO iiso = 1, D%NIso
+    ret = ret + D%dRdEiso(ibin,iiso)
+    END DO
+  ELSE
+    stop 'Bin index out of range!'
+  END IF
+END FUNCTION
+
+!-----------------------------------------------------------------------
+! C/C++ wrapper for DDCalc_GetBindRdE
+!
+REAL(KIND=C_DOUBLE) FUNCTION C_DDCalc_BindRdE(DetectorIndex, BinIndex) &
+ BIND(C,NAME='C_DDRates_ddcalc_bindrde')
+  USE ISO_C_BINDING, only: C_DOUBLE, C_INT
+  IMPLICIT NONE
+  INTEGER(KIND=C_INT), INTENT(IN) :: DetectorIndex
+  INTEGER(KIND=C_INT), INTENT(IN) :: BinIndex
+  IF (.NOT. ASSOCIATED(Detectors(DetectorIndex)%p)) stop 'Invalid detector index given to C_DDCalc_Events'
+  C_DDCalc_BindRdE = REAL(GetBindRdE(Detectors(DetectorIndex)%p, BinIndex),KIND=C_DOUBLE)
 END FUNCTION
 
 END MODULE

@@ -47,6 +47,7 @@ def InitExperiment(ExperimentName):
 'PandaX_2017' : ddcalc_lib.C_DDCalc_pandax_2017_init(),
 'Xenon1T_2017' : ddcalc_lib.C_DDCalc_xenon1t_2017_init(),
 'Xenon1T_2018' : ddcalc_lib.C_DDCalc_xenon1t_2018_init(),
+'Xenon1T_2022' : ddcalc_lib.C_DDCalc_xenon1t_2022_init(),
 'LUX_2015' : ddcalc_lib.C_DDCalc_lux_2015_init(),
 'PICO_2L' : ddcalc_lib.C_DDCalc_pico_2l_init(),
 'PICO_60' : ddcalc_lib.C_DDCalc_pico_60_init(),
@@ -157,6 +158,11 @@ def BinBackground(detector, BinIndex):
 def BinSignal(detector, BinIndex):
   ddcalc_lib.C_DDRates_ddcalc_binsignal.restype = ctypes.c_double
   return ddcalc_lib.C_DDRates_ddcalc_binsignal(int_byref(detector), \
+              int_byref(BinIndex))
+
+def BindRdE(detector, BinIndex):
+  ddcalc_lib.C_DDRates_ddcalc_bindrde.restype = ctypes.c_double
+  return ddcalc_lib.C_DDRates_ddcalc_bindrde(int_byref(detector), \
               int_byref(BinIndex))
 
 
